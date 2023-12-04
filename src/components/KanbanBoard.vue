@@ -1,12 +1,17 @@
 <template>
   <!-- 드래그엔 드랍이 가능한 칸반보드 (한일, 보류, 할일) -->
   <div class="kanban-container">
+    <section class="kanban-action-menue-bar">
+      <!-- 칸반 추가 버튼 -->
+      <!-- 필터 버튼 -->
+    </section>
     <div class="kanban-container-boards">
+
       <div class="kanban-container-boards__panel">
         <!-- 칸반 카드 입니다. (드래그엔드랍기능) -->
         <header class="kanban-container-boards__panel-header">
-          <h1>할일</h1>
-          <menu class="왼쪽 버튼">열기</menu>
+          <h1 class="kanban-class">할일</h1>
+          <menu class="kanban-menu">메뉴</menu>
         </header>
         <KanbanBoardCard ref="kanbanBoardCard" />
       </div>
@@ -28,7 +33,7 @@ import KanbanBoardCard from "@/components/KanbanBoardCard.vue";
 <style scoped lang="scss">
 .kanban-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
   gap: 20px;
@@ -73,5 +78,19 @@ import KanbanBoardCard from "@/components/KanbanBoardCard.vue";
     font-weight: 700;
     padding: 0 10px;
   }
+
+  .kanban-class {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  // 확장 메뉴 버튼
+  .kanban-menu {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
 }
 </style>

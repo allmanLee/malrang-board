@@ -4,6 +4,9 @@
       <div class="kanban-board-card-header-title">
         카드 제목
       </div>
+      <div class="kanban-board-card-header__menu">
+        메뉴
+      </div>
     </div>
     <div class="kanban-board-card-body">
       카드 내용
@@ -33,7 +36,7 @@
   max-height: 600px;
   background-color: #3b3b3b;
   border-radius: 10px;
-  padding: 20px;
+  padding: 0 20px;
 
   .kanban-board-card-header {
     display: flex;
@@ -41,10 +44,15 @@
     justify-content: space-between;
     width: 100%;
     height: 50px;
-    padding: 20px;
 
     .kanban-board-card-header-title {
-      font-size: 20px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .kanban-board-card-header__menu {
+      font-size: 14px;
       font-weight: 700;
       color: #ffffff;
     }
@@ -53,13 +61,11 @@
   .kanban-board-card-body {
     display: flex;
     flex-direction: row;
-    align-items: center;
     justify-content: space-between;
     gap: 20px;
     width: 100%;
-    height: 50px;
-    background-color: #2b2b2b;
-    padding: 20px;
+    max-height: 200px;
+    // background-color: #2b2b2b;
 
     .kanban-board-card-body-title {
       font-size: 20px;
@@ -76,12 +82,13 @@
     gap: 20px;
     width: 100%;
     height: 50px;
-    background-color: #2b2b2b;
-    padding: 20px;
 
     .kanban-board-card-tags-tag {
-      font-size: 20px;
+      font-size: 14px;
       font-weight: 700;
+      background-color: #ca1a1a;
+      padding: 0 10px;
+      border-radius: 10px;
       color: #ffffff;
     }
   }
