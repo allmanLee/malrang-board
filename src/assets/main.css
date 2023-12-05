@@ -7,3 +7,8 @@
 
   font-weight: normal;
 }
+
+/* 폼 라벨 너비 */
+.el-form-item__label {
+  min-width: 100px;
+}
