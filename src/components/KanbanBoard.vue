@@ -23,27 +23,47 @@
       </div>
     </div>
     <!-- 팝업 메뉴 -->
-    <el-dialog class="dark" :title="`노트 추가`" v-model="dialogVisible" :before-close="modalKanban.dialogVisible">
-      <el-form>
-        <el-form-item label="담당자">
+    <el-dialog class="dark" :title="`노트 추가`" v-model="modalKanban.dialogVisible" :before-close="modalKanban.beforeClose">
+      <el-form class="form-wrap">
+        <el-form-item label-width="60px" size="large" label="담당자">
           <el-input v-model="form.user" placeholder="담당자를 입력하세요"></el-input>
         </el-form-item>
-        <el-form-item label="제목">
+        <el-form-item label-width="60px" size="large" label="제목">
           <el-input v-model="form.title" placeholder="제목을 입력하세요"></el-input>
         </el-form-item>
-        <el-form-item label="내용">
-          <el-input v-model="form.description" :rows="12" class="form-textarea" type="textarea"
-            placeholder="내용을 입력하세요"></el-input>
-        </el-form-item>
-        <el-form-item label="태그">
-
+        <el-form-item label-width="60px" label="태그">
           <el-input class="tag__input" v-model="form.tag" placeholder="태그를 입력하세요" @keyup.enter="handleAddTag"></el-input>
-          <div class="tag-container">
+          <div class="tag-co∂ntainer">
             <el-tag v-for="tag in form.tags" :key="tag.id" :type="tag.color" closable @close="handleCloseTag(tag)">
               {{ tag.title }}
             </el-tag>
           </div>
         </el-form-item>
+        <el-form-item label="">
+          <!-- <el-input v-model="form.description" :rows="12" class="form-textarea" type="textarea"
+            placeholder="내용을 입력하세요"></el-input> -->
+          <!-- 전체화면으로 버튼 -->
+          <div class="tool-bar">
+            <el-tooltip class="item" effect="dark" content="전체화면" placement="top">
+              <i @click="editorRef.togglePageFullscreen(true)">
+                <el-icon>
+                  <FullScreen />
+                </el-icon>
+              </i>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="미리보기" placement="top">
+              <i @click="editorRef.togglePreview()">
+                <el-icon>
+                  <View />
+                </el-icon>
+              </i>
+            </el-tooltip>
+          </div>
+          <div class="md-editor">
+            <md-editor ref="editorRef" language="en-US" :scrollAuto="true" theme="dark" v-model="form.description" />
+          </div>
+        </el-form-item>
+
       </el-form>
       <!-- eslint-disable-next-line vue/no-deprecated-slot-attribute -->
       <span slot="footer" class="dialog-footer">
@@ -51,17 +71,34 @@
         <el-button type="primary" @click="handleSave">저장</el-button>
       </span>
     </el-dialog>
+
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, reactive } from "vue";
 import { Board, Card } from "@/types/KanbanBoard.ts";
+
+// MD 에디터
+// import { MdPreview, MdCatalog } from 'md-editor-v3';
+// import 'md-editor-v3/lib/preview.css';
+
+import { MdEditor } from 'md-editor-v3';
+import "md-editor-v3/lib/style.css";
+
 
 const props = defineProps<{
   boards: Board[];
 }>();
 
 const boards = props.boards
+
+// 전체화면
+const editorRef = ref(null)
+// const isFullScreen = ref(false)
+
+nextTick(() => {
+  console.log(editorRef.value)
+})
 
 // 칸반 카드 데이터 (MOCKUP)
 const cards = ref<Card[]>([
@@ -132,28 +169,37 @@ const handleSave = () => {
   form.value.description = "";
   form.value.tags = [];
   form.value.tag = "";
-  dialogVisible.value = false;
+  // dialogVisible.value = false;
 };
 
 
-// 팝업 객체
-const popup = class {
-  dialogVisible = false;
-  handleClose(done: any) {
-    // this.$confirm("정말 취소하시겠습니까?").then(() => {
-    //   done();
-    // });
-    console.log("닫힘")
-    done();
+
+
+// 팝업 클래스 (모달) 상태, 열기, 닫기
+class ModalKanban {
+  private dialogVisible: boolean = false;
+  open() {
+    this.dialogVisible = true;
   }
-};
+  close() {
+    this.dialogVisible = false;
+  }
+  beforeClose(done) {
+    const isClose = window.confirm("작성중인 내용이 있습니다. 정말 닫으시겠습니까?");
+    if (isClose) {
+      this.dialogVisible = false;
+      done();
+    }
+  }
+}
 
-const modalKanban = new popup();
-const dialogVisible = ref(false);
+
+const modalKanban = reactive(new ModalKanban());
+
 
 
 const handleClickNoteAdd = () => {
-  dialogVisible.value = true;
+  modalKanban.open();
 };
 
 
@@ -162,6 +208,9 @@ const handleClickNoteAdd = () => {
 
 // 사용한 컴포넌트
 import KanbanBoardCard from "@/components/KanbanBoardCard.vue";
+import { is } from "cypress/types/bluebird";
+import { watch } from "fs";
+import { nextTick } from "process";
 
 // 드래그 앤 드랍 기능
 
@@ -234,6 +283,12 @@ import KanbanBoardCard from "@/components/KanbanBoardCard.vue";
 
 
   // 폼
+  .form-wrap {
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #1f1f1f;
+  }
+
   .el-form-item__content {
     color: #ffffff;
   }
@@ -261,6 +316,28 @@ import KanbanBoardCard from "@/components/KanbanBoardCard.vue";
 
 
 .dialog-footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  width: 100%;
+  height: 50px;
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.md-editor {
+  width: 100%;
+  height: 300px;
+  background-color: black;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.tool-bar {
   display: flex;
   flex-direction: row;
   align-items: center;
