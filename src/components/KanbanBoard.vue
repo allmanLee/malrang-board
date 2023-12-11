@@ -32,12 +32,12 @@
           <el-input v-model="form.title" placeholder="제목을 입력하세요"></el-input>
         </el-form-item>
         <el-form-item label="내용">
-          <el-input v-model="form.description" type="textarea" placeholder="내용을 입력하세요"></el-input>
+          <el-input v-model="form.description" :rows="12" class="form-textarea" type="textarea"
+            placeholder="내용을 입력하세요"></el-input>
         </el-form-item>
         <el-form-item label="태그">
 
-          <el-input class="tag__input" v-model="form.tag" placeholder="태그를 입력하세요"
-            @keyup.enter.native="handleAddTag"></el-input>
+          <el-input class="tag__input" v-model="form.tag" placeholder="태그를 입력하세요" @keyup.enter="handleAddTag"></el-input>
           <div class="tag-container">
             <el-tag v-for="tag in form.tags" :key="tag.id" :type="tag.color" closable @close="handleCloseTag(tag)">
               {{ tag.title }}
@@ -257,5 +257,19 @@ import KanbanBoardCard from "@/components/KanbanBoardCard.vue";
   .tag-container {
     margin-bottom: 10px;
   }
+}
+
+
+.dialog-footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  width: 100%;
+  height: 50px;
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
 }
 </style>

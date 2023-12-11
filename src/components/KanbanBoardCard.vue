@@ -12,7 +12,7 @@
           <Delete />
         </el-icon>
         <el-icon class="kanban-menu menu-icon">
-          <Edit />
+          <MoreFilled />
         </el-icon>
       </div>
 
@@ -82,15 +82,46 @@
       font-size: 16px;
       font-weight: 700;
       color: #ffffff;
-      gap: 10px;
-      padding: 10px;
+
+
       border-radius: 12px;
       box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
       background-color: #1b1b1b;
-
-
     }
+
+    .kanban-board-card-header__menu {
+      display: none;
+    }
+
+    .menu-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 12px;
+      cursor: pointer;
+
+      .kanban-delete {
+        color: #ffffff;
+        border-radius: 0 12px 12px 0;
+      }
+
+      .kanban-menu {
+        color: #ffffff;
+        border-radius: 12px 0 0 12px;
+      }
+    }
+
+    // 칸반 카드 메뉴 아이콘 호버했을때
+    .menu-icon:hover {
+      background-color: #2b2b2b;
+    }
+
+
+
   }
+
 
   .kanban-board-card-body {
     display: flex;
@@ -158,17 +189,19 @@ div.solid {
 
   .el-badge {
     display: flex;
-    margin-top: 4px;
+    margin-top: px;
   }
 
 }
 
-.el-badge {
-  display: flex;
-  margin-top: -4px;
-}
+
 
 // hover
+
+.kanban-board-card:hover .kanban-board-card-header__menu {
+  display: flex;
+}
+
 .kanban-board-card:hover {
   background-color: #4b4b4b;
 }
