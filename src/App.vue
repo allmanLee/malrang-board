@@ -1,5 +1,14 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import { useDark, useToggle } from '@vueuse/core'
+
+import { ref } from 'vue'
+
+let isDark = ref(false)
+
+isDark.value = useDark()
+const toggleDarkMode = useToggle(isDark)
+
 
 </script>
 <template>
@@ -12,8 +21,11 @@ import { RouterLink, RouterView } from 'vue-router'
       <router-link to="/about">About</router-link> |
       <router-link to="/mypage">MyPage</router-link>
     </nav>
+    <el-button type="primary" @click="toggleDarkMode">
+      {{ isDark ? true : false }}
+    </el-button>
   </header>
-  <div class="main">
+  <div class="main dark">
     <RouterView />
   </div>
 </template>

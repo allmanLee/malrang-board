@@ -7,27 +7,19 @@
     <section>
       <h1>칸반보드</h1>
       <p>할일, 보류, 한일</p>
-      <KanbanBoard />
-    </section>
-    <!-- 오늘 할일, 한일 기록 -->
-    <section>
-      <h1>오늘 할일, 한일 기록</h1>
-      <p>오늘 할일, 한일 기록</p>
-      <!-- <Today /> -->
+      <KanbanBoard :boards="boards" />
     </section>
     <!-- 링크 모음 -->
-    <section>
+    <!-- <section>
       <h1>링크 모음</h1>
       <p>링크 모음</p>
-      <!-- <Link /> -->
-    </section>
+    </section> -->
 
     <!-- 깃허브 커밋 내역 -->
-    <section>
+    <!-- <section>
       <h1>깃허브 커밋 내역</h1>
       <p>깃허브 커밋 내역</p>
-      <!-- <Github /> -->
-    </section>
+    </section> -->
 
   </div>
 </template>
@@ -36,6 +28,33 @@ import KanbanBoard from "@/components/KanbanBoard.vue";
 // import Today from "@/components/Today.vue";
 // import Link from "@/components/Link.vue";
 // import Github from "@/components/Github.vue";
+
+import { ref } from "vue";
+import { Board } from "@/types/KanbanBoard.ts";
+
+// 목업 데이터
+const boards = ref<Board[]>(
+  [
+    {
+      id: 1,
+      status: "todo",
+      title: "할일",
+      user_idx: 1
+    },
+    {
+      id: 2,
+      status: "pending",
+      title: "보류",
+      user_idx: 1
+    },
+    {
+      id: 3,
+      status: "done",
+      title: "한일",
+      user_idx: 1
+    },
+  ]
+)
 
 
 </script>
