@@ -12,19 +12,22 @@
         <header class="kanban-container-boards__panel-header">
           <h1 class="kanban-class">{{ board.title }}</h1>
           <el-tooltip class="item" effect="dark" content="노트 추가" placement="top">
-            <i @click="handleClickNoteAdd"> <el-icon class="kanban-menu">
+            <i @click="handleClickNoteAdd(board.id)"> <el-icon class="kanban-menu">
                 <Edit />
               </el-icon>
             </i>
           </el-tooltip>
           <!-- 추가기능 아이콘 (추가하기) -->
         </header>
-        <KanbanBoardCard ref="kanbanBoardCard" v-for="card in cards" :key="card.id" :card="card" />
+        <KanbanBoardCard ref="kanbanBoardCard" v-for="card in cards.filter(el => el.board_idx === board.id)"
+          :key="card.id" :card="card" />
+
+
       </div>
     </div>
     <!-- 팝업 메뉴 -->
     <el-dialog class="dark" :title="`노트 추가`" v-model="modalKanban.dialogVisible" :before-close="modalKanban.beforeClose">
-      <el-form class="form-wrap">
+      <!-- <el-form class="form-wrap">
         <el-form-item label-width="60px" size="large" label="담당자">
           <el-input v-model="form.user" placeholder="담당자를 입력하세요"></el-input>
         </el-form-item>
@@ -40,9 +43,6 @@
           </div>
         </el-form-item>
         <el-form-item label="">
-          <!-- <el-input v-model="form.description" :rows="12" class="form-textarea" type="textarea"
-            placeholder="내용을 입력하세요"></el-input> -->
-          <!-- 전체화면으로 버튼 -->
           <div class="tool-bar">
             <el-tooltip class="item" effect="dark" content="전체화면" placement="top">
               <i @click="editorRef.togglePageFullscreen(true)">
@@ -64,14 +64,13 @@
           </div>
         </el-form-item>
 
-      </el-form>
+      </el-form> -->
       <!-- eslint-disable-next-line vue/no-deprecated-slot-attribute -->
       <span slot="footer" class="dialog-footer">
-        <el-button @click="modalKanban.dialogVisible = false">취소</el-button>
-        <el-button type="primary" @click="handleSave">저장</el-button>
+        <el-button @click="modalKanban.close()">취소</el-button>
+        <el-button type="primary" @click="handleSave(selectedBoardId)">저장</el-button>
       </span>
     </el-dialog>
-
   </div>
 </template>
 <script setup lang="ts">
@@ -91,6 +90,8 @@ const props = defineProps<{
 }>();
 
 const boards = props.boards
+const selectedBoardId = ref(0)
+
 
 // 전체화면
 const editorRef = ref(null)
@@ -104,7 +105,7 @@ nextTick(() => {
 const cards = ref<Card[]>([
   {
     id: 1,
-    title: "카드 제목",
+    title: "테스트 카드",
     description: "카드 내용",
     created_date: "2021-10-10",
     user_idx: 1,
@@ -117,7 +118,7 @@ const cards = ref<Card[]>([
     commit: [
       {
         id: 1,
-        title: "fix: 말랑보드 칸반 만크업 완료",
+        title: "fix: 말랑보드 칸반 크업 완료",
         created_date: "2021-10-10",
         user_idx: 1,
         card_idx: 2,
@@ -136,6 +137,7 @@ const form = ref({
   tag: "",
 });
 
+
 // 태그 추가
 const handleAddTag = () => {
   if (form.value.tag) {
@@ -153,23 +155,21 @@ const handleCloseTag = (tag: any) => {
   form.value.tags.splice(form.value.tags.indexOf(tag), 1);
 };
 
-// 저장
-const handleSave = () => {
-  cards.value.push({
+// 저장 boardId를 받아서 Form 데이터를 가진 카드를 저장
+const handleSave = (boardId) => {
+  console.log(boardId);
+  const card = {
     id: cards.value.length + 1,
     title: form.value.title,
     description: form.value.description,
     created_date: "2021-10-10",
     user_idx: 1,
-    board_idx: 1,
+    board_idx: boardId,
     tags: form.value.tags,
     commit: [],
-  });
-  form.value.title = "";
-  form.value.description = "";
-  form.value.tags = [];
-  form.value.tag = "";
-  // dialogVisible.value = false;
+  };
+  cards.value.push(card);
+  modalKanban.close();
 };
 
 
@@ -177,7 +177,7 @@ const handleSave = () => {
 
 // 팝업 클래스 (모달) 상태, 열기, 닫기
 class ModalKanban {
-  private dialogVisible: boolean = false;
+  dialogVisible: boolean = false;
   open() {
     this.dialogVisible = true;
   }
@@ -198,7 +198,8 @@ const modalKanban = reactive(new ModalKanban());
 
 
 
-const handleClickNoteAdd = () => {
+const handleClickNoteAdd = (boardId) => {
+  selectedBoardId.value = boardId
   modalKanban.open();
 };
 

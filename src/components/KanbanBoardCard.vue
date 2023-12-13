@@ -3,7 +3,7 @@
     <div class="kanban-board-card-header">
       <div class="kanban-board-card-header-title">
 
-        <span class="title-text">카드 제목</span>
+        <span class="title-text">{{ card.title }}</span>
         <!-- <el-tag type="info" effect="dark">Cmit</el-tag> -->
       </div>
 
@@ -21,26 +21,31 @@
       <el-tag type="info" effect="dark">Commit</el-tag>
     </div>
     <div class="kanban-board-card-body">
-      카드 내용 (원하는 항목을 추가해주세요.)
+      {{ card.description }}
     </div>
 
     <!-- <div class="solid"></div> -->
-    <div class="commit">
+    <div class="commit" v-if="card.commit[0]">
       <span class="commit__body">
-        fix: 말랑보드 칸반 만크업 완료
+        {{ card.commit[0].title }}
       </span>
       <el-badge value="1"></el-badge>
     </div>
-
   </div>
 </template>
 <script setup lang="ts">
+import KanbanCardCreate from "@/components/ModalKanbanCard.vue";
+import { defineProps } from "vue";
+import { ElIcon } from "element-plus";
+import { ElTag } from "element-plus";
+import { Card } from "@/types/KanbanBoard.ts";
 
-// const props = defineProps<{
-//   board: Board;
-// }>();
+defineProps<{
+  card: Card;
+}>();
 
-// const board = props.board;
+
+
 </script>
 <style scoped lang="scss">
 .kanban-board-card {
@@ -54,6 +59,7 @@
   background-color: #3b3b3b;
   border-radius: 10px;
   padding: 0 20px;
+  padding-bottom: 10px;
 
   .kanban-board-card-header {
     display: flex;
@@ -189,7 +195,7 @@ div.solid {
 
   .el-badge {
     display: flex;
-    margin-top: px;
+    margin-top: 6px;
   }
 
 }
