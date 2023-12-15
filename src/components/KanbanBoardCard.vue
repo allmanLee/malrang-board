@@ -1,25 +1,45 @@
 <template>
   <div class="kanban-board-card">
+    <div class="kanban-board-card--num">
+      <span class="header__card-num">
+        #mb-{{ card.id }}
+      </span> <!-- 복사 버튼 -->
+      <el-tooltip content="번호 복사" placement="top">
+        <el-icon @click.stop="handleClickNumCopy(card.id)" class="kanban-copy">
+          <CopyDocument />
+        </el-icon>
+      </el-tooltip>
+      <el-tooltip content="커밋 메시지 복사" placement="top">
+        <el-icon @click.stop="handleClickCommitCreate(card)" class="kanban-copy">
+          <el-icon>
+            <Ticket />
+          </el-icon>
+        </el-icon>
+      </el-tooltip>
+    </div>
     <div class="kanban-board-card-header">
+      <div class="kanban-board-card-tags">
+        <el-tag v-for="tag in card.tags" :key="tag.id" type="info" effect="dark">{{ tag.title }}</el-tag>
+      </div>
       <div class="kanban-board-card-header-title">
-
-        <span class="title-text">{{ card.title }}</span>
+        <span class="title-text">
+          {{ card.title }}</span>
         <!-- <el-tag type="info" effect="dark">Cmit</el-tag> -->
       </div>
 
       <div class="kanban-board-card-header__menu">
+        <!-- 삭제 아이콘 버튼 -->
         <el-icon class="kanban-delete menu-icon">
           <Delete />
         </el-icon>
+        <!-- 메뉴 아이콘 버튼 -->
         <el-icon class="kanban-menu menu-icon">
           <MoreFilled />
         </el-icon>
       </div>
 
     </div>
-    <div class="kanban-board-card-tags">
-      <el-tag type="info" effect="dark">Commit</el-tag>
-    </div>
+
     <div class="kanban-board-card-body">
       {{ card.description }}
     </div>
@@ -27,7 +47,13 @@
     <!-- <div class="solid"></div> -->
     <div class="commit" v-if="card.commit[0]">
       <span class="commit__body">
+
         {{ card.commit[0].title }}
+        <span class="card-num">
+          <a class="card-num__link" href="">
+            (#mb-{{ card.commit[0].id }})
+          </a>
+        </span>
       </span>
       <el-badge value="1"></el-badge>
     </div>
@@ -39,12 +65,36 @@ import { defineProps } from "vue";
 import { ElIcon } from "element-plus";
 import { ElTag } from "element-plus";
 import { Card } from "@/types/KanbanBoard.ts";
+import { ElMessage } from "element-plus";
 
 defineProps<{
   card: Card;
 }>();
 
+// 카드 번호를 클립보드에  복사합니다.
+const handleClickNumCopy = (id) => {
+  navigator.clipboard.writeText(`#mb-${id}`);
+  // element ui 메시지
+  ElMessage({
+    message: "카드 번호가 복사되었습니다.",
+    type: "success",
+  });
+};
 
+/** function handleClickCommitCreate
+ * @description 커밋 메시지를 생성하여 클립보드에 저장합니다.
+ * @param {Card} card
+ */
+const handleClickCommitCreate = (card) => {
+  const cardId = card.id;
+  const cardTitle = card.title;
+  const cardTag = card.tags[0]?.title || 'chore';
+
+  const commitMessage =
+    ` ${cardTag}: ${cardTitle} (#mb-${cardId})`
+
+  navigator.clipboard.writeText(commitMessage);
+};
 
 </script>
 <style scoped lang="scss">
@@ -55,25 +105,70 @@ defineProps<{
   justify-content: flex-start;
   flex-direction: column;
   width: 100%;
-  max-height: 600px;
   background-color: #3b3b3b;
   border-radius: 10px;
   padding: 0 20px;
   padding-bottom: 10px;
 
+  // 칸반 카드 번호
+  .kanban-board-card--num {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 30px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-top: 10px;
+
+    .header__card-num {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      height: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .kanban-copy {
+      margin-left: 10px;
+      cursor: pointer;
+      color: #ffffff;
+    }
+  }
+
   .kanban-board-card-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     width: 100%;
-    height: 50px;
+    height: 80px;
 
     .kanban-board-card-header-title {
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      align-items: flex-start;
       font-size: 16px;
       font-weight: 700;
       color: #ffffff;
+
+      .header__card-num {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+        height: 10px;
+        font-size: 16px;
+        font-weight: 700;
+        color: #ffffff;
+
+        .card-num__link {
+          color: #ffffff;
+          font-size: 12px;
+          text-decoration: none;
+        }
+      }
     }
 
     .title-text {
@@ -136,7 +231,7 @@ defineProps<{
     max-height: 200px;
     gap: 20px;
     width: 100%;
-    margin-top: 20px;
+    margin-top: 10px;
     // background-color: #2b2b2b;
 
     .kanban-board-card-body-title {
@@ -150,10 +245,8 @@ defineProps<{
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
     gap: 20px;
-    width: 100%;
-    height: 20px;
+    margin-right: 10px;
   }
 }
 
@@ -188,9 +281,16 @@ div.solid {
     height: 30px;
     margin-top: 10px;
     font-size: 14px;
+    text-overflow: ellipsis;
     font-weight: 500;
     color: #ffffff;
     justify-content: space-between;
+
+    .card-num__link {
+      color: #ffffff;
+      text-decoration: none;
+      margin-right: 2px;
+    }
   }
 
   .el-badge {

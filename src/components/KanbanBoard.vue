@@ -19,10 +19,8 @@
           </el-tooltip>
           <!-- 추가기능 아이콘 (추가하기) -->
         </header>
-        <KanbanBoardCard ref="kanbanBoardCard" v-for="card in cards.filter(el => el.board_idx === board.id)"
-          :key="card.id" :card="card" />
-
-
+        <KanbanBoardCard @click="handleClickCard(card)" ref="kanbanBoardCard"
+          v-for="card in cards.filter(el => el.board_idx === board.id)" :key="card.id" :card="card" />
       </div>
     </div>
     <!-- 팝업 메뉴 -->
@@ -66,6 +64,7 @@
 
       </el-form> -->
       <!-- eslint-disable-next-line vue/no-deprecated-slot-attribute -->
+      <ModalKanbanCardCreate :form="form" />
       <span slot="footer" class="dialog-footer">
         <el-button @click="modalKanban.close()">취소</el-button>
         <el-button type="primary" @click="handleSave(selectedBoardId)">저장</el-button>
@@ -76,12 +75,10 @@
 <script setup lang="ts">
 import { ref, reactive } from "vue";
 import { Board, Card } from "@/types/KanbanBoard.ts";
+import ModalKanbanCardCreate from "./ModalKanbanCardCreate.vue";
+import KanbanBoardCard from "@/components/KanbanBoardCard.vue";
 
-// MD 에디터
-// import { MdPreview, MdCatalog } from 'md-editor-v3';
-// import 'md-editor-v3/lib/preview.css';
 
-import { MdEditor } from 'md-editor-v3';
 import "md-editor-v3/lib/style.css";
 
 
@@ -92,14 +89,6 @@ const props = defineProps<{
 const boards = props.boards
 const selectedBoardId = ref(0)
 
-
-// 전체화면
-const editorRef = ref(null)
-// const isFullScreen = ref(false)
-
-nextTick(() => {
-  console.log(editorRef.value)
-})
 
 // 칸반 카드 데이터 (MOCKUP)
 const cards = ref<Card[]>([
@@ -124,56 +113,45 @@ const cards = ref<Card[]>([
         card_idx: 2,
       },
     ],
-  },
-
+  }
 ]);
 
-// 칸반 카드 데이터 (MOCKUP)
-const form = ref({
-  user: "",
+// 칸반 폼 (MOCKUP)
+let form = reactive<Card>({
+  id: 0,
   title: "",
   description: "",
+  created_date: "",
+  user_idx: 0,
+  board_idx: 0,
   tags: [],
-  tag: "",
+  commit: [],
 });
 
-
-// 태그 추가
-const handleAddTag = () => {
-  if (form.value.tag) {
-    form.value.tags.push({
-      id: form.value.tags.length + 1,
-      title: form.value.tag,
-      color: "#ffffff",
-    });
-    form.value.tag = "";
-  }
+// 카드 선택시 모달 열기
+const handleClickCard = (card: Card) => {
+  console.log(card)
+  form = card;
+  modalKanban.open();
 };
 
-// 태그 삭제
-const handleCloseTag = (tag: any) => {
-  form.value.tags.splice(form.value.tags.indexOf(tag), 1);
-};
 
 // 저장 boardId를 받아서 Form 데이터를 가진 카드를 저장
 const handleSave = (boardId) => {
   console.log(boardId);
   const card = {
     id: cards.value.length + 1,
-    title: form.value.title,
-    description: form.value.description,
+    title: form.title,
+    description: form.description,
     created_date: "2021-10-10",
     user_idx: 1,
     board_idx: boardId,
-    tags: form.value.tags,
+    tags: form.tags,
     commit: [],
   };
   cards.value.push(card);
   modalKanban.close();
 };
-
-
-
 
 // 팝업 클래스 (모달) 상태, 열기, 닫기
 class ModalKanban {
@@ -181,8 +159,22 @@ class ModalKanban {
   open() {
     this.dialogVisible = true;
   }
+  resetModal() {
+    form = {
+      id: 0,
+      title: "",
+      description: "",
+      created_date: "",
+      user_idx: 0,
+      board_idx: 0,
+      tags: [],
+      commit: [],
+    };
+  }
   close() {
     this.dialogVisible = false;
+
+    this.resetModal();
   }
   beforeClose(done) {
     const isClose = window.confirm("작성중인 내용이 있습니다. 정말 닫으시겠습니까?");
@@ -194,10 +186,8 @@ class ModalKanban {
 }
 
 
+
 const modalKanban = reactive(new ModalKanban());
-
-
-
 const handleClickNoteAdd = (boardId) => {
   selectedBoardId.value = boardId
   modalKanban.open();
@@ -207,13 +197,10 @@ const handleClickNoteAdd = (boardId) => {
 
 
 
-// 사용한 컴포넌트
-import KanbanBoardCard from "@/components/KanbanBoardCard.vue";
-import { is } from "cypress/types/bluebird";
-import { watch } from "fs";
-import { nextTick } from "process";
+
 
 // 드래그 앤 드랍 기능
+// TODO : 드래그앤드랍 기능 구현
 
 
 </script>
@@ -280,7 +267,6 @@ import { nextTick } from "process";
     font-weight: 700;
     color: #ffffff;
   }
-
 
 
   // 폼
