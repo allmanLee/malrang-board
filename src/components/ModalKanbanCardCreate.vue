@@ -2,7 +2,7 @@
   <!-- 팝업 메뉴 -->
   <el-form class="form-wrap">
     <el-form-item label-width="60px" size="large" label="담당자">
-      <el-input v-model="customForm.user" placeholder="담당자를 입력하세요"></el-input>
+      <el-input v-model="customForm.user_idx" placeholder="담당자를 입력하세요"></el-input>
     </el-form-item>
     <el-form-item label-width="60px" size="large" label="제목">
       <el-input v-model="customForm.title" placeholder="제목을 입력하세요"></el-input>
@@ -11,7 +11,7 @@
       <el-input class="tag__input" v-model="customForm.tag" placeholder="태그를 입력하세요"
         @keyup.enter="handleAddTag"></el-input>
       <div class="tag-co∂ntainer">
-        <el-tag v-for="tag in customForm.tags" :key="tag.id" :type="tag.color" closable @close="handleCloseTag(tag)">
+        <el-tag v-for="tag in customForm.tags" :key="tag.id" type="info" closable @close="handleCloseTag(tag)">
           {{ tag.title }}
         </el-tag>
       </div>
@@ -26,41 +26,50 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, defineProps, toRef, ref } from "vue";
-import { cloneDeep } from "lodash";
+import { defineProps, ref, toRef, watch } from "vue";
+// import { cloneDeep } from "lodash";
 import { MdEditor } from 'md-editor-v3';
-import { Card } from "@/types/KanbanBoard";
+import { cloneDeep } from "lodash";
+// import { Card } from "@/types/KanbanBoard";
 
 // form 데이터
-const { form } = defineProps({
+const props = defineProps({
   form: {
     type: Object,
     required: true,
   },
 });
 
+const form = toRef(props, "form");
 
-const editorRef = ref(null)
 
-let customForm = null
 
-customForm = form;
+/* --------------------------------- 업데이트 폼 --------------------------------- */
+let customForm = ref(cloneDeep(form.value));
+// watch form
+watch(form, (newVal) => {
+  console.log("watch testValue", newVal);
+  customForm.value = newVal;
+}, { deep: true });
+
+
+/* --------------------------------- 태그 핸들링 --------------------------------- */
+// 태그 추가
+const handleAddTag = () => {
+  if (customForm.value.tag) {
+    customForm.value.tags.push({
+      id: customForm.value.tags.length + 1,
+      title: customForm.value.tag,
+      color: "info",
+    });
+    customForm.value.tag = "";
+  }
+};
 
 // 태그 삭제
 const handleCloseTag = (tag: any) => {
-  const index = customForm.tags.indexOf(tag);
-  customForm.tags.splice(index, 1);
-};
-
-const handleAddTag = () => {
-  if (customForm.tag) {
-    customForm.tags.push({
-      id: customForm.tags.length + 1,
-      title: customForm.tag,
-      color: "primary",
-    });
-    customForm.tag = "";
-  }
+  const index = customForm.value.tags.indexOf(tag);
+  customForm.value.tags.splice(index, 1);
 };
 </script>
 <style scoped lang="scss">

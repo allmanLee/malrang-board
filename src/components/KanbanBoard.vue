@@ -12,14 +12,14 @@
         <header class="kanban-container-boards__panel-header">
           <h1 class="kanban-class">{{ board.title }}</h1>
           <el-tooltip class="item" effect="dark" content="노트 추가" placement="top">
-            <i @click="handleClickNoteAdd(board.id)"> <el-icon class="kanban-menu">
+            <i @click="handleClickToAdd(board.id)"> <el-icon class="kanban-menu">
                 <Edit />
               </el-icon>
             </i>
           </el-tooltip>
           <!-- 추가기능 아이콘 (추가하기) -->
         </header>
-        <KanbanBoardCard @click="handleClickCard(card)" ref="kanbanBoardCard"
+        <KanbanBoardCard @click="handleClickToUpdate(card)" ref="kanbanBoardCard"
           v-for="card in cards.filter(el => el.board_idx === board.id)" :key="card.id" :card="card" />
       </div>
     </div>
@@ -77,20 +77,17 @@ import { ref, reactive } from "vue";
 import { Board, Card } from "@/types/KanbanBoard.ts";
 import ModalKanbanCardCreate from "./ModalKanbanCardCreate.vue";
 import KanbanBoardCard from "@/components/KanbanBoardCard.vue";
+import { cloneDeep } from "lodash";
 
 
 import "md-editor-v3/lib/style.css";
-
 
 const props = defineProps<{
   boards: Board[];
 }>();
 
-const boards = props.boards
-const selectedBoardId = ref(0)
-
-
-// 칸반 카드 데이터 (MOCKUP)
+const selectedBoardId = ref(0);
+const boards = props.boards;
 const cards = ref<Card[]>([
   {
     id: 1,
@@ -115,9 +112,7 @@ const cards = ref<Card[]>([
     ],
   }
 ]);
-
-// 칸반 폼 (MOCKUP)
-let form = reactive<Card>({
+const initForm = () => ({
   id: 0,
   title: "",
   description: "",
@@ -128,54 +123,40 @@ let form = reactive<Card>({
   commit: [],
 });
 
-// 카드 선택시 모달 열기
-const handleClickCard = (card: Card) => {
-  console.log(card)
-  form = card;
-  modalKanban.open();
-};
+class CardActions {
+  create(boardId) {
+    cards.value.push({
+      ...form.value,
+      id: cards.value.length + 1,
+      board_idx: boardId,
+      created_date: new Date().toISOString().slice(0, 10),
+    });
+  }
 
+  update(boardId) {
+    const index = cards.value.findIndex((el) => el.id === form.value.id);
+    cards.value.splice(index, 1, {
+      ...form.value,
+      board_idx: boardId,
+    });
+  }
+}
 
-// 저장 boardId를 받아서 Form 데이터를 가진 카드를 저장
-const handleSave = (boardId) => {
-  console.log(boardId);
-  const card = {
-    id: cards.value.length + 1,
-    title: form.title,
-    description: form.description,
-    created_date: "2021-10-10",
-    user_idx: 1,
-    board_idx: boardId,
-    tags: form.tags,
-    commit: [],
-  };
-  cards.value.push(card);
-  modalKanban.close();
-};
+type ModalOpenType = "create" | "update" | "none";
 
-// 팝업 클래스 (모달) 상태, 열기, 닫기
 class ModalKanban {
-  dialogVisible: boolean = false;
-  open() {
+  dialogVisible = false;
+  openType: ModalOpenType = "none";
+
+  open(type: ModalOpenType = "create") {
     this.dialogVisible = true;
+    this.openType = type;
   }
-  resetModal() {
-    form = {
-      id: 0,
-      title: "",
-      description: "",
-      created_date: "",
-      user_idx: 0,
-      board_idx: 0,
-      tags: [],
-      commit: [],
-    };
-  }
+
   close() {
     this.dialogVisible = false;
-
-    this.resetModal();
   }
+
   beforeClose(done) {
     const isClose = window.confirm("작성중인 내용이 있습니다. 정말 닫으시겠습니까?");
     if (isClose) {
@@ -185,24 +166,36 @@ class ModalKanban {
   }
 }
 
-
-
+let cardActions = new CardActions();
 const modalKanban = reactive(new ModalKanban());
-const handleClickNoteAdd = (boardId) => {
-  selectedBoardId.value = boardId
-  modalKanban.open();
+
+let form = ref<Card>(initForm());
+
+
+const handleClickToUpdate = (card: Card) => {
+  form.value = cloneDeep(card);
+  modalKanban.open("update");
+};
+
+const handleSave = (boardId) => {
+  const modalType = modalKanban.openType;
+
+  if (modalType === 'create') {
+    cardActions.create(boardId)
+  } else if (modalType === 'update') {
+    cardActions.update(boardId)
+  }
+  console.log(boardId);
+  modalKanban.close();
+  form.value = initForm();
 };
 
 
-
-
-
-
-
-// 드래그 앤 드랍 기능
-// TODO : 드래그앤드랍 기능 구현
-
-
+const handleClickToAdd = (boardId) => {
+  selectedBoardId.value = boardId
+  form.value = initForm();
+  modalKanban.open("create")
+};
 </script>
 <style scoped lang="scss">
 .kanban-container {

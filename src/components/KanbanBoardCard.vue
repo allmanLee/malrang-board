@@ -24,7 +24,6 @@
       <div class="kanban-board-card-header-title">
         <span class="title-text">
           {{ card.title }}</span>
-        <!-- <el-tag type="info" effect="dark">Cmit</el-tag> -->
       </div>
 
       <div class="kanban-board-card-header__menu">
@@ -37,7 +36,6 @@
           <MoreFilled />
         </el-icon>
       </div>
-
     </div>
 
     <div class="kanban-board-card-body">
@@ -60,7 +58,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import KanbanCardCreate from "@/components/ModalKanbanCard.vue";
 import { defineProps } from "vue";
 import { ElIcon } from "element-plus";
 import { ElTag } from "element-plus";
@@ -71,7 +68,7 @@ defineProps<{
   card: Card;
 }>();
 
-// 카드 번호를 클립보드에  복사합니다.
+// 카드 번호를 클립보드에 복사합니다.
 const handleClickNumCopy = (id) => {
   navigator.clipboard.writeText(`#mb-${id}`);
   // element ui 메시지
