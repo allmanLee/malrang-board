@@ -2,7 +2,9 @@
   <!-- 팝업 메뉴 -->
   <el-form class="form-wrap">
     <el-form-item label-width="60px" size="large" label="담당자">
-      <el-input v-model="customForm.user_idx" placeholder="담당자를 입력하세요"></el-input>
+      <el-select v-model="customForm.user_idx" placeholder="담당자를 선택하세요">
+        <el-option v-for="user in mockUsers" :key="user.id" :label="user.name" :value="user.id"></el-option>
+      </el-select>
     </el-form-item>
     <el-form-item label-width="60px" size="large" label="제목">
       <el-input v-model="customForm.title" placeholder="제목을 입력하세요"></el-input>
@@ -26,16 +28,29 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, toRef, watch } from "vue";
+import { defineProps, ref, toRef, watch, defineEmits } from "vue";
 // import { cloneDeep } from "lodash";
 import { MdEditor } from 'md-editor-v3';
 import { cloneDeep } from "lodash";
+import { useUserStore } from "@/stores/user";
 // import { Card } from "@/types/KanbanBoard";
+
+// emit
+const emit = defineEmits(["update:form"]);
+
+// Store
+const userStore = useUserStore();
+// const users = userStore.users;
+const mockUsers = userStore.getMockUsers;
 
 // form 데이터
 const props = defineProps({
   form: {
     type: Object,
+    required: true,
+  },
+  isOpen: {
+    type: Boolean,
     required: true,
   },
 });
@@ -46,12 +61,19 @@ const form = toRef(props, "form");
 
 /* --------------------------------- 업데이트 폼 --------------------------------- */
 let customForm = ref(cloneDeep(form.value));
-// watch form
-watch(form, (newVal) => {
-  console.log("watch testValue", newVal);
-  customForm.value = newVal;
+
+// customForm 업데이트 될때 emit
+watch(customForm, (newVal) => {
+  console.log("watch customForm", newVal);
+  emit("update:form", newVal);
 }, { deep: true });
 
+// open 될 때 form 업데이트
+watch(() => props.isOpen, (newVal) => {
+  if (newVal) {
+    customForm.value = cloneDeep(form.value);
+  }
+});
 
 /* --------------------------------- 태그 핸들링 --------------------------------- */
 // 태그 추가

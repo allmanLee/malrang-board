@@ -25,46 +25,8 @@
     </div>
     <!-- 팝업 메뉴 -->
     <el-dialog class="dark" :title="`노트 추가`" v-model="modalKanban.dialogVisible" :before-close="modalKanban.beforeClose">
-      <!-- <el-form class="form-wrap">
-        <el-form-item label-width="60px" size="large" label="담당자">
-          <el-input v-model="form.user" placeholder="담당자를 입력하세요"></el-input>
-        </el-form-item>
-        <el-form-item label-width="60px" size="large" label="제목">
-          <el-input v-model="form.title" placeholder="제목을 입력하세요"></el-input>
-        </el-form-item>
-        <el-form-item label-width="60px" label="태그">
-          <el-input class="tag__input" v-model="form.tag" placeholder="태그를 입력하세요" @keyup.enter="handleAddTag"></el-input>
-          <div class="tag-co∂ntainer">
-            <el-tag v-for="tag in form.tags" :key="tag.id" :type="tag.color" closable @close="handleCloseTag(tag)">
-              {{ tag.title }}
-            </el-tag>
-          </div>
-        </el-form-item>
-        <el-form-item label="">
-          <div class="tool-bar">
-            <el-tooltip class="item" effect="dark" content="전체화면" placement="top">
-              <i @click="editorRef.togglePageFullscreen(true)">
-                <el-icon>
-                  <FullScreen />
-                </el-icon>
-              </i>
-            </el-tooltip>
-            <el-tooltip class="item" effect="dark" content="미리보기" placement="top">
-              <i @click="editorRef.togglePreview()">
-                <el-icon>
-                  <View />
-                </el-icon>
-              </i>
-            </el-tooltip>
-          </div>
-          <div class="md-editor">
-            <md-editor ref="editorRef" language="en-US" :scrollAuto="true" theme="dark" v-model="form.description" />
-          </div>
-        </el-form-item>
-
-      </el-form> -->
       <!-- eslint-disable-next-line vue/no-deprecated-slot-attribute -->
-      <ModalKanbanCardCreate :form="form" />
+      <ModalKanbanCardCreate :isOpen="modalKanban.dialogVisible" :form="form" @update:form="updateForm" />
       <span slot="footer" class="dialog-footer">
         <el-button @click="modalKanban.close()">취소</el-button>
         <el-button type="primary" @click="handleSave(selectedBoardId)">저장</el-button>
@@ -104,7 +66,7 @@ const cards = ref<Card[]>([
     commit: [
       {
         id: 1,
-        title: "fix: 말랑보드 칸반 크업 완료",
+        title: "fix: 말랑보드 칸반 마크업 완료",
         created_date: "2021-10-10",
         user_idx: 1,
         card_idx: 2,
@@ -113,34 +75,38 @@ const cards = ref<Card[]>([
   }
 ]);
 const initForm = () => ({
-  id: 0,
+  id: 1,
   title: "",
   description: "",
   created_date: "",
-  user_idx: 0,
-  board_idx: 0,
+  user_idx: 1,
+  board_idx: 1,
   tags: [],
   commit: [],
 });
 
 class CardActions {
-  create(boardId) {
+  create(cardId, boardId, form) {
+    console.log(boardId);
     cards.value.push({
       ...form.value,
-      id: cards.value.length + 1,
+      id: cardId,
       board_idx: boardId,
       created_date: new Date().toISOString().slice(0, 10),
     });
   }
 
-  update(boardId) {
-    const index = cards.value.findIndex((el) => el.id === form.value.id);
-    cards.value.splice(index, 1, {
+  update(cardId, form) {
+    const cardIdx = cards.value.findIndex((card) => card.id === cardId);
+    cards.value.splice(cardIdx, 1, {
       ...form.value,
-      board_idx: boardId,
     });
   }
 }
+
+const updateForm = (newForm) => {
+  form.value = newForm;
+};
 
 type ModalOpenType = "create" | "update" | "none";
 
@@ -181,9 +147,9 @@ const handleSave = (boardId) => {
   const modalType = modalKanban.openType;
 
   if (modalType === 'create') {
-    cardActions.create(boardId)
+    cardActions.create(cards.value.length + 1, boardId, form);
   } else if (modalType === 'update') {
-    cardActions.update(boardId)
+    cardActions.update(form.value.id, form);
   }
   console.log(boardId);
   modalKanban.close();
