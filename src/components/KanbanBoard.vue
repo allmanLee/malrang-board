@@ -19,7 +19,7 @@
           </el-tooltip>
           <!-- 추가기능 아이콘 (추가하기) -->
         </header>
-        <KanbanBoardCard @click="handleClickToUpdate(card)" ref="kanbanBoardCard"
+        <KanbanBoardCard @click="handleClickToUpdate(card)" ref="kanbanBoardCard" @delete="handleDeleteCard(card.id)"
           v-for="card in cards.filter(el => el.board_idx === board.id)" :key="card.id" :card="card" />
       </div>
     </div>
@@ -162,6 +162,12 @@ const handleClickToAdd = (boardId) => {
   form.value = initForm();
   modalKanban.open("create")
 };
+
+const handleDeleteCard = (cardId) => {
+  const cardIdx = cards.value.findIndex((card) => card.id === cardId);
+  cards.value.splice(cardIdx, 1);
+};
+
 </script>
 <style scoped lang="scss">
 .kanban-container {

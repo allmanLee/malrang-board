@@ -28,7 +28,7 @@
 
       <div class="kanban-board-card-header__menu">
         <!-- 삭제 아이콘 버튼 -->
-        <el-icon class="kanban-delete menu-icon">
+        <el-icon class="kanban-delete menu-icon" @click.stop="handleClickDelete">
           <Delete />
         </el-icon>
         <!-- 메뉴 아이콘 버튼 -->
@@ -38,9 +38,9 @@
       </div>
     </div>
 
-    <div class="kanban-board-card-body">
+    <!-- <div class="kanban-board-card-body">
       {{ card.description }}
-    </div>
+    </div> -->
 
     <!-- <div class="solid"></div> -->
     <div class="commit" v-if="card.commit[0]">
@@ -58,11 +58,13 @@
   </div>
 </template>
 <script setup lang="ts">
-import { defineProps } from "vue";
+import { defineProps, defineEmits } from "vue";
 import { ElIcon } from "element-plus";
 import { ElTag } from "element-plus";
 import { Card } from "@/types/KanbanBoard.ts";
 import { ElMessage } from "element-plus";
+
+const emit = defineEmits(["delete"]);
 
 defineProps<{
   card: Card;
@@ -97,6 +99,11 @@ const handleClickCommitCreate = (card) => {
     message: "커밋 메시지가 복사되었습니다.",
     type: "success",
   });
+};
+
+const handleClickDelete = () => {
+  console.log("삭제");
+  emit("delete");
 };
 
 </script>
