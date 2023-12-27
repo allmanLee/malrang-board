@@ -91,6 +91,12 @@ const handleClickCommitCreate = (card) => {
     ` ${cardTag}: ${cardTitle} (#mb-${cardId})`
 
   navigator.clipboard.writeText(commitMessage);
+
+  // element ui 메시지
+  ElMessage({
+    message: "커밋 메시지가 복사되었습니다.",
+    type: "success",
+  });
 };
 
 </script>
