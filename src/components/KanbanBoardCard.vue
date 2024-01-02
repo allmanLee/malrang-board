@@ -1,5 +1,11 @@
 <template>
-  <div class="kanban-board-card">
+  <div class="kanban-board-card" :class="{ 'kanban-board-card--linked': isLinked }" :id="`card__item-${card.id}`">
+    <!-- 링크 아이콘 -->
+    <div v-if="isLinked" class="linked-icon">
+      <el-icon class="kanban-copy">
+        <Link />
+      </el-icon>
+    </div>
     <div class="kanban-board-card--num">
       <span class="header__card-num">
         #mb-{{ card.id }}
@@ -20,7 +26,7 @@
     <div class="kanban-board-card-header">
       <div class="kanban-board-card-tags" v-if="card.tags.length">
         <!-- 태그중 첫번째 -->
-        <el-tag v-for="tag in card.tags" :key="tag.id" type="info" effect="dark">{{ tag.title }}</el-tag>
+        <el-tag v-for=" tag  in  card.tags " :key="tag.id" type="info" effect="dark">{{ tag.title }}</el-tag>
       </div>
       <div class="kanban-board-card-header__menu">
         <!-- 삭제 아이콘 버튼 -->
@@ -44,12 +50,12 @@
 
     <div class="commit" v-if="card.commit[0]">
       <!-- 전체 커밋 노출 -->
-      <div class="commit__item" v-for="(commit, index) of card.commit" :key="index">
+      <div class="commit__item" v-for="( commit, index ) of  card.commit " :key="index">
         <article :class="{ 'commit__item--hind': index > 3 }">
           <span class="commit__body">
             {{ commit.title }}
             <span class="card-num">
-              <a class="card-num__link" href="">
+              <a class="card-num__link" :href="`#card__item-${commit.id}`">
                 (#mb-{{ commit.id }})
               </a>
             </span>
@@ -57,7 +63,8 @@
         </article>
       </div>
     </div>
-    <!-- 만약 커밋이 3개 이상이면 더보기 버튼 노출 -->
+
+    <!-- [더보기 버튼] 만약 커밋이 3개 이상이면 노출 -->
     <div class="commit__more__btn" v-if="card.commit.length > 2">
       <span class="commit__header">
         <el-icon class="kanban-copy">
@@ -65,12 +72,10 @@
         </el-icon>
       </span>
     </div>
-
-
   </div>
 </template>
 <script setup lang="ts">
-import { defineProps, defineEmits } from "vue";
+import { defineProps, defineEmits, computed } from "vue";
 import { ElIcon } from "element-plus";
 import { ElTag } from "element-plus";
 import { Card } from "@/types/KanbanBoard.ts";
@@ -78,9 +83,15 @@ import { ElMessage } from "element-plus";
 
 const emit = defineEmits(["delete"]);
 
-defineProps<{
+const props = defineProps<{
   card: Card;
 }>();
+
+// 연결된 카드가 있는지 여부
+// 제목에 #이 들어가 있으면 연결된 카드가 있다고 판단합니다.
+const isLinked = computed(() => {
+  return props.card.title.includes("#");
+});
 
 // 카드 번호를 클립보드에 복사합니다.
 const handleClickNumCopy = (id) => {
@@ -91,6 +102,8 @@ const handleClickNumCopy = (id) => {
     type: "success",
   });
 };
+
+
 
 /** function handleClickCommitCreate
  * @description 커밋 메시지를 생성하여 클립보드에 저장합니다.
@@ -131,6 +144,25 @@ const handleClickDelete = () => {
   border-radius: 10px;
   padding: 0 20px;
   padding-bottom: 10px;
+
+  // 연결된 카드일 경우: 어두운 보랏빛
+  &.kanban-board-card--linked {
+    background-color: #534755;
+  }
+
+  .linked-icon {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    background-color: #3b0545;
+    cursor: pointer;
+  }
 
   // 칸반 카드 번호
   .kanban-board-card--num {
@@ -262,7 +294,7 @@ const handleClickDelete = () => {
     flex-direction: row;
     gap: 10px;
     margin-top: 10px;
-    margin-bottom: 40px;
+    margin-bottom: 26px;
     margin-right: 10px;
   }
 }
@@ -378,5 +410,10 @@ div.solid {
 
 .commit__body:hover {
   text-decoration: underline;
+}
+
+/* ---------------------------------- focus --------------------------------- */
+.kanban-board-card:focus {
+  background-color: #ffffff;
 }
 </style>

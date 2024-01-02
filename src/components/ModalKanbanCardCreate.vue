@@ -21,7 +21,6 @@
 
     <el-form-item>
       <!-- 에디이터 -->
-      <!-- <custom-md-editor ref="editorRef" language="en-US" :scrollAuto="true" theme="dark" v-model="form.description" /> -->
       <md-editor ref="editorRef" language="en-US" :scrollAuto="true" theme="dark" v-model="customForm.description" />
     </el-form-item>
 

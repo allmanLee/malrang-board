@@ -92,13 +92,13 @@ const cards = ref<Card[]>([
       color: '#ffffff'
     }],
     commit: [
-      {
-        id: 1,
-        title: "fix: 말랑보드 칸반 마크업 완료",
-        created_date: "2021-10-10",
-        user_idx: 1,
-        card_idx: 2,
-      },
+      // {
+      //   id: 1,
+      //   title: "fix: 말랑보드 칸반 마크업 완료",
+      //   created_date: "2021-10-10",
+      //   user_idx: 1,
+      //   card_idx: 2,
+      // },
     ],
   }
 ]);
@@ -140,28 +140,46 @@ class CardActions {
     }
   }
 
+  delete(cardId) {
+    const cardIdx = cards.value.findIndex((card) => card.id === cardId);
+    cards.value.splice(cardIdx, 1);
+
+    this.resetCommit(cards.value)
+    this.addCommit(cardId, cards.value)
+  }
+
+  resetCommit(cards) {
+    cards.forEach(card => {
+      card.commit = []
+    })
+  }
+
   // title에 #mb-1 이런식으로 카드 번호가 붙어있으면 해당 카드 번호의 카드를 찾아서 커밋에 추가
   addCommit(cardId, form) {
-    // '#mb-'' 다음오는 숫자를 카드를 찾습니다. (괄호 또는 스페이스바 전)
-    if (!form.title.includes(`#mb-`)) return;
-    const afterMb = form.title.split(`#mb-`)[1].split(/[\s\(\)]/)[0];
-    console.log(afterMb, form);
-    const cardIdx = cards.value.findIndex((card) => card.id === Number(afterMb));
+    if (!form?.title?.includes(`#mb-`)) return;
 
-    console.log(cardIdx);
-    const cardTitle = form.title;
-    const cardTag = form?.tags[0]?.title || 'chore';
+    this.resetCommit(cards.value)
 
-    const commitMessage =
-      ` ${cardTag}: ${cardTitle}`
+    cards.value
+      .forEach(element => {
+        if (element.title.includes(`#mb-`)) {
+          const afterMb = element.title.split(`#mb-`)[1].split(/[\s\(\)]/)[0];
+          const cardIdx = cards.value.findIndex((card) => card.id === Number(afterMb));
+          const cardTitle = element.title;
+          const cardTag = element?.tags[0]?.title || 'chore';
 
-    cards.value[cardIdx].commit.push({
-      id: cards.value[cardIdx].commit.length + 1,
-      title: commitMessage,
-      created_date: new Date().toISOString().slice(0, 10),
-      user_idx: form.user_idx,
-      card_idx: form.id,
-    });
+          const commitMessage =
+            ` ${cardTag}: ${cardTitle}`
+
+          cards.value[cardIdx].commit.push({
+            id: modalKanban.openType === 'create' ? cards.value[cardIdx].commit.length + 1 : form.id,
+            title: commitMessage,
+            created_date: new Date().toISOString().slice(0, 10),
+            user_idx: element.user_idx,
+            card_idx: element.id,
+          });
+        }
+      });
   }
 }
 
@@ -239,8 +257,7 @@ const handleClickToAdd = (board) => {
 };
 
 const handleDeleteCard = (cardId) => {
-  const cardIdx = cards.value.findIndex((card) => card.id === cardId);
-  cards.value.splice(cardIdx, 1);
+  cardActions.delete(cardId);
 };
 
 </script>
