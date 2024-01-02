@@ -19,13 +19,9 @@
     </div>
     <div class="kanban-board-card-header">
       <div class="kanban-board-card-tags">
+        <!-- 태그중 첫번째 -->
         <el-tag v-for="tag in card.tags" :key="tag.id" type="info" effect="dark">{{ tag.title }}</el-tag>
       </div>
-      <div class="kanban-board-card-header-title">
-        <span class="title-text">
-          {{ card.title }}</span>
-      </div>
-
       <div class="kanban-board-card-header__menu">
         <!-- 삭제 아이콘 버튼 -->
         <el-icon class="kanban-delete menu-icon" @click.stop="handleClickDelete">
@@ -37,7 +33,10 @@
         </el-icon>
       </div>
     </div>
-
+    <div class="kanban-board-card-header-title">
+      <span class="title-text">
+        {{ card.title }}</span>
+    </div>
     <!-- <div class="kanban-board-card-body">
       {{ card.description }}
     </div> -->
@@ -53,7 +52,6 @@
           </a>
         </span>
       </span>
-      <el-badge value="1"></el-badge>
     </div>
   </div>
 </template>
@@ -151,9 +149,7 @@ const handleClickDelete = () => {
 
   .kanban-board-card-header {
     display: flex;
-    align-items: center;
     width: 100%;
-    height: 80px;
 
     .kanban-board-card-header-title {
       display: flex;
@@ -179,10 +175,6 @@ const handleClickDelete = () => {
           text-decoration: none;
         }
       }
-    }
-
-    .title-text {
-      margin-right: 10px;
     }
 
     .kanban-board-card-header__menu {
@@ -254,8 +246,9 @@ const handleClickDelete = () => {
   .kanban-board-card-tags {
     display: flex;
     flex-direction: row;
-    align-items: center;
-    gap: 20px;
+    gap: 10px;
+    margin-top: 10px;
+    margin-bottom: 40px;
     margin-right: 10px;
   }
 }
@@ -311,9 +304,14 @@ div.solid {
 }
 
 
+.title-text {
+  margin-right: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+}
 
-// hover
-
+/* ---------------------------------- hover --------------------------------- */
 .kanban-board-card:hover .kanban-board-card-header__menu {
   display: flex;
 }

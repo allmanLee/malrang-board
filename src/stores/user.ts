@@ -35,6 +35,9 @@ export const useUserStore = defineStore('user', {
     },
     addUser(user: User) {
       this.users.push(user)
+    },
+    findUserNameById(id: number) {
+      return this.users.find((user) => user.id === id)?.name
     }
   }
 })

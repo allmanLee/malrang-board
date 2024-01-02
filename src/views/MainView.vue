@@ -5,22 +5,8 @@
   <div>
     <!-- 드래그엔 드랍이 가능한 칸반보드(할일, 보류, 한일, 칸반 추가 기능) -->
     <section>
-      <h1>칸반보드</h1>
-      <p>할일, 보류, 한일</p>
       <KanbanBoard :boards="boards" />
     </section>
-    <!-- 링크 모음 -->
-    <!-- <section>
-      <h1>링크 모음</h1>
-      <p>링크 모음</p>
-    </section> -->
-
-    <!-- 깃허브 커밋 내역 -->
-    <!-- <section>
-      <h1>깃허브 커밋 내역</h1>
-      <p>깃허브 커밋 내역</p>
-    </section> -->
-
   </div>
 </template>
 <script setup lang="ts">
