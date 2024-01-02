@@ -78,6 +78,7 @@ import { ElTag } from "element-plus";
 import { Card } from "@/types/KanbanBoard.ts";
 import { ElMessage } from "element-plus";
 import { watch } from "fs";
+import router from "@/router";
 
 const emit = defineEmits(["delete"]);
 
@@ -115,11 +116,10 @@ const linkedCardId = computed(() => {
   return `card__item-${props.card.id}`;
 });
 
-const linkedElementId = computed(() => {
-  return `#card__item-${props.card.id}`;
-})
+// const linkedElementId = computed(() => {
+//   return `#card__item-${props.card.id}`;
+// })
 
-// URL에 해시가 있을 경우 해당 카드 active
 
 /* ------------------------------- 커밋 메시지 ------------------------------- */
 
@@ -153,6 +153,7 @@ const handleClickCommitCreate = (card) => {
     type: "success",
   });
 };
+
 
 /* ------------------------------- 삭제 ------------------------------- */
 
@@ -452,7 +453,4 @@ div.solid {
 }
 
 /* ---------------------------------- focus --------------------------------- */
-.kanban-board-card:focus {
-  background-color: #ffffff;
-}
 </style>
