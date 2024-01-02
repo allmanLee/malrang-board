@@ -156,8 +156,6 @@ class CardActions {
 
   // title에 #mb-1 이런식으로 카드 번호가 붙어있으면 해당 카드 번호의 카드를 찾아서 커밋에 추가
   addCommit(cardId, form) {
-    if (!form?.title?.includes(`#mb-`)) return;
-
     this.resetCommit(cards.value)
 
     cards.value
