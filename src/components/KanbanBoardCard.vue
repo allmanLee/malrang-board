@@ -1,5 +1,5 @@
 <template>
-  <div class="kanban-board-card" :class="{ 'kanban-board-card--linked': isLinked }" :id="`card__item-${card.id}`">
+  <div class="kanban-board-card" ref="cardRef" :class="{ 'kanban-board-card--linked': isLinked }" :id="linkedCardId">
     <!-- 링크 아이콘 -->
     <div v-if="isLinked" class="linked-icon">
       <el-icon class="kanban-copy">
@@ -43,23 +43,20 @@
       <span class="title-text">
         {{ card.title }}</span>
     </div>
-    <!-- <div class="kanban-board-card-body">
-      {{ card.description }}
-    </div> -->
-
 
     <div class="commit" v-if="card.commit[0]">
       <!-- 전체 커밋 노출 -->
       <div class="commit__item" v-for="( commit, index ) of  card.commit " :key="index">
         <article :class="{ 'commit__item--hind': index > 3 }">
-          <span class="commit__body">
-            {{ commit.title }}
+
+          <a class="card-num__link" @click.stop="() => { }" :href="`#card__item-${commit.id}`">
             <span class="card-num">
-              <a class="card-num__link" :href="`#card__item-${commit.id}`">
-                (#mb-{{ commit.id }})
-              </a>
+              #mb-{{ commit.id }}
             </span>
-          </span>
+            <span class="commit__body">
+              {{ commit.title }}
+            </span>
+          </a>
         </article>
       </div>
     </div>
@@ -75,11 +72,12 @@
   </div>
 </template>
 <script setup lang="ts">
-import { defineProps, defineEmits, computed } from "vue";
+import { ref, defineProps, defineEmits, computed, onUnmounted } from "vue";
 import { ElIcon } from "element-plus";
 import { ElTag } from "element-plus";
 import { Card } from "@/types/KanbanBoard.ts";
 import { ElMessage } from "element-plus";
+import { watch } from "fs";
 
 const emit = defineEmits(["delete"]);
 
@@ -87,23 +85,53 @@ const props = defineProps<{
   card: Card;
 }>();
 
+/* ------------------------------- URL 해시 관련 코드 ------------------------------- */
+const cardRef = ref(null);
+
+// 카드 밖 클릭시 URL 해시 제거
+const handleClickOutside = (e) => {
+  if (!cardRef.value.contains(e.target)) {
+    const url = window.location.href.split("#")[0];
+    window.history.pushState({}, null, url);
+  }
+};
+
+// 카드 밖 클릭시 이벤트 등록
+window.addEventListener("click", handleClickOutside);
+
+// 컴포넌트가 제거될때 이벤트 제거
+onUnmounted(() => {
+  window.removeEventListener("click", handleClickOutside);
+});
+
 // 연결된 카드가 있는지 여부
 // 제목에 #이 들어가 있으면 연결된 카드가 있다고 판단합니다.
 const isLinked = computed(() => {
   return props.card.title.includes("#");
 });
 
+// 연결된 카드의의 id
+const linkedCardId = computed(() => {
+  return `card__item-${props.card.id}`;
+});
+
+const linkedElementId = computed(() => {
+  return `#card__item-${props.card.id}`;
+})
+
+// URL에 해시가 있을 경우 해당 카드 active
+
+/* ------------------------------- 커밋 메시지 ------------------------------- */
+
 // 카드 번호를 클립보드에 복사합니다.
 const handleClickNumCopy = (id) => {
-  navigator.clipboard.writeText(`#mb-${id}`);
-  // element ui 메시지
+  navigator.clipboard.writeText(`#mb - ${id} `);
+
   ElMessage({
     message: "카드 번호가 복사되었습니다.",
     type: "success",
   });
 };
-
-
 
 /** function handleClickCommitCreate
  * @description 커밋 메시지를 생성하여 클립보드에 저장합니다.
@@ -115,7 +143,7 @@ const handleClickCommitCreate = (card) => {
   const cardTag = card.tags[0]?.title || 'chore';
 
   const commitMessage =
-    ` ${cardTag}: ${cardTitle} (#mb-${cardId})`
+    ` ${cardTag}: ${cardTitle} (#mb - ${cardId})`
 
   navigator.clipboard.writeText(commitMessage);
 
@@ -125,6 +153,8 @@ const handleClickCommitCreate = (card) => {
     type: "success",
   });
 };
+
+/* ------------------------------- 삭제 ------------------------------- */
 
 const handleClickDelete = () => {
   console.log("삭제");
@@ -337,25 +367,34 @@ div.solid {
     text-overflow: ellipsis;
   }
 
-  .commit__body {
+  .card-num__link {
     cursor: pointer;
     display: flex;
     align-items: center;
     height: 20px;
-    font-size: 14px;
-    text-overflow: ellipsis;
+    color: #9e9e9e;
     font-weight: 500;
     color: #f5f5f5;
+    text-decoration: none;
+    margin-right: 2px;
     white-space: nowrap;
     text-overflow: ellipsis;
+    white-space: nowrap;
 
-    .card-num__link {
+    .card-num {
+      margin-right: 10px;
+      font-size: 14px;
+      font-weight: 700;
       color: #9e9e9e;
-      text-decoration: none;
-      margin-right: 2px;
-      white-space: nowrap;
-      text-overflow: ellipsis;
     }
+  }
+
+  .commit__body {
+    cursor: pointer;
+    display: flex;
+    font-size: 14px;
+
+
 
     .commit__item--hind {
       display: none;

@@ -45,7 +45,7 @@
     <el-dialog class="dark" :title="modalKanban.boardTitle" v-model="modalKanban.dialogVisible"
       :before-close="modalKanban.beforeClose">
       <!-- eslint-disable-next-line vue/no-deprecated-slot-attribute -->
-      <ModalKanbanCardCreate :isOpen="modalKanban.dialogVisible" :form="form" @enter="handleSave(selectedBoardId)"
+      <ModalKanbanCardCreate :isOpen="modalKanban.dialogVisible" :form="form" @enter.self="handleSave(selectedBoardId)"
         @update:form="updateForm" />
       <span slot="footer" class="dialog-footer">
         <el-button @click="modalKanban.close()">취소</el-button>
@@ -152,13 +152,17 @@ class CardActions {
     cards.value
       .forEach(element => {
         if (element.title.includes(`#mb-`)) {
-          const afterMb = element.title.split(`#mb-`)[1].split(/[\s\(\)]/)[0];
+          // 띄어쓰기나 괄호까지
+          const afterMb = element.title.split(`#mb-`)[1].split(' ')[0].split(')')[0].split(']')[0];
           const cardIdx = cards.value.findIndex((card) => card.id === Number(afterMb));
           const cardTitle = element.title;
-          const cardTag = element?.tags[0]?.title || 'chore';
+          // const cardTag = element?.tags[0]?.title || 'chore';
+
+          // const commitMessage =
+          //   ` ${cardTag}: ${cardTitle}`
 
           const commitMessage =
-            ` ${cardTag}: ${cardTitle}`
+            `${cardTitle}`
 
           cards.value[cardIdx].commit.push({
             id: modalKanban.openType === 'create' ? cards.value[cardIdx].commit.length + 1 : form.id,

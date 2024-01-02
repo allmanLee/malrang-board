@@ -16,7 +16,7 @@
       </div>
     </el-form-item>
     <el-form-item label-width="60px" size="large" label="제목">
-      <el-input v-model="customForm.title" @keyup.enter="handleEnterCard" placeholder="제목을 입력하세요"></el-input>
+      <el-input v-model="customForm.title" @keypress.enter="handleEnterCard" placeholder="제목을 입력하세요"></el-input>
     </el-form-item>
 
     <el-form-item>
