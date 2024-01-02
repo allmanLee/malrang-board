@@ -20,7 +20,8 @@
       clearable />
     <div class="kanban-container-boards">
 
-      <div class="kanban-container-boards__panel" v-for="board in boards" :key="board.id">
+      <div class="kanban-container-boards__panel" v-for="board in boards" :key="board.id"
+        @drop.prevent="onDrop($event, board.id)" @dragenter.prevent @dragover.prevent>
         <!-- 칸반 카드 입니다. (드래그엔드랍기능) -->
         <header class="kanban-container-boards__panel-header">
           <h1 class="kanban-class">{{ board.title }}</h1>
@@ -34,7 +35,7 @@
         </header>
         <KanbanBoardCard @click="handleClickToUpdate(card, board.title)" ref="kanbanBoardCard"
           @delete="handleDeleteCard(card.id)" v-for="card in filterCards.filter(el => el.board_idx === board.id)"
-          :key="card.id" :card="card" />
+          @dragstart="handleDragStart($event, card)" draggable="true" :key="card.id" :card="card" />
 
         <EmptyKanbanCard v-if="filterCards.filter(el => el.board_idx === board.id).length === 0"
           @add="handleClickToAdd(board)" />
@@ -247,6 +248,27 @@ const handleClickToAdd = (board) => {
 const handleDeleteCard = (cardId) => {
   cardActions.delete(cardId);
 };
+
+/* -------------------------------- 드래그엔드랍기능 -------------------------------- */
+// 카드 드래그 (다른 보드의 카드로 이동 가능)
+const handleDragStart = (e, card) => {
+  e.dataTransfer.setData("cardId", card.id);
+  // e.dataTransfer.setData("cardBoardIdx", card.board_idx);
+};
+
+// 카드 드랍 (다른 보드의 카드로 이동 가능)
+const onDrop = (e, boardId) => {
+  const cardId = e.dataTransfer.getData("cardId");
+  // const cardBoardIdx = e.dataTransfer.getData("cardBoardIdx");
+
+  const cardIdx = cards.value.findIndex((card) => card.id === Number(cardId));
+  cards.value[cardIdx].board_idx = boardId;
+
+  // 만약 커밋에 #mb-1 이런식으로 카드 번호가 붙어있으면 해당 카드의 커밋에 추가
+  cardActions.addCommit(cardId, cards.value)
+};
+
+
 
 </script>
 <style scoped lang="scss">
