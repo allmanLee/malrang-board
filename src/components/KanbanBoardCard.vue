@@ -18,7 +18,7 @@
       </el-tooltip>
     </div>
     <div class="kanban-board-card-header">
-      <div class="kanban-board-card-tags">
+      <div class="kanban-board-card-tags" v-if="card.tags.length">
         <!-- 태그중 첫번째 -->
         <el-tag v-for="tag in card.tags" :key="tag.id" type="info" effect="dark">{{ tag.title }}</el-tag>
       </div>
@@ -41,18 +41,32 @@
       {{ card.description }}
     </div> -->
 
-    <!-- <div class="solid"></div> -->
-    <div class="commit" v-if="card.commit[0]">
-      <span class="commit__body">
 
-        {{ card.commit[0].title }}
-        <span class="card-num">
-          <a class="card-num__link" href="">
-            (#mb-{{ card.commit[0].id }})
-          </a>
-        </span>
+    <div class="commit" v-if="card.commit[0]">
+      <!-- 전체 커밋 노출 -->
+      <div class="commit__item" v-for="(commit, index) of card.commit" :key="index">
+        <article :class="{ 'commit__item--hind': index > 3 }">
+          <span class="commit__body">
+            {{ commit.title }}
+            <span class="card-num">
+              <a class="card-num__link" href="">
+                (#mb-{{ commit.id }})
+              </a>
+            </span>
+          </span>
+        </article>
+      </div>
+    </div>
+    <!-- 만약 커밋이 3개 이상이면 더보기 버튼 노출 -->
+    <div class="commit__more__btn" v-if="card.commit.length > 2">
+      <span class="commit__header">
+        <el-icon class="kanban-copy">
+          <MoreFilled />
+        </el-icon>
       </span>
     </div>
+
+
   </div>
 </template>
 <script setup lang="ts">
@@ -260,21 +274,34 @@ const handleClickDelete = () => {
 // 구분선
 div.solid {
   width: 100%;
-  border-top: 1px solid #ffffff;
+  border-top: 1px solid #616161;
 }
 
 .commit {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  margin-bottom: 10px;
+
+  .commit__item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+    height: 24px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #f5f5f5;
+  }
 
   .commit__header {
     margin-top: 10px;
     font-size: 14px;
     font-weight: 700;
-    color: #ffffff;
+    color: #4b4b4b;
   }
 
   .commit__body {
@@ -286,13 +313,39 @@ div.solid {
     font-size: 14px;
     text-overflow: ellipsis;
     font-weight: 500;
-    color: #ffffff;
+    color: #f5f5f5;
     justify-content: space-between;
 
     .card-num__link {
-      color: #ffffff;
+      color: #9e9e9e;
       text-decoration: none;
       margin-right: 2px;
+    }
+
+    .commit__item--hind {
+      display: none;
+    }
+
+    .commit__more__btn {
+      width: 100%;
+      height: 30px;
+      margin-top: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #f5f5f5;
+      cursor: pointer;
+    }
+
+    .solid {
+      width: 100%;
+      border-top: 1px solid #616161;
+    }
+
+    .commit__header {
+      margin-top: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #4b4b4b;
     }
   }
 

@@ -123,7 +123,10 @@ class CardActions {
       created_date: new Date().toISOString().slice(0, 10),
     });
 
-    this.addCommit(cardId, form);
+    // 만약 커밋에 #mb-1 이런식으로 카드 번호가 붙어있으면 해당 카드의 커밋에 추가
+    if (form.value.title.includes(`#mb-`)) {
+      this.addCommit(cardId, form.value);
+    }
   }
 
   update(cardId, form) {
@@ -131,19 +134,33 @@ class CardActions {
     cards.value.splice(cardIdx, 1, {
       ...form.value,
     });
-
-    this.addCommit(cardId, form);
+    // 만약 커밋에 #mb-1 이런식으로 카드 번호가 붙어있으면 해당 카드의 커밋에 추가
+    if (form.value.title.includes(`#mb-`)) {
+      this.addCommit(cardId, form.value);
+    }
   }
 
-  // title에 #mb-1 이런식으로 카드 번호가 붙어있으면 해당 카드의 커밋에 추가
+  // title에 #mb-1 이런식으로 카드 번호가 붙어있으면 해당 카드 번호의 카드를 찾아서 커밋에 추가
   addCommit(cardId, form) {
-    const cardIdx = cards.value.findIndex((card) => card.id === cardId);
+    // '#mb-'' 다음오는 숫자를 카드를 찾습니다. (괄호 또는 스페이스바 전)
+    if (!form.title.includes(`#mb-`)) return;
+    const afterMb = form.title.split(`#mb-`)[1].split(/[\s\(\)]/)[0];
+    console.log(afterMb, form);
+    const cardIdx = cards.value.findIndex((card) => card.id === Number(afterMb));
+
+    console.log(cardIdx);
+    const cardTitle = form.title;
+    const cardTag = form?.tags[0]?.title || 'chore';
+
+    const commitMessage =
+      ` ${cardTag}: ${cardTitle}`
+
     cards.value[cardIdx].commit.push({
       id: cards.value[cardIdx].commit.length + 1,
-      title: form.value.title,
+      title: commitMessage,
       created_date: new Date().toISOString().slice(0, 10),
-      user_idx: form.value.user_idx,
-      card_idx: cardId,
+      user_idx: form.user_idx,
+      card_idx: form.id,
     });
   }
 }

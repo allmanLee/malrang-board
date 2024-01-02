@@ -76,19 +76,19 @@ watch(() => props.isOpen, (newVal) => {
 });
 
 // 제목 앞에 fix:, feat:, add:, chore 등 이 붙어있으면 태그로 인식 태그로 추가
-watch(() => customForm.value.title, (newVal) => {
-  const title = newVal;
-  const tag = title.split(":")[0];
-  const tagList = ["fix", "feat", "add", "chore"];
-  if (tagList.includes(tag) && newVal.includes(":")) {
-    customForm.value.tags.push({
-      id: customForm.value.tags.length + 1,
-      title: tag,
-      color: "info",
-    });
-    customForm.value.title = title.replace(`${tag}:`, "");
-  }
-});
+// watch(() => customForm.value.title, (newVal) => {
+//   const title = newVal;
+//   const tag = title.split(":")[0];
+//   const tagList = ["fix", "feat", "add", "chore"];
+//   if (tagList.includes(tag) && newVal.includes(":")) {
+//     customForm.value.tags.push({
+//       id: customForm.value.tags.length + 1,
+//       title: tag,
+//       color: "info",
+//     });
+//     customForm.value.title = title.replace(`${tag}:`, "");
+//   }
+// });
 
 /* --------------------------------- 태그 핸들링 --------------------------------- */
 // 태그 추가
