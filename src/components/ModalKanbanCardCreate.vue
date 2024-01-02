@@ -6,9 +6,6 @@
         <el-option v-for="user in mockUsers" :key="user.id" :label="user.name" :value="user.id"></el-option>
       </el-select>
     </el-form-item>
-    <el-form-item label-width="60px" size="large" label="제목">
-      <el-input v-model="customForm.title" placeholder="제목을 입력하세요"></el-input>
-    </el-form-item>
     <el-form-item label-width="60px" label="태그">
       <el-input class="tag__input" v-model="customForm.tag" placeholder="태그를 입력하세요"
         @keyup.enter="handleAddTag"></el-input>
@@ -18,6 +15,10 @@
         </el-tag>
       </div>
     </el-form-item>
+    <el-form-item label-width="60px" size="large" label="제목">
+      <el-input v-model="customForm.title" placeholder="제목을 입력하세요"></el-input>
+    </el-form-item>
+
     <el-form-item>
       <!-- 에디이터 -->
       <!-- <custom-md-editor ref="editorRef" language="en-US" :scrollAuto="true" theme="dark" v-model="form.description" /> -->

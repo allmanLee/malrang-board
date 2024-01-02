@@ -321,6 +321,8 @@ const handleDeleteCard = (cardId) => {
     min-height: 60%;
     background-color: #2b2b2b;
     padding: 4px;
+    padding-bottom: 16px;
+    border-radius: 10px;
 
   }
 
