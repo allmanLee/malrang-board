@@ -44,7 +44,8 @@
     <el-dialog class="dark" :title="modalKanban.boardTitle" v-model="modalKanban.dialogVisible"
       :before-close="modalKanban.beforeClose">
       <!-- eslint-disable-next-line vue/no-deprecated-slot-attribute -->
-      <ModalKanbanCardCreate :isOpen="modalKanban.dialogVisible" :form="form" @update:form="updateForm" />
+      <ModalKanbanCardCreate :isOpen="modalKanban.dialogVisible" :form="form" @enter="handleSave(selectedBoardId)"
+        @update:form="updateForm" />
       <span slot="footer" class="dialog-footer">
         <el-button @click="modalKanban.close()">취소</el-button>
         <el-button type="primary" @click="handleSave(selectedBoardId)">저장</el-button>
@@ -91,15 +92,7 @@ const cards = ref<Card[]>([
       title: 'Commit',
       color: '#ffffff'
     }],
-    commit: [
-      // {
-      //   id: 1,
-      //   title: "fix: 말랑보드 칸반 마크업 완료",
-      //   created_date: "2021-10-10",
-      //   user_idx: 1,
-      //   card_idx: 2,
-      // },
-    ],
+    commit: [],
   }
 ]);
 const initForm = () => ({
@@ -124,9 +117,8 @@ class CardActions {
     });
 
     // 만약 커밋에 #mb-1 이런식으로 카드 번호가 붙어있으면 해당 카드의 커밋에 추가
-    if (form.value.title.includes(`#mb-`)) {
-      this.addCommit(cardId, form.value);
-    }
+    this.addCommit(cardId, form.value);
+
   }
 
   update(cardId, form) {
@@ -135,9 +127,7 @@ class CardActions {
       ...form.value,
     });
     // 만약 커밋에 #mb-1 이런식으로 카드 번호가 붙어있으면 해당 카드의 커밋에 추가
-    if (form.value.title.includes(`#mb-`)) {
-      this.addCommit(cardId, form.value);
-    }
+    this.addCommit(cardId, form.value);
   }
 
   delete(cardId) {

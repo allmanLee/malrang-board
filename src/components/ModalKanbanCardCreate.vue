@@ -16,7 +16,7 @@
       </div>
     </el-form-item>
     <el-form-item label-width="60px" size="large" label="제목">
-      <el-input v-model="customForm.title" placeholder="제목을 입력하세요"></el-input>
+      <el-input v-model="customForm.title" @keyup.enter="handleEnterCard" placeholder="제목을 입력하세요"></el-input>
     </el-form-item>
 
     <el-form-item>
@@ -36,7 +36,7 @@ import { useUserStore } from "@/stores/user";
 // import { Card } from "@/types/KanbanBoard";
 
 // emit
-const emit = defineEmits(["update:form"]);
+const emit = defineEmits(["update:form", "enter"]);
 
 // Store
 const userStore = useUserStore();
@@ -74,6 +74,11 @@ watch(() => props.isOpen, (newVal) => {
     customForm.value = cloneDeep(form.value);
   }
 });
+
+const handleEnterCard = () => {
+  console.log("handleEnterCard");
+  emit("enter", customForm.value);
+}
 
 // 제목 앞에 fix:, feat:, add:, chore 등 이 붙어있으면 태그로 인식 태그로 추가
 // watch(() => customForm.value.title, (newVal) => {
