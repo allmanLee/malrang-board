@@ -281,7 +281,6 @@ div.solid {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
   width: 100%;
   margin-bottom: 10px;
 
@@ -291,10 +290,10 @@ div.solid {
     align-items: flex-start;
     justify-content: flex-start;
     width: 100%;
-    height: 24px;
     font-size: 14px;
     font-weight: 500;
     color: #f5f5f5;
+    overflow: hidden;
   }
 
   .commit__header {
@@ -302,24 +301,28 @@ div.solid {
     font-size: 14px;
     font-weight: 700;
     color: #4b4b4b;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .commit__body {
     cursor: pointer;
     display: flex;
     align-items: center;
-    height: 30px;
-    margin-top: 10px;
+    height: 20px;
     font-size: 14px;
     text-overflow: ellipsis;
     font-weight: 500;
     color: #f5f5f5;
-    justify-content: space-between;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 
     .card-num__link {
       color: #9e9e9e;
       text-decoration: none;
       margin-right: 2px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
 
     .commit__item--hind {
