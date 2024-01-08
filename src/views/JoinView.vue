@@ -18,7 +18,7 @@
       <!-- 임시 PL 여부 -->
       <el-checkbox v-model="isAdmin" id="isAdmin">당신은 관리자 이신가요?</el-checkbox>
 
-      <el-button type="submit" color="primary">완료</el-button>
+      <el-button type="primary" color="primary" @click="submitForm">완료</el-button>
     </el-form>
   </div>
 </template>
@@ -26,19 +26,48 @@
 <script>
 import { ref } from 'vue';
 
+// API
+import API from '@/apis';
+import { ElMessage } from 'element-plus';
+import { useRouter } from 'vue-router';
+
+
 export default {
   setup() {
+
+    const $router = useRouter();
+
+
     const name = ref('');
     const email = ref('');
     const password = ref('');
     const isAdmin = ref(false);
 
-    const submitForm = () => {
+    const submitForm = async () => {
       // Perform signup logic here
       console.log('Name:', name.value);
       console.log('Email:', email.value);
       console.log('Password:', password.value);
       console.log('Is Admin:', isAdmin.value);
+
+      try {
+        // 회원가입 API 호출
+        await API.createUser({
+          name: name.value,
+          email: email.value,
+          password: password.value,
+          isAdmin: isAdmin.value
+        });
+
+        // 회원가입 성공
+        ElMessage.success('회원가입이 완료되었습니다.');
+
+        // 로그인 페이지로 이동
+        $router.push('/login');
+      } catch (error) {
+        console.error(error);
+        ElMessage.error('회원가입에 실패했습니다.');
+      }
     };
 
     return {
@@ -103,11 +132,6 @@ h1 {
 .el-checkbox {
   display: flex;
   align-items: center;
-}
-
-.dark-mode {
-  background-color: #333;
-  color: #fff;
 }
 
 .description-text {

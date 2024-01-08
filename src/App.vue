@@ -1,5 +1,29 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import { useDark, useToggle } from '@vueuse/core'
+import { useUserStore } from '@/stores/user';
+import { computed } from 'vue';
+
+// Store
+const userStore = useUserStore();
+
+// 로그인 여부
+const isLogin = computed(() => {
+  return userStore.isLogin;
+});
+
+// 로그아웃
+const handleClickToLogout = () => {
+  userStore.logout();
+}
+
+// 로그인한 사용자명
+const userName = computed(() => {
+  return userStore.getUserState.name;
+});
+
+// 다크모드
+useDark()
 
 </script>
 <template>
@@ -14,11 +38,34 @@ import { RouterLink, RouterView } from 'vue-router'
         <router-link to="/mypage">MyPage</router-link>
       </nav>
     </section>
-    <nav class="header__right">
+    <nav v-if="!isLogin" class="header__right">
       <!-- 우측 - 로그인, 회원가입 -->
       <router-link to="/login">로그인</router-link> |
       <router-link to="/signup">회원가입</router-link>
     </nav>
+
+    <div v-else class="header__right">
+      <!-- 우측 - 로그인 성공시 프로필 노출 -->
+      <el-dropdown trigger="click" placement="bottom-end">
+        <span class="el-dropdown-link">
+          <el-avatar shape="square" :size="20" src="https://avatars.githubusercontent.com/u/26598542?v=4" alt="avatar" />
+          <p>{{ userName }}</p>
+          <!-- <i class="el-icon-arrow-down el-icon--right"></i> -->
+        </span>
+        <template #dropdown>
+          <el-dropdown-item>
+            <router-link to="/mypate">
+              회원정보
+            </router-link>
+          </el-dropdown-item>
+          <el-dropdown-item>
+            <span @click="handleClickToLogout">
+              로그아웃
+            </span>
+          </el-dropdown-item>
+        </template>
+      </el-dropdown>
+    </div>
 
   </header>
   <div class="main dark">
@@ -51,6 +98,53 @@ import { RouterLink, RouterView } from 'vue-router'
     align-items: center;
     gap: 20px;
     margin-right: 20px;
+
+    a {
+      color: #fff;
+      text-decoration: none;
+
+      &:hover {
+        color: #eaeaea;
+      }
+    }
+
+    // 프로필
+    .el-dropdown-link {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+      text-decoration: none;
+
+      &:hover {
+        color: #eaeaea;
+      }
+    }
+
+    .dropdown-menu {
+      background-color: #2b2b2b;
+      border: none;
+      border-radius: 10px;
+      padding: 10px;
+      height: 100px;
+
+      .el-dropdown-item {
+
+        color: #fff;
+        text-decoration: none;
+
+        &:hover {
+          color: #eaeaea;
+        }
+
+        &:last-child {
+          margin-top: 10px;
+          border-top: 1px solid #eaeaea;
+          padding-top: 10px;
+        }
+      }
+    }
   }
 }
 

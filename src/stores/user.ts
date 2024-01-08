@@ -1,4 +1,6 @@
 import { defineStore } from 'pinia'
+import API from '../apis'
+import { UserState } from '../types/users'
 
 interface User {
   id: number
@@ -18,6 +20,17 @@ export const useUserStore = defineStore('user', {
       { id: 2, name: 'Bob' },
       { id: 3, name: 'Charlie' },
     ],
+    userState: {
+      id: 0,
+      name: 'Alice',
+      email: '',
+      team: {
+        id: 1,
+        name: 'team1',
+        members: [],
+      },
+      projects: []
+    }
   }),
   getters: {
     getUsers:(state) => {
@@ -27,6 +40,12 @@ export const useUserStore = defineStore('user', {
     getMockUsers:(state) => {
       console.log('state.mockUsers', state.mockUsers)
       return  state.mockUsers
+    },
+    isLogin: (state) => {
+      return state.userState.id !== 0
+    },
+    getUserState: (state) => {
+      return state.userState
     },
   },
   actions: {
@@ -38,6 +57,23 @@ export const useUserStore = defineStore('user', {
     },
     findUserNameById(id: number) {
       return this.users.find((user) => user.id === id)?.name
+    },
+    async fetchUser(userState: User) {
+      const _userState: UserState = userState
+      this.userState = _userState
+    },
+    logout() {
+      this.userState = {
+        id: 0,
+        name: 'Alice',
+        email: '',
+        team: {
+          id: 1,
+          name: 'team1',
+          members: [],
+        },
+        projects: []
+      }
     }
   }
 })
