@@ -75,7 +75,6 @@ const boards = ref<Board[]>(
 }
 
 // 사이드 메뉴
-
 .navigation-side-bar {
   position: fixed;
   top: 40px;

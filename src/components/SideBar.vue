@@ -13,6 +13,15 @@
         </el-input>
       </section>
 
+      <section class="admin-settings">
+        <!-- 프로젝트 관리 버튼 - solid -->
+        <el-tooltip content="프로젝트 및 팀 관리 화면으로 이동합니다." placement="top">
+          <el-button class="admin-settings__btn">
+            프로젝트 관리
+          </el-button>
+        </el-tooltip>
+      </section>
+
       <!-- 팀 즐겨찾기 -->
       <h5 class="mb-2">팀 즐겨찾기</h5>
 
@@ -120,7 +129,6 @@ const bookmarkTeam = [
     prj_id: 2,
   }
 ]
-
 
 const projects = [
   {
@@ -248,6 +256,24 @@ const filteredTeamsByBookmark = computed(() => {
       &::v-deep(.el-input__inner) {
         padding: 0;
       }
+    }
+  }
+
+
+  // 프로젝트 관리 (관리자 메뉴)
+  .admin-settings__btn {
+    width: 100%;
+    background-color: #2b2b2b;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 0;
+    border: none;
+    margin-bottom: 20px;
+
+    &:hover {
+      background-color: #6b6b6b;
+      border: none;
     }
   }
 }

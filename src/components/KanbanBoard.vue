@@ -3,7 +3,6 @@
   <div class="kanban-container">
     <section class="kanban-action-menue-bar">
       <!-- 작업자 - 생성시 공통 담당자의 이름 -->
-
       <el-collapse v-model="activeName" accordion class="accordion">
         <el-collapse-item title="1. 작업자를 선택해주세요." name="1">
           <p class="accordion__sub-text">카드를 생성할 때 기본 담당자가 선택한 작업자로 등록됩니다.</p>
