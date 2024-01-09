@@ -16,7 +16,7 @@
       <section class="admin-settings">
         <!-- 프로젝트 관리 버튼 - solid -->
         <el-tooltip content="프로젝트 및 팀 관리 화면으로 이동합니다." placement="top">
-          <el-button class="admin-settings__btn">
+          <el-button class="admin-settings__btn" @click="() => $router.push('/project')">
             프로젝트 관리
           </el-button>
         </el-tooltip>

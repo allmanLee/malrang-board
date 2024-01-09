@@ -40,6 +40,12 @@ const router = createRouter({
       name: 'signup',
       component: () => import('../views/JoinView.vue')
     },
+    // 프로젝트 관리
+    {
+      path: '/project',
+      name: 'project',
+      component: () => import('../views/ProjectView.vue')
+    },
   ]
 })
 
