@@ -2,7 +2,11 @@
 <!-- 말랑보드에서는 링크를 모아볼수 있습니다. -->
 <!-- 오늘 할일 한일 기록 및 깃연동으로 인원별 커밋 내용을 확인할 수 있습니다. -->
 <template>
+  <div class="navigation-side-bar">
+    <SideBar />
+  </div>
   <div>
+
     <!-- 드래그엔 드랍이 가능한 칸반보드(할일, 보류, 한일, 칸반 추가 기능) -->
     <section>
       <KanbanBoard :boards="boards" />
@@ -17,6 +21,7 @@ import KanbanBoard from "@/components/KanbanBoard.vue";
 
 import { ref } from "vue";
 import { Board } from "@/types/KanbanBoard.ts";
+import SideBar from "@/components/SideBar.vue";
 
 // 목업 데이터
 const boards = ref<Board[]>(
@@ -67,5 +72,17 @@ const boards = ref<Board[]>(
     font-size: 20px;
     font-weight: 500;
   }
+}
+
+// 사이드 메뉴
+
+.navigation-side-bar {
+  position: fixed;
+  top: 40px;
+  left: 0;
+  height: 100vh;
+  z-index: 100;
+  background-color: black;
+  overflow-y: scroll;
 }
 </style>
