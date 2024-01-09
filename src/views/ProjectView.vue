@@ -142,6 +142,8 @@ const filteredMembers = computed(() => {
 // Delete Project
 const deleteProject = (projectId) => {
   projects.value = projects.value.filter(project => project.id !== projectId);
+  selectedPrjId.value = 0; // Reset selected project
+  selectedTeamId.value = 0; // Reset selected team
 };
 
 // Show Team Form
@@ -182,6 +184,7 @@ const deleteTeam = (projectId, teamId) => {
   const project = projects.value.find(project => project.id === projectId);
   if (project) {
     project.teams = project.teams.filter(team => team.id !== teamId);
+    selectedTeamId.value = 0; // Reset selected team
   }
 };
 
@@ -236,6 +239,7 @@ const deleteMember = (projectId, teamId, memberId) => {
 // Select Project
 const selectProject = (projectId) => {
   selectedPrjId.value = projectId;
+  selectedTeamId.value = 0; // Reset selected team
 };
 
 // Select Team
