@@ -76,8 +76,8 @@ useDark()
 <style scoped lang="scss">
 .header {
   display: flex;
-  background-color: #2b2b2b;
-  border-bottom: 1px solid #eaeaea;
+  background-color: black;
+  border-bottom: 1px solid #2b2b2b;
   position: fixed;
   top: 0;
   left: 0;

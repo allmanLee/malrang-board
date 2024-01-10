@@ -1,0 +1,70 @@
+@import './base.css';
+
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  font-weight: normal;
+}
+
+// 스크롤 스타일
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--vt-c-indigo);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--vt-c-text-dark-2);
+  border-radius: 10px;
+
+  &:hover {
+    background: var(--vt-c-text-dark-1);
+  }
+}
+
+.el-input {
+  background: var(--vt-c-black-mute);
+  border-radius: 6px !important;
+  border: none !important;
+}
+.el-input__wrapper {
+  border-radius: 6px !important;
+  border: none !important;
+}
+
+
+.el-input__inner {
+  border: none !important;
+  background: var(--vt-c-black-mute);
+}
+
+.el-input__inner:focus {
+  border-color: var(--color-border-hover);
+  box-shadow: none;
+}
+
+.el-input__inner:hover {
+  border-color: none;
+  box-shadow: none;
+}
+
+// 모달 오픈시 뒷 배경
+.el-dialog{
+  position: absolute !important;
+ border-radius: 16px !important;
+ top: 50% !important;
+ left:50% !important;
+ transform: translate(-50%, -50%) !important;
+ margin: 0px !important;
+ 
+
+}
+
+.el-overlay {
+  background: rgba(231, 232, 255, 0.3) !important;
+}

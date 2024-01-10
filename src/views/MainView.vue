@@ -83,5 +83,6 @@ const boards = ref<Board[]>(
   z-index: 100;
   background-color: black;
   overflow-y: scroll;
+  padding: 0px;
 }
 </style>

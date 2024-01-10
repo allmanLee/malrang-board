@@ -418,7 +418,6 @@ const selectTeam = (teamId) => {
 
 
 // 삭제 추가 아이콘 버튼
-.add-button,
 .delete-button {
   margin: 0;
   border-radius: 4px;

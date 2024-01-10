@@ -1,29 +1,35 @@
 <template>
   <!-- 팝업 메뉴 -->
-  <el-form class="form-wrap">
-    <el-form-item label-width="60px" size="large" label="담당자">
-      <el-select v-model="customForm.user_idx" placeholder="담당자를 선택하세요">
-        <el-option v-for="user in mockUsers" :key="user.id" :label="user.name" :value="user.id"></el-option>
-      </el-select>
-    </el-form-item>
-    <el-form-item label-width="60px" label="태그">
-      <el-input class="tag__input" v-model="customForm.tag" placeholder="태그를 입력하세요"
-        @keyup.enter="handleAddTag"></el-input>
-      <div class="tag-co∂ntainer">
-        <el-tag v-for="tag in customForm.tags" :key="tag.id" type="info" closable @close="handleCloseTag(tag)">
-          {{ tag.title }}
-        </el-tag>
-      </div>
-    </el-form-item>
-    <el-form-item label-width="60px" size="large" label="제목">
-      <el-input v-model="customForm.title" @keypress.enter="handleEnterCard" placeholder="제목을 입력하세요"></el-input>
-    </el-form-item>
+  <el-form label-position="top" class="form-wrap">
 
+    <section class="form-items__base-info">
+      <el-form-item label-width="60px" size="large" label="담당자">
+        <el-select v-model="customForm.user_idx" placeholder="담당자를 선택하세요" class="select-user">
+          <el-option v-for="user in mockUsers" :key="user.id" :label="user.name" :value="user.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label-width="60px" size="large" label="제목">
+        <el-input aria-required="true" v-model="customForm.title" @keypress.enter="handleEnterCard"
+          placeholder="제목을 입력하세요"></el-input>
+      </el-form-item>
+
+      <el-form-item label-width="60px" label="태그">
+        <div class="tag-container">
+          <el-tag v-for="tag in customForm.tags" :key="tag.id" type="info" closable @close="handleCloseTag(tag)">
+            {{ tag.title }}
+          </el-tag>
+          <el-input class="tag__input" v-model="customForm.tag" placeholder="추가 태그를 입력"
+            @keyup.enter="handleAddTag"></el-input>
+        </div>
+
+      </el-form-item>
+    </section>
     <el-form-item>
       <!-- 에디이터 -->
-      <md-editor ref="editorRef" language="en-US" :scrollAuto="true" theme="dark" v-model="customForm.description" />
+      <md-editor ref="editorRef" language="en-US" :scrollAuto="true" :disabled="false" theme="dark" :preview="true"
+        v-model="customForm.description" />
     </el-form-item>
-
+    <el-button v-show="false" type="primary">등록</el-button>
   </el-form>
 </template>
 
@@ -37,6 +43,16 @@ import { useUserStore } from "@/stores/user";
 
 // emit
 const emit = defineEmits(["update:form", "enter"]);
+
+// editor
+const isPreview = ref(false);
+const editorRef = ref(null);
+
+// 미리보기
+const handlePreview = () => {
+  console.log("handlePreview");
+  isPreview.value = !isPreview.value;
+};
 
 // Store
 const userStore = useUserStore();
@@ -119,7 +135,19 @@ const handleCloseTag = (tag: any) => {
 .form-wrap {
   padding: 20px;
   border-radius: 10px;
-  background-color: #1f1f1f;
+  height: 600px;
+  overflow: auto;
+}
+
+.select-user {
+  width: 100%;
+}
+
+.form-items__base-info {
+  border: 1px solid #2b2b2b;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
 }
 
 .el-form-item__content {
@@ -127,8 +155,11 @@ const handleCloseTag = (tag: any) => {
 }
 
 .el-form-item__content .el-input__inner {
-  background-color: #2b2b2b;
   color: #ffffff;
+}
+
+.el-form-item__content .el-tag {
+  height: 32px;
 }
 
 // 첫번째 태그 마진 제거
@@ -137,13 +168,34 @@ const handleCloseTag = (tag: any) => {
 }
 
 .el-form-item__content .el-tag {
-  background-color: #2b2b2b;
-  margin-left: 10px;
+  // margin-left: 10px;
   color: #ffffff;
+  background-color: #2b2b2b;
+
+  &:hover {
+    color: #ffffff;
+    border: 1px solid #9e9e9e;
+
+    .el-tag__close {
+      color: #ffffff;
+    }
+  }
 }
 
 .tag-container {
+  display: flex;
   margin-bottom: 10px;
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  .tag__input {
+    width: 140px;
+    // background-color: #2b2b2b;
+    color: #ffffff;
+    margin-left: 10px;
+
+  }
 }
 
 

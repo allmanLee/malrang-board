@@ -1,22 +1,27 @@
 <template>
   <!-- 드래그엔 드랍이 가능한 칸반보드 (한일, 보류, 할일) -->
   <div class="kanban-container">
-    <section class="kanban-action-menue-bar">
-      <!-- 작업자 - 생성시 공통 담당자의 이름 -->
-      <el-collapse v-model="activeName" accordion class="accordion">
-        <el-collapse-item title="1. 작업자를 선택해주세요." name="1">
-          <p class="accordion__sub-text">카드를 생성할 때 기본 담당자가 선택한 작업자로 등록됩니다.</p>
+    <h1 class="kanban-class">칸반보드</h1>
 
-          <el-select v-model="selectedWorker" placeholder="작업자를 선택해주세요." class="kanban-select">
-            <el-option v-for="user in users" :key="user.id" :label="user.name" :value="user.id">
-            </el-option>
-          </el-select>
-        </el-collapse-item>
-      </el-collapse>
-    </section>
     <!-- 검색 -->
     <el-input class="kanban-search" v-model="searchValue" placeholder="검색어를 입력하세요" prefix-icon="el-icon-search"
       clearable />
+    <section class="kanban-action-menue-bar">
+
+      <el-menu v-model="activeName" class="dashboard-filter" mode="horizontal" @select="el => handleClickNameActive(el)">
+        <el-sub-menu index="담당자">
+          <template #title>
+            <span>{{ activeName ? activeName : '담당자' }}</span>
+          </template>
+          <el-menu-item index="전체">
+            <span>전체</span>
+          </el-menu-item>
+          <el-menu-item v-for="user in users" :key="user.id" :index="user.name">
+            <span>{{ user.name }}</span>
+          </el-menu-item>
+        </el-sub-menu>
+      </el-menu>
+    </section>
     <div class="kanban-container-boards">
 
       <div class="kanban-container-boards__panel" v-for="board in boards" :key="board.id"
@@ -41,15 +46,16 @@
       </div>
     </div>
     <!-- 팝업 메뉴 -->
-    <el-dialog class="dark" :title="modalKanban.boardTitle" v-model="modalKanban.dialogVisible"
+    <el-dialog class="dark" width="800" :title="modalKanban.boardTitle" v-model="modalKanban.dialogVisible"
       :before-close="modalKanban.beforeClose">
-      <!-- eslint-disable-next-line vue/no-deprecated-slot-attribute -->
       <ModalKanbanCardCreate :isOpen="modalKanban.dialogVisible" :form="form" @enter.self="handleSave(selectedBoardId)"
         @update:form="updateForm" />
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="modalKanban.close()">취소</el-button>
-        <el-button type="primary" @click="handleSave(selectedBoardId)">저장</el-button>
-      </span>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="modalKanban.close()">취소</el-button>
+          <el-button type="primary" @click="handleSave(selectedBoardId)">저장</el-button>
+        </div>
+      </template>
     </el-dialog>
   </div>
 </template>
@@ -76,7 +82,7 @@ const props = defineProps<{
 
 const selectedBoardId = ref(0);
 const selectedWorker = ref(null);
-const activeName = ref("1");
+const activeName = ref("전체 담당자");
 const searchValue = ref("");
 const boards = props.boards;
 const cards = ref<Card[]>([
@@ -86,6 +92,7 @@ const cards = ref<Card[]>([
     description: "카드 내용",
     created_date: "2021-10-10",
     user_idx: 1,
+    user_name: '김말랑',
     board_idx: 1,
     tags: [{
       id: 1,
@@ -101,10 +108,15 @@ const initForm = () => ({
   description: "",
   created_date: "",
   user_idx: 1,
+  user_name: '김말랑',
   board_idx: 1,
   tags: [],
   commit: [],
 });
+const handleClickNameActive = (name) => {
+  activeName.value = name;
+  selectedWorker.value = name;
+}
 
 class CardActions {
   create(cardId, boardId, form) {
@@ -120,6 +132,8 @@ class CardActions {
     this.addCommit(cardId, form.value);
 
   }
+
+
 
   update(cardId, form) {
     const cardIdx = cards.value.findIndex((card) => card.id === cardId);
@@ -252,6 +266,10 @@ const handleDeleteCard = (cardId) => {
   cardActions.delete(cardId);
 };
 
+const handleSaveToEmit = {
+
+}
+
 /* -------------------------------- 드래그엔드랍기능 -------------------------------- */
 // 카드 드래그 (다른 보드의 카드로 이동 가능)
 const handleDragStart = (e, card) => {
@@ -289,43 +307,24 @@ const onDrop = (e, boardId) => {
   height: 100%;
 
   .kanban-action-menue-bar {
-    display: flex;
-    flex-direction: column;
+
+    flex-direction: row;
     align-items: center;
-    justify-content: flex-start;
-    gap: 20px;
     width: 100%;
-    font-size: 20px;
-    font-weight: 700;
+    justify-content: flex-end;
 
-
-    .accordion {
+    dashboard-filter {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
       width: 100%;
-      color: #ffffff;
-      font-size: 20px;
-      font-weight: 700;
-      padding: 0 20px;
-
-
-      &::v-deep(.el-collapse-item__header) {
-        color: #ffffff;
-        font-size: 20px;
-        font-weight: 700;
-      }
-
-      .accordion__sub-text {
-        color: #ffffff;
-        font-size: 14px;
-        font-weight: 500;
-        margin-bottom: 20px;
-      }
+      justify-content: flex-end;
     }
   }
 
   .kanban-search {
     width: 100%;
     height: 50px;
-    background-color: #2b2b2b;
     color: #ffffff;
     padding: 0 0px;
 
@@ -349,7 +348,7 @@ const onDrop = (e, boardId) => {
     gap: 20px;
     width: 300px;
     min-height: 60%;
-    background-color: #2b2b2b;
+    background-color: black;
     padding: 4px;
     padding-bottom: 16px;
     border-radius: 10px;
@@ -364,7 +363,6 @@ const onDrop = (e, boardId) => {
     gap: 20px;
     width: 100%;
     height: 50px;
-    background-color: #2b2b2b;
     color: white;
     font-size: 20px;
     font-weight: 700;
@@ -387,9 +385,8 @@ const onDrop = (e, boardId) => {
 
   // 폼
   .form-wrap {
-    padding: 20px;
+    padding: 0 20px;
     border-radius: 10px;
-    background-color: #1f1f1f;
   }
 
   .el-form-item__content {
@@ -425,7 +422,7 @@ const onDrop = (e, boardId) => {
   justify-content: flex-end;
   gap: 10px;
   width: 100%;
-  height: 50px;
+  height: 30px;
   color: white;
   font-size: 20px;
   font-weight: 700;

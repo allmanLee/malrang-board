@@ -21,6 +21,7 @@ export interface Card {
   description: string;
   created_date: string;
   user_idx: number;
+  user_name: string;
   board_idx: number;
   tags: Tag[];
   commit: Commit[];

@@ -1,10 +1,22 @@
 <template>
-  <div class="kanban-board-card" ref="cardRef" :class="{ 'kanban-board-card--linked': isLinked }" :id="linkedCardId">
+  <el-card class="kanban-board-card" ref="cardRef" :class="{ 'kanban-board-card--linked': isLinked }" :id="linkedCardId">
     <!-- 링크 아이콘 -->
     <div v-if="isLinked" class="linked-icon">
       <el-icon class="kanban-copy">
         <Link />
       </el-icon>
+    </div>
+
+    <section class="card__item--profile">
+      <el-avatar shape="square" class="header__user-avatar" :size="20"
+        src="https://avatars.githubusercontent.com/u/26598542?v=4" alt="avatar" />
+      <span class="header__user-name">
+        {{ card.user_name }}
+      </span>
+    </section>
+    <div class="kanban-board-card-header-title">
+      <span class="title-text">
+        {{ card.title }}</span>
     </div>
     <div class="kanban-board-card--num">
       <span class="header__card-num">
@@ -23,6 +35,7 @@
         </el-icon>
       </el-tooltip>
     </div>
+
     <div class="kanban-board-card-header">
       <div class="kanban-board-card-tags" v-if="card.tags.length">
         <!-- 태그중 첫번째 -->
@@ -38,10 +51,6 @@
           <MoreFilled />
         </el-icon>
       </div>
-    </div>
-    <div class="kanban-board-card-header-title">
-      <span class="title-text">
-        {{ card.title }}</span>
     </div>
 
     <div class="commit" v-if="card.commit[0]">
@@ -69,7 +78,7 @@
         </el-icon>
       </span>
     </div>
-  </div>
+  </el-card>
 </template>
 <script setup lang="ts">
 import { ref, defineProps, defineEmits, computed, onUnmounted } from "vue";
@@ -80,21 +89,33 @@ import { ElMessage } from "element-plus";
 import { watch } from "fs";
 import router from "@/router";
 
+// Store
+import { useUserStore } from "@/stores/user";
+const userStore = useUserStore();
+
 const emit = defineEmits(["delete"]);
 
 const props = defineProps<{
   card: Card;
 }>();
 
+const users = computed(() => userStore.getUsers);
+
 /* ------------------------------- URL 해시 관련 코드 ------------------------------- */
 const cardRef = ref(null);
 
+// const userName = computed(() => {
+//   const userIdx = props.card.user_idx;
+//   return users.value.find((user) => user.id === userIdx)?.name || "이름없음";
+// });
+
 // 카드 밖 클릭시 URL 해시 제거
 const handleClickOutside = (e) => {
-  if (!cardRef.value.contains(e.target)) {
-    const url = window.location.href.split("#")[0];
-    window.history.pushState({}, null, url);
-  }
+  // const test = !cardRef.value.contains(e.target);
+  // if (test) {
+  const url = window.location.href.split("#")[0];
+  window.history.pushState({}, null, url);
+  // }
 };
 
 // 카드 밖 클릭시 이벤트 등록
@@ -171,10 +192,9 @@ const handleClickDelete = () => {
   justify-content: flex-start;
   flex-direction: column;
   width: 100%;
-  background-color: #3b3b3b;
   border-radius: 10px;
-  padding: 0 20px;
-  padding-bottom: 10px;
+  padding: 0;
+  // padding-bottom: 10px;
 
   // 연결된 카드일 경우: 어두운 보랏빛
   &.kanban-board-card--linked {
@@ -195,6 +215,24 @@ const handleClickDelete = () => {
     cursor: pointer;
   }
 
+  .card__item--profile {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+
+    .header__user-avatar {
+      // margin-right: 10px;
+      border: 1px solid;
+    }
+
+    .header__user-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: #ffffff;
+      margin-left: 10px;
+    }
+  }
+
   // 칸반 카드 번호
   .kanban-board-card--num {
     display: flex;
@@ -205,25 +243,36 @@ const handleClickDelete = () => {
     font-size: 16px;
     font-weight: 700;
     color: #ffffff;
-    margin-top: 10px;
+    margin-top: 12px;
+
 
     .header__card-num {
       display: flex;
       align-items: center;
       justify-content: flex-start;
       height: 10px;
-      font-size: 16px;
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 500;
       color: white;
     }
 
     .kanban-copy {
+      box-sizing: content-box;
       margin-left: 10px;
       cursor: pointer;
       color: #ffffff;
+      padding: 4px;
+      // background-color: #434242;
+      border-radius: 12px;
+    }
+
+    .kanban-copy:hover {
+      color: #eaeaea;
+      background-color: #1b1b1b;
     }
   }
 
+  // 카드 헤더
   .kanban-board-card-header {
     display: flex;
     width: 100%;
@@ -325,7 +374,7 @@ const handleClickDelete = () => {
     flex-direction: row;
     gap: 10px;
     margin-top: 10px;
-    margin-bottom: 26px;
+    // margin-bottom: 26px;
     margin-right: 10px;
   }
 }
