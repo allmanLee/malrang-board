@@ -8,6 +8,7 @@ interface User {
 }
 interface UserStore {
   users: User[],
+  userState: UserState,
   mockUsers: User[],
 }
 
@@ -34,7 +35,6 @@ export const useUserStore = defineStore('user', {
   }),
   getters: {
     getUsers:(state) => {
-
       return state.users
     },
     getMockUsers:(state) => {
@@ -50,6 +50,9 @@ export const useUserStore = defineStore('user', {
   },
   actions: {
     fetchUsers() {
+      // TODO: 팀 맴버만 불로오도록 API 개발 필요
+      // const response = await API.get('/users')
+
       this.users = this.mockUsers
     },
     addUser(user: User) {

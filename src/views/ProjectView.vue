@@ -1,18 +1,45 @@
 <template>
+  <div class="project-magage-header">
+    <h1 class="project-magage-title">프로젝트 관리</h1>
+    <h3 class="project-magage-title">
+      <el-tooltip content="소속은 마이페이지에서 변경 가능합니다." placement="top">
+        <div class="tooltip-container">
+          <span class="-border">서원정보</span>
+          <el-icon>
+            <QuestionFilled />
+          </el-icon>
+        </div>
+      </el-tooltip> 그룹의 프로젝트를 관리합니다.
+    </h3>
+    <h5>
+      팀원은 가입시 소속을 선택하고, 동일한 소속의 프로젝트에만 참여할 수 있습니다.
+    </h5>
+  </div>
   <div class="container">
     <!-- Project Column -->
     <div class="column">
-      <h2>프로젝트</h2>
-      <el-card v-for="project in projects" :key="project.id" class="card"
+      <h2 class="column-title">프로젝트</h2>
+      <!-- 아이콘과 같이 팀 갯수 / 팀원 수 표기 -->
+
+
+      <el-card v-for="(project, index) in projects" :key="project.id" class="card"
         :class="{ 'highlighted': project.id === selectedPrjId }" @click="selectProject(project.id)">
         <div class="card-header">
-          {{ project.name }}
+          <section class="project-card-column">
+            <p class="project-card-column-title">
+              프로젝트 명
+            </p>
+            <span class="project-card-title">{{ project.name }}</span>
+          </section>
+          <count-user :member="project.teams.reduce((acc, cur) => acc + cur.members.length, 0)"
+            :team="project.teams.length" class="count-user"></count-user>
           <el-button @click="deleteProject(project.id)" class="delete-button">
             <el-icon>
               <Delete />
             </el-icon>
           </el-button>
         </div>
+        <div v-if="index === projects.length - 1" class="new-badge">New</div>
       </el-card>
       <el-card v-if="!showTeamFormFlag" class="card project-form-add">
         <el-form @submit.prevent="addProject" class="form">
@@ -24,13 +51,20 @@
 
     <!-- Team Column -->
     <div class="column">
-      <h2>팀 </h2>
+      <h2 class="column-title">팀</h2>
       <el-card v-for=" team in filteredTeams" :key="team.id" class="card"
         :class="{ 'highlighted': team.id === selectedTeamId }" @click="selectTeam(team.id)">
         <div class="team-list">
           <div class="card-header">
-            {{ team.name }}
+            <section class="project-card-column">
+              <p class="project-card-column-title --team">
+                팀 명
+              </p>
 
+              <span class="project-card-title">{{ team.name }}</span>
+            </section>
+
+            <count-user :member="team.members.length" class="count-user"></count-user>
             <el-button @click="deleteTeam(selectedPrjId, selectedTeamId)" class="delete-button">
               <el-icon>
                 <Delete />
@@ -38,6 +72,7 @@
             </el-button>
           </div>
         </div>
+        <div v-if="team.id === filteredTeams.length" class="new-badge">New</div>
       </el-card>
 
       <el-card v-if="showTeamFormFlag" class="card">
@@ -59,23 +94,29 @@
 
     <!-- Member Column -->
     <div class="column" :cass="'column-opacity'">
-      <h2>팀원</h2>
+      <h2 class="column-title">팀원</h2>
       <el-card v-for=" member  in  filteredMembers " :key="member.id" class="card">
         <div class="member-list">
           <p class="member-profile">
             <el-avatar icon="el-icon-user-solid" size="small" shape="circle" :src="member.avatar" fit="fill"></el-avatar>
             {{ member.name }}
           </p>
-          <el-button type="danger" @click="deleteMember(selectedPrjId, selectedTeamId, member.id)">Delete</el-button>
+          <el-button type="danger" class="delete-button--danger"
+            @click="deleteMember(selectedPrjId, selectedTeamId, member.id)">Delete</el-button>
         </div>
-        <!-- <p class="member-email">{{ member.email }}</p> -->
         <span class="member-is-admin">팀장 / </span>
         <span class="member-email">yjlee@seowoninfo.com</span>
 
       </el-card>
+      <!-- 선택 -->
       <el-card v-if="showMemberFormFlag" class="avator">
         <el-form @submit.prevent="addMember(selectedPrjId, selectedTeamId)" class="form">
-          <el-input v-model="newMemberName" placeholder="Member Name" required></el-input>
+          <!-- <el-input v-model="newMember" placeholder="Member Name" required></el-input> -->
+          <!-- 팀원을 선택할 수 있음 -->
+          <el-select v-model="newMember" placeholder="Member Name" value-key="id" required class="form-select">
+            <el-option v-for="member in memberOptions" :key="member.id" :label="member.name" :value="member">
+            </el-option>
+          </el-select>
           <el-button type="primary" native-type="submit" class="add-button">Add Member</el-button>
           <el-button text @click="hideMemberForm" class="add-button">Cancel</el-button>
         </el-form>
@@ -93,11 +134,16 @@
 </template>
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { useUserStore } from '@/stores/user';
+import CountUser from '@/components/CountUser.vue';
+import { ElMessage, ElMessageBox } from 'element-plus';
 
 // Project data
 const projects = ref([]);
-
 const newProjectName = ref('');
+
+// User data
+const userStore = useUserStore();
 
 // Team data
 const newTeamName = ref('');
@@ -105,9 +151,17 @@ const showTeamFormFlag = ref(false);
 const selectedPrjId = ref(0);
 
 // Team member data
-const newMemberName = ref('');
+const memberOptions = computed(() => userStore.getUsers);
+const newMember = ref('');
 const showMemberFormFlag = ref(false);
 const selectedTeamId = ref(0);
+
+// API call
+const fetchUser = () => {
+  userStore.fetchUsers();
+};
+
+fetchUser();
 
 // Add Project
 const addProject = () => {
@@ -122,10 +176,7 @@ const addProject = () => {
 
 const filteredTeams = computed(() => {
   const project = projects.value.find(project => project.id === selectedPrjId.value);
-  if (project) {
-    return project.teams;
-  }
-  return [];
+  return project ? project.teams : [];
 });
 
 const filteredMembers = computed(() => {
@@ -139,11 +190,23 @@ const filteredMembers = computed(() => {
   return [];
 });
 
+const beforeDeleteMessage = async () => {
+  const result = await ElMessageBox.confirm('정말로 삭제하시겠습니까?', '알림', {
+    confirmButtonText: '삭제',
+    cancelButtonText: '취소',
+    type: 'warning'
+  }).then(() => true).catch(() => false);
+  return result;
+};
+
 // Delete Project
-const deleteProject = (projectId) => {
-  projects.value = projects.value.filter(project => project.id !== projectId);
-  selectedPrjId.value = 0; // Reset selected project
-  selectedTeamId.value = 0; // Reset selected team
+const deleteProject = async (projectId) => {
+  const confirm = await beforeDeleteMessage();
+  if (confirm && projectId && projects.value.find(project => project.id === projectId)) {
+    projects.value = projects.value.filter(project => project.id !== projectId);
+    selectedPrjId.value = 0; // Reset selected project
+    selectedTeamId.value = 0; // Reset selected team
+  }
 };
 
 // Show Team Form
@@ -158,15 +221,12 @@ const showTeamForm = (projectId) => {
 
 // Hide Team Form
 const hideTeamForm = () => {
-  console.log('hideTeamForm')
   showTeamFormFlag.value = false;
 };
 
 // Add Team
 const addTeam = () => {
-  console.log('addTeam', selectedPrjId.value)
   const project = projects.value.find(project => project.id === selectedPrjId.value);
-
   if (project) {
     const team = {
       id: project.teams.length + 1,
@@ -180,9 +240,10 @@ const addTeam = () => {
 };
 
 // Delete Team
-const deleteTeam = (projectId, teamId) => {
+const deleteTeam = async (projectId, teamId) => {
+  const confirm = await beforeDeleteMessage();
   const project = projects.value.find(project => project.id === projectId);
-  if (project) {
+  if (confirm && project) {
     project.teams = project.teams.filter(team => team.id !== teamId);
     selectedTeamId.value = 0; // Reset selected team
   }
@@ -196,7 +257,7 @@ const showMemberForm = (projectId, teamId) => {
     if (team) {
       showMemberFormFlag.value = true;
       selectedTeamId.value = teamId;
-      newMemberName.value = '';
+      newMember.value = '';
     }
   }
 };
@@ -211,15 +272,19 @@ const addMember = (projectId, teamId) => {
   const project = projects.value.find(project => project.id === projectId);
   if (project) {
     const team = project.teams.find(team => team.id === teamId);
-
-    console.log('addMember', team);
     if (team) {
       const member = {
         id: team.members.length + 1,
-        name: newMemberName.value
+        name: newMember.value.name,
       };
+
+      if (!newMember?.value?.name) {
+        ElMessage('팀원을 선택해주세요.');
+        return false;
+      }
+
       team.members.push(member);
-      newMemberName.value = '';
+      newMember.value = '';
       showMemberFormFlag.value = false;
     }
   }
@@ -249,6 +314,56 @@ const selectTeam = (teamId) => {
 </script>
 
 <style lang="scss" scoped>
+.project-magage-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.project-magage-title {
+  display: flex;
+  color: white;
+  vertical-align: middle;
+  width: 100%;
+
+  // 아이콘 조금 위로 조정
+  .el-icon {
+    margin-top: -2px;
+    margin-right: 4px;
+    ;
+  }
+
+  .tooltip-container {
+    display: flex;
+    cursor: pointer;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+  }
+
+  & .-border {
+    // border-bottom: 1px solid #eaeaea;;
+    text-decoration: underline;
+    padding-bottom: 10px;
+    font-weight: 600;
+    padding: 0;
+
+  }
+}
+
+.project-card-title {
+  font-size: 16px;
+  font-weight: bold;
+  width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
 .container {
   display: flex;
   justify-content: space-between;
@@ -257,24 +372,75 @@ const selectTeam = (teamId) => {
 
 .column {
   flex: 1;
-  margin-right: 20px;
+  background-color: #000;
+  padding: 20px;
+  border-radius: 10px;
+
+  &-title {
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+}
+
+.form-select {
+  width: 100%;
 }
 
 .card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+
+  .project-card-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .project-card-column-title {
+    font-size: 12px;
+    color: #616161;
+    width: 140px;
+    overflow: hidden;
+  }
 }
 
 .card {
+  position: relative;
   cursor: pointer;
   margin-bottom: 10px;
 }
 
+
+
+// 삭제 추가 아이콘 버튼
 .add-button,
 .delete-button {
   margin: 0;
-  border-radius: 0px;
+  border-radius: 4px;
+  background-color: none !important;
+
+  // 버튼 색상
+  --el-button-border-color: #616161;
+  --el-button-hover-bg-color: #eaeaea;
+  --el-button-hover-border-color: #2c2c2c;
+
+  &::v-deep(button) {
+    border: 1px solid red;
+  }
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+    border-color: #2c2c2c !important;
+
+    .el-icon {
+      color: #fff !important;
+    }
+  }
 }
 
 .add-button {
@@ -320,6 +486,12 @@ const selectTeam = (teamId) => {
   .el-icon {
     color: #000 !important;
   }
+
+  .new-badge {
+    background-color: #2196f3;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+    color: #fff;
+  }
 }
 
 .member-list {
@@ -332,6 +504,12 @@ const selectTeam = (teamId) => {
     display: flex;
     align-items: center;
     gap: 10px;
+  }
+
+  .delete-button--danger {
+    color: #fff;
+    background-color: #f44336;
+    border-color: #f44336;
   }
 
 
@@ -349,5 +527,31 @@ const selectTeam = (teamId) => {
 
 .column-opacity {
   opacity: 0.7 !important;
+}
+
+// New badge - 팀, 프로젝트 팀원 추가시 나타나는 뱃지
+.new-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #1973bd;
+  color: #fff;
+  padding: 2px 10px;
+  border-radius: 0 0 0 4px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  font-size: 12px;
+}
+
+
+// count-user
+.count-user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  font-size: 12px;
+  width: 100px;
+  padding: 10px;
 }
 </style>
