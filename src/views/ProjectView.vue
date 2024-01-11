@@ -1,134 +1,140 @@
 <template>
-  <div class="project-magage-header">
-    <h1 class="project-magage-title">프로젝트 관리</h1>
-    <h3 class="project-magage-title">
-      <el-tooltip content="소속은 마이페이지에서 변경 가능합니다." placement="top">
-        <div class="tooltip-container">
-          <span class="-border">서원정보</span>
-          <el-icon>
-            <QuestionFilled />
-          </el-icon>
+  <div class="project-manager-view">
+    <div class="project-manager-view__wrapper">
+      <div class="project-magage-header">
+        <h1 class="project-magage-title">프로젝트 관리</h1>
+        <h3 class="project-magage-title">
+          <el-tooltip content="소속은 마이페이지에서 변경 가능합니다." placement="top">
+            <div class="tooltip-container">
+              <span class="-border">서원정보</span>
+              <el-icon>
+                <QuestionFilled />
+              </el-icon>
+            </div>
+          </el-tooltip> 그룹의 프로젝트를 관리합니다.
+        </h3>
+        <h5>
+          팀원은 가입시 소속을 선택하고, 동일한 소속의 프로젝트에만 참여할 수 있습니다.
+        </h5>
+      </div>
+      <div class="container">
+        <!-- Project Column -->
+        <div class="column">
+          <h2 class="column-title">프로젝트</h2>
+          <!-- 아이콘과 같이 팀 갯수 / 팀원 수 표기 -->
+
+
+          <el-card v-for="(project, index) in projects" :key="project.id" class="card"
+            :class="{ 'highlighted': project.id === selectedPrjId }" @click="selectProject(project.id)">
+            <div class="card-header">
+              <section class="project-card-column">
+                <p class="project-card-column-title">
+                  프로젝트 명
+                </p>
+                <span class="project-card-title">{{ project.name }}</span>
+              </section>
+              <count-user :member="project.teams.reduce((acc, cur) => acc + cur.members.length, 0)"
+                :team="project.teams.length" class="count-user"></count-user>
+              <el-button @click="deleteProject(project.id)" class="delete-button">
+                <el-icon>
+                  <Delete />
+                </el-icon>
+              </el-button>
+            </div>
+            <div v-if="index === projects.length - 1" class="new-badge">New</div>
+          </el-card>
+          <el-card v-if="!showTeamFormFlag" class="card project-form-add">
+            <el-form @submit.prevent="addProject" class="form">
+              <el-input v-model="newProjectName" placeholder="Project Name" required></el-input>
+              <el-button type="primary" native-type="submit" class="add-button">Add Project</el-button>
+            </el-form>
+          </el-card>
         </div>
-      </el-tooltip> 그룹의 프로젝트를 관리합니다.
-    </h3>
-    <h5>
-      팀원은 가입시 소속을 선택하고, 동일한 소속의 프로젝트에만 참여할 수 있습니다.
-    </h5>
-  </div>
-  <div class="container">
-    <!-- Project Column -->
-    <div class="column">
-      <h2 class="column-title">프로젝트</h2>
-      <!-- 아이콘과 같이 팀 갯수 / 팀원 수 표기 -->
 
+        <!-- Team Column -->
+        <div class="column">
+          <h2 class="column-title">팀</h2>
+          <el-card v-for=" team in filteredTeams" :key="team.id" class="card"
+            :class="{ 'highlighted': team.id === selectedTeamId }" @click="selectTeam(team.id)">
+            <div class="team-list">
+              <div class="card-header">
+                <section class="project-card-column">
+                  <p class="project-card-column-title --team">
+                    팀 명
+                  </p>
 
-      <el-card v-for="(project, index) in projects" :key="project.id" class="card"
-        :class="{ 'highlighted': project.id === selectedPrjId }" @click="selectProject(project.id)">
-        <div class="card-header">
-          <section class="project-card-column">
-            <p class="project-card-column-title">
-              프로젝트 명
-            </p>
-            <span class="project-card-title">{{ project.name }}</span>
-          </section>
-          <count-user :member="project.teams.reduce((acc, cur) => acc + cur.members.length, 0)"
-            :team="project.teams.length" class="count-user"></count-user>
-          <el-button @click="deleteProject(project.id)" class="delete-button">
+                  <span class="project-card-title">{{ team.name }}</span>
+                </section>
+
+                <count-user :member="team.members.length" class="count-user"></count-user>
+                <el-button @click="deleteTeam(selectedPrjId, selectedTeamId)" class="delete-button">
+                  <el-icon>
+                    <Delete />
+                  </el-icon>
+                </el-button>
+              </div>
+            </div>
+            <div v-if="team.id === filteredTeams.length" class="new-badge">New</div>
+          </el-card>
+
+          <el-card v-if="showTeamFormFlag" class="card">
+            <el-form @submit.prevent="addTeam" class="form">
+              <el-input v-model="newTeamName" placeholder="Team Name" required></el-input>
+              <el-button type="primary" native-type="submit" class="add-button">Add Team</el-button>
+              <el-button text @click="hideTeamForm" class="add-button">Cancel</el-button>
+            </el-form>
+          </el-card>
+
+          <el-button v-else-if="!showTeamFormFlag && selectedPrjId" @click="showTeamForm(selectedPrjId)"
+            class="add-button">
             <el-icon>
-              <Delete />
+              <plus />
             </el-icon>
           </el-button>
-        </div>
-        <div v-if="index === projects.length - 1" class="new-badge">New</div>
-      </el-card>
-      <el-card v-if="!showTeamFormFlag" class="card project-form-add">
-        <el-form @submit.prevent="addProject" class="form">
-          <el-input v-model="newProjectName" placeholder="Project Name" required></el-input>
-          <el-button type="primary" native-type="submit" class="add-button">Add Project</el-button>
-        </el-form>
-      </el-card>
-    </div>
 
-    <!-- Team Column -->
-    <div class="column">
-      <h2 class="column-title">팀</h2>
-      <el-card v-for=" team in filteredTeams" :key="team.id" class="card"
-        :class="{ 'highlighted': team.id === selectedTeamId }" @click="selectTeam(team.id)">
-        <div class="team-list">
-          <div class="card-header">
-            <section class="project-card-column">
-              <p class="project-card-column-title --team">
-                팀 명
+          <el-empty v-else description="프로젝트를 선택해주세요."></el-empty>
+        </div>
+
+        <!-- Member Column -->
+        <div class="column" :cass="'column-opacity'">
+          <h2 class="column-title">팀원</h2>
+          <el-card v-for=" member  in  filteredMembers " :key="member.id" class="card">
+            <div class="member-list">
+              <p class="member-profile">
+                <el-avatar icon="el-icon-user-solid" size="small" shape="circle" :src="member.avatar"
+                  fit="fill"></el-avatar>
+                {{ member.name }}
               </p>
+              <el-button type="danger" class="delete-button--danger"
+                @click="deleteMember(selectedPrjId, selectedTeamId, member.id)">Delete</el-button>
+            </div>
+            <span class="member-is-admin">팀장 / </span>
+            <span class="member-email">yjlee@seowoninfo.com</span>
 
-              <span class="project-card-title">{{ team.name }}</span>
-            </section>
+          </el-card>
+          <!-- 선택 -->
+          <el-card v-if="showMemberFormFlag" class="avator">
+            <el-form @submit.prevent="addMember(selectedPrjId, selectedTeamId)" class="form">
+              <!-- <el-input v-model="newMember" placeholder="Member Name" required></el-input> -->
+              <!-- 팀원을 선택할 수 있음 -->
+              <el-select v-model="newMember" placeholder="Member Name" value-key="id" required class="form-select">
+                <el-option v-for="member in memberOptions" :key="member.id" :label="member.name" :value="member">
+                </el-option>
+              </el-select>
+              <el-button type="primary" native-type="submit" class="add-button">Add Member</el-button>
+              <el-button text @click="hideMemberForm" class="add-button">Cancel</el-button>
+            </el-form>
+          </el-card>
 
-            <count-user :member="team.members.length" class="count-user"></count-user>
-            <el-button @click="deleteTeam(selectedPrjId, selectedTeamId)" class="delete-button">
-              <el-icon>
-                <Delete />
-              </el-icon>
-            </el-button>
-          </div>
+          <el-button v-else-if="!showMemberFormFlag && selectedTeamId"
+            @click="showMemberForm(selectedPrjId, selectedTeamId)" class="add-button">
+            <el-icon>
+              <plus />
+            </el-icon>
+          </el-button>
+          <el-empty v-else description="팀을 선택해주세요."></el-empty>
         </div>
-        <div v-if="team.id === filteredTeams.length" class="new-badge">New</div>
-      </el-card>
-
-      <el-card v-if="showTeamFormFlag" class="card">
-        <el-form @submit.native.prevent="addTeam" class="form">
-          <el-input v-model="newTeamName" placeholder="Team Name" required></el-input>
-          <el-button type="primary" native-type="submit" class="add-button">Add Team</el-button>
-          <el-button text @click="hideTeamForm" class="add-button">Cancel</el-button>
-        </el-form>
-      </el-card>
-
-      <el-button v-else-if="!showTeamFormFlag && selectedPrjId" @click="showTeamForm(selectedPrjId)" class="add-button">
-        <el-icon>
-          <plus />
-        </el-icon>
-      </el-button>
-
-      <el-empty v-else description="프로젝트를 선택해주세요."></el-empty>
-    </div>
-
-    <!-- Member Column -->
-    <div class="column" :cass="'column-opacity'">
-      <h2 class="column-title">팀원</h2>
-      <el-card v-for=" member  in  filteredMembers " :key="member.id" class="card">
-        <div class="member-list">
-          <p class="member-profile">
-            <el-avatar icon="el-icon-user-solid" size="small" shape="circle" :src="member.avatar" fit="fill"></el-avatar>
-            {{ member.name }}
-          </p>
-          <el-button type="danger" class="delete-button--danger"
-            @click="deleteMember(selectedPrjId, selectedTeamId, member.id)">Delete</el-button>
-        </div>
-        <span class="member-is-admin">팀장 / </span>
-        <span class="member-email">yjlee@seowoninfo.com</span>
-
-      </el-card>
-      <!-- 선택 -->
-      <el-card v-if="showMemberFormFlag" class="avator">
-        <el-form @submit.prevent="addMember(selectedPrjId, selectedTeamId)" class="form">
-          <!-- <el-input v-model="newMember" placeholder="Member Name" required></el-input> -->
-          <!-- 팀원을 선택할 수 있음 -->
-          <el-select v-model="newMember" placeholder="Member Name" value-key="id" required class="form-select">
-            <el-option v-for="member in memberOptions" :key="member.id" :label="member.name" :value="member">
-            </el-option>
-          </el-select>
-          <el-button type="primary" native-type="submit" class="add-button">Add Member</el-button>
-          <el-button text @click="hideMemberForm" class="add-button">Cancel</el-button>
-        </el-form>
-      </el-card>
-
-      <el-button v-else-if="!showMemberFormFlag && selectedTeamId" @click="showMemberForm(selectedPrjId, selectedTeamId)"
-        class="add-button">
-        <el-icon>
-          <plus />
-        </el-icon>
-      </el-button>
-      <el-empty v-else description="팀을 선택해주세요."></el-empty>
+      </div>
     </div>
   </div>
 </template>
@@ -314,13 +320,38 @@ const selectTeam = (teamId) => {
 </script>
 
 <style lang="scss" scoped>
+.project-manager-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 100px;
+  margin-top: 100px;
+  margin-bottom: 100px;
+  text-align: center;
+}
+
 .project-magage-header {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  // align-items: center;
   justify-content: center;
-  gap: 10px;
+  // width: 100%;
+  gap: 0px;
   margin-bottom: 20px;
+
+  h1 {
+    font-size: 40px;
+    font-weight: 700;
+    color: white;
+  }
+
+  .project-manager-view__wrapper {
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 20px;
+  }
 }
 
 .project-magage-title {
@@ -375,6 +406,7 @@ const selectTeam = (teamId) => {
   background-color: #000;
   padding: 20px;
   border-radius: 10px;
+  width: 400px;
 
   &-title {
     color: #fff;
