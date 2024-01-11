@@ -1,11 +1,17 @@
 <template>
   <!-- 드래그엔 드랍이 가능한 칸반보드 (한일, 보류, 할일) -->
   <div class="kanban-container">
-    <h1 class="kanban-class">칸반보드</h1>
+    <!-- <h1 class="kanban-class">칸반보드</h1> -->
 
     <!-- 검색 -->
-    <el-input class="kanban-search" v-model="searchValue" placeholder="검색어를 입력하세요" prefix-icon="el-icon-search"
-      clearable />
+    <el-input class="kanban-search" v-model="searchValue" placeholder="티켓의 제목, 담당자, 태그를 생각나는거 있어요?" clearable>
+      <!-- prefix 검색 아이콘 -->
+      <template #prefix>
+        <el-icon>
+          <Search />
+        </el-icon>
+      </template>
+    </el-input>
     <section class="kanban-action-menue-bar">
 
       <el-menu v-model="activeName" class="dashboard-filter" mode="horizontal" @select="el => handleClickNameActive(el)">
@@ -301,7 +307,7 @@ const onDrop = (e, boardId) => {
   align-items: flex-start;
   justify-content: flex-start;
   gap: 20px;
-  margin-top: 0px;
+  margin-top: 20px;
   margin-bottom: 100px;
   width: 100%;
   height: 100%;
@@ -323,7 +329,7 @@ const onDrop = (e, boardId) => {
   }
 
   .kanban-search {
-    width: 100%;
+    width: 400px;
     height: 50px;
     color: #ffffff;
     padding: 0 0px;

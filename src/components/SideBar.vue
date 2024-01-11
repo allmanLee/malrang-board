@@ -3,7 +3,7 @@
     <el-col>
       <!-- 팀 또는 프로젝트 검색 -->
       <section class="search">
-        <el-input v-model="searchText" placeholder="팀 또는 프로젝트 검색" prefix-icon="el-icon-search" clearable>
+        <el-input v-model="searchText" placeholder="팀 또는 프로젝트 검색" clearable>
           <!-- prefix 검색 아이콘 -->
           <template #prefix>
             <el-icon>
@@ -242,11 +242,11 @@ const filteredTeamsByBookmark = computed(() => {
   // 검색
   .search {
     margin-bottom: 20px;
+    margin-top: 10px;
+    padding: 0 4px;
 
     .el-input {
       width: 100%;
-      background-color: transparent;
-      border: none;
       border-bottom: 1px solid #fff;
       border-radius: 0;
       color: #fff;

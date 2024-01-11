@@ -2,7 +2,7 @@
 
 #app {
   max-width: 1280px;
-  margin: 0 auto;
+  // margin: 0 auto;
   // padding: 2rem;
 
   font-weight: normal;
@@ -56,8 +56,7 @@
 .el-input__prefix {
   width: auto;
   .el-input__prefix-inner {
-    display: inline-block;
-    margin-top: 4px;
+    color: var(--vt-c-text-dark-2);
   }
 }
 

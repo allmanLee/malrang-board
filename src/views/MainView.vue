@@ -2,15 +2,17 @@
 <!-- 말랑보드에서는 링크를 모아볼수 있습니다. -->
 <!-- 오늘 할일 한일 기록 및 깃연동으로 인원별 커밋 내용을 확인할 수 있습니다. -->
 <template>
-  <div class="navigation-side-bar">
-    <SideBar />
-  </div>
-  <div>
+  <div class="main-container">
+    <div class="navigation-side-bar">
+      <SideBar />
+    </div>
+    <div>
 
-    <!-- 드래그엔 드랍이 가능한 칸반보드(할일, 보류, 한일, 칸반 추가 기능) -->
-    <section>
-      <KanbanBoard :boards="boards" />
-    </section>
+      <!-- 드래그엔 드랍이 가능한 칸반보드(할일, 보류, 한일, 칸반 추가 기능) -->
+      <section>
+        <KanbanBoard :boards="boards" />
+      </section>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
@@ -50,6 +52,11 @@ const boards = ref<Board[]>(
 
 </script>
 <style scoped lang="scss">
+.main-container {
+  display: flex;
+  gap: 20px;
+}
+
 .container {
   display: flex;
   flex-direction: column;
@@ -76,7 +83,7 @@ const boards = ref<Board[]>(
 
 // 사이드 메뉴
 .navigation-side-bar {
-  position: fixed;
+  // display: flex;
   top: 40px;
   left: 0;
   height: 100vh;

@@ -172,6 +172,6 @@ nav {
 }
 
 .main {
-  margin-top: 80px;
+  margin-top: 40px; // 헤더 높이만큼 마진
 }
 </style>
