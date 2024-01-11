@@ -96,7 +96,7 @@
         </div>
 
         <!-- Member Column -->
-        <div class="column" :cass="'column-opacity'">
+        <div class="column">
           <h2 class="column-title">팀원</h2>
           <el-card v-for=" member  in  filteredMembers " :key="member.id" class="card">
             <div class="member-list">
@@ -335,7 +335,6 @@ const selectTeam = (teamId) => {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  // align-items: center;
   justify-content: center;
   // width: 100%;
   gap: 0px;
@@ -444,7 +443,9 @@ const selectTeam = (teamId) => {
 .card {
   position: relative;
   cursor: pointer;
+  align-items: flex-start !important;
   margin-bottom: 10px;
+  text-align: left;
 }
 
 

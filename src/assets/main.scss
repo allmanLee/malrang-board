@@ -35,8 +35,18 @@
 .el-input__wrapper {
   border-radius: 6px !important;
   border: none !important;
+  box-shadow: none !important;
 }
 
+.el-input__wrapper:hover {
+  border-color: none;
+  box-shadow: 0 0 0 1px var(--el-input-border-color,var(--el-border-color)) inset !important;
+}
+
+.el-input__wrapper:focus {
+  border-color: none;
+  box-shadow: 0 0 0 1px var(--el-input-focus-border) inset !important;
+}
 
 .el-input__inner {
   display: flex !important;

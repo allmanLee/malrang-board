@@ -2,16 +2,7 @@
   <!-- 드래그엔 드랍이 가능한 칸반보드 (한일, 보류, 할일) -->
   <div class="kanban-container">
     <!-- <h1 class="kanban-class">칸반보드</h1> -->
-
     <!-- 검색 -->
-    <el-input class="kanban-search" v-model="searchValue" placeholder="티켓의 제목, 담당자, 태그를 생각나는거 있어요?" clearable>
-      <!-- prefix 검색 아이콘 -->
-      <template #prefix>
-        <el-icon>
-          <Search />
-        </el-icon>
-      </template>
-    </el-input>
     <section class="kanban-action-menue-bar">
 
       <el-menu v-model="activeName" class="dashboard-filter" mode="horizontal" @select="el => handleClickNameActive(el)">
@@ -28,6 +19,15 @@
         </el-sub-menu>
       </el-menu>
     </section>
+    <el-input class="kanban-search" v-model="searchValue" placeholder="티켓의 제목, 담당자, 태그를 생각나는거 있어요?" clearable>
+      <!-- prefix 검색 아이콘 -->
+      <template #prefix>
+        <el-icon>
+          <Search />
+        </el-icon>
+      </template>
+    </el-input>
+
     <div class="kanban-container-boards">
 
       <div class="kanban-container-boards__panel" v-for="board in boards" :key="board.id"
@@ -329,8 +329,10 @@ const onDrop = (e, boardId) => {
   }
 
   .kanban-search {
+    position: absolute;
+    right: 0px;
     width: 400px;
-    height: 50px;
+    height: 40px;
     color: #ffffff;
     padding: 0 0px;
 
@@ -341,7 +343,7 @@ const onDrop = (e, boardId) => {
     flex-direction: row;
     align-items: flex-start;
     justify-content: flex-start;
-    gap: 20px;
+    gap: 10px;
     width: 100%;
     height: 500px;
   }
@@ -351,14 +353,13 @@ const onDrop = (e, boardId) => {
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    gap: 20px;
+    gap: 10px;
     width: 300px;
     min-height: 60%;
     background-color: black;
-    padding: 4px;
+    padding: 4px 20px;
     padding-bottom: 16px;
     border-radius: 10px;
-
   }
 
   .kanban-container-boards__panel-header {
