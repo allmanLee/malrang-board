@@ -54,6 +54,7 @@ const boards = ref<Board[]>(
 <style scoped lang="scss">
 .main-container {
   display: flex;
+  width: 100%;
   gap: 20px;
 }
 

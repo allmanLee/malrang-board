@@ -31,10 +31,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  gap: 20px;
+  justify-content: center;
+  gap: 100px;
   margin-top: 100px;
   margin-bottom: 100px;
+  text-align: center;
 
   section {
     width: 100%;
@@ -43,6 +44,7 @@
   h1 {
     font-size: 40px;
     font-weight: 700;
+    color: white;
   }
 
   p {
