@@ -3,7 +3,7 @@
 #app {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  // padding: 2rem;
 
   font-weight: normal;
 }
@@ -39,6 +39,7 @@
 
 
 .el-input__inner {
+  display: flex !important;
   border: none !important;
   background: var(--vt-c-black-mute);
 }
@@ -51,6 +52,13 @@
 .el-input__inner:hover {
   border-color: none;
   box-shadow: none;
+}
+.el-input__prefix {
+  width: auto;
+  .el-input__prefix-inner {
+    display: inline-block;
+    margin-top: 4px;
+  }
 }
 
 // 모달 오픈시 뒷 배경

@@ -3,23 +3,27 @@
   <el-form label-position="top" class="form-wrap">
 
     <section class="form-items__base-info">
-      <el-form-item label-width="60px" size="large" label="담당자">
+      <el-form-item label-width="60px" size="large" label="담당자 (복수 선택 가능)">
         <el-select v-model="customForm.user_idx" placeholder="담당자를 선택하세요" class="select-user">
           <el-option v-for="user in mockUsers" :key="user.id" :label="user.name" :value="user.id"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label-width="60px" size="large" label="제목">
+      <!-- 필수  -->
+      <el-form-item label-width="60px" size="large" label="제목 (필수)" required>
         <el-input aria-required="true" v-model="customForm.title" @keypress.enter="handleEnterCard"
           placeholder="제목을 입력하세요"></el-input>
       </el-form-item>
 
-      <el-form-item label-width="60px" label="태그">
+      <el-form-item label-width="60px" label="태그 (최대 10개)">
         <div class="tag-container">
           <el-tag v-for="tag in customForm.tags" :key="tag.id" type="info" closable @close="handleCloseTag(tag)">
             {{ tag.title }}
           </el-tag>
           <el-input class="tag__input" v-model="customForm.tag" placeholder="추가 태그를 입력"
             @keyup.enter="handleAddTag"></el-input>
+          <!-- 태그에 입력된 값이 있으면 'Enter'표시 -->
+          <el-button v-if="customForm.tag" type="primary" @click="handleAddTag">
+            <span class="icon-enter">↵</span></el-button>
         </div>
 
       </el-form-item>
@@ -45,14 +49,7 @@ import { useUserStore } from "@/stores/user";
 const emit = defineEmits(["update:form", "enter"]);
 
 // editor
-const isPreview = ref(false);
 const editorRef = ref(null);
-
-// 미리보기
-const handlePreview = () => {
-  console.log("handlePreview");
-  isPreview.value = !isPreview.value;
-};
 
 // Store
 const userStore = useUserStore();
@@ -193,8 +190,6 @@ const handleCloseTag = (tag: any) => {
     width: 140px;
     // background-color: #2b2b2b;
     color: #ffffff;
-    margin-left: 10px;
-
   }
 }
 
@@ -221,16 +216,11 @@ const handleCloseTag = (tag: any) => {
   padding: 10px;
 }
 
-.tool-bar {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-  width: 100%;
-  height: 50px;
-  color: white;
-  font-size: 20px;
+.icon-enter {
+  font-size: 12px;
+  // margin-left: 5px;
+  margin-top: 6px;
+  color: #ffffff;
   font-weight: 700;
 }
 </style>

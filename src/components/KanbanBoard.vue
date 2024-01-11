@@ -301,7 +301,7 @@ const onDrop = (e, boardId) => {
   align-items: flex-start;
   justify-content: flex-start;
   gap: 20px;
-  margin-top: 100px;
+  margin-top: 0px;
   margin-bottom: 100px;
   width: 100%;
   height: 100%;
