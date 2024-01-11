@@ -79,12 +79,6 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  Document,
-  Menu as IconMenu,
-  Location,
-  Setting,
-} from '@element-plus/icons-vue'
 import { computed, ref } from 'vue'
 
 const handleOpen = (key: string, keyPath: string[]) => {

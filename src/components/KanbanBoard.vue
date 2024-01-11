@@ -77,9 +77,9 @@ import { useUserStore } from "@/stores/user";
 import "md-editor-v3/lib/style.css";
 
 
-const users = useUserStore().getMockUsers;
+const users = computed(() => useUserStore().getMockUsers)
 
-const findUserNameById = useUserStore().findUserNameById
+// const findUserNameById = useUserStore().findUserNameById
 
 
 const props = defineProps<{
@@ -271,10 +271,6 @@ const handleClickToAdd = (board) => {
 const handleDeleteCard = (cardId) => {
   cardActions.delete(cardId);
 };
-
-const handleSaveToEmit = {
-
-}
 
 /* -------------------------------- 드래그엔드랍기능 -------------------------------- */
 // 카드 드래그 (다른 보드의 카드로 이동 가능)

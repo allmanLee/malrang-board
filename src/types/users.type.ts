@@ -5,7 +5,14 @@ export interface User {
   name: string;
   email: string;
   password?: string;
-  group_id?: string;
+  group?: Group;
+}
+
+export type userRequestDto = {
+  name: string;
+  email: string;
+  password: string;
+  groupName: string;
 }
 
 export interface UserState {

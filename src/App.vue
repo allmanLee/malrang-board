@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import { useDark, useToggle } from '@vueuse/core'
+import { useDark } from '@vueuse/core'
 import { useUserStore } from '@/stores/user';
 import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+// router.push('/mypage')
 
 // Store
 const userStore = useUserStore();
@@ -54,9 +59,10 @@ useDark()
         </span>
         <template #dropdown>
           <el-dropdown-item>
-            <router-link to="/mypate">
+            <span @click.self="router.push('/mypage')">
               회원정보
-            </router-link>
+            </span>
+
           </el-dropdown-item>
           <el-dropdown-item>
             <span @click="handleClickToLogout">

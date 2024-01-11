@@ -281,10 +281,10 @@ const addMember = (projectId, teamId) => {
     if (team) {
       const member = {
         id: team.members.length + 1,
-        name: newMember.value.name,
+        name: newMember.value,
       };
 
-      if (!newMember?.value?.name) {
+      if (!newMember?.value) {
         ElMessage('팀원을 선택해주세요.');
         return false;
       }

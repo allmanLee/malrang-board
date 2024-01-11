@@ -98,20 +98,13 @@ import { ElIcon } from "element-plus";
 import { ElTag } from "element-plus";
 import { Card } from "@/types/KanbanBoard.ts";
 import { ElMessage } from "element-plus";
-import { watch } from "fs";
-import router from "@/router";
 
-// Store
-import { useUserStore } from "@/stores/user";
-const userStore = useUserStore();
 
 const emit = defineEmits(["delete"]);
 
 const props = defineProps<{
   card: Card;
 }>();
-
-const users = computed(() => userStore.getUsers);
 
 /* ------------------------------- URL 해시 관련 코드 ------------------------------- */
 const cardRef = ref(null);
@@ -122,7 +115,7 @@ const cardRef = ref(null);
 // });
 
 // 카드 밖 클릭시 URL 해시 제거
-const handleClickOutside = (e) => {
+const handleClickOutside = () => {
   // const test = !cardRef.value.contains(e.target);
   // if (test) {
   const url = window.location.href.split("#")[0];
@@ -240,10 +233,6 @@ const handleClickDelete = () => {
       font-size: 14px;
       font-weight: 500;
       color: #ffffff;
-    }
-
-    &.linked-icon--linked {
-      // background-color: #534755;
     }
 
     &:hover {

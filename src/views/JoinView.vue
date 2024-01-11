@@ -9,7 +9,12 @@
       <el-label for="name">Name:</el-label>
       <el-input type="text" id="name" v-model="name" required />
 
-      <el-label for="email">Email:</el-label>
+      <el-label for="group">Group (테스트용)</el-label>
+      <el-select v-model="groupName" filterable allow-create placeholder="소속을 선택하세요" class="select-user">
+        <el-option v-for="group in mockGroups" :key="group.id" :label="group.name" :value="group.name"></el-option>
+      </el-select>
+
+      <el-label for="email">Email (테스트용)</el-label>
       <el-input type="email" id="email" v-model="email" required />
 
       <el-label for="password">Password:</el-label>
@@ -23,62 +28,59 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import { ref } from 'vue';
 
 // API
 import API from '@/apis';
 import { ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
+import { type Group } from '@/types/users.type.ts';
 
 
-export default {
-  setup() {
 
-    const $router = useRouter();
+const $router = useRouter();
 
 
-    const name = ref('');
-    const email = ref('');
-    const password = ref('');
-    const isAdmin = ref(false);
+const name = ref('');
+const email = ref('');
+const groupName = ref('');
+const password = ref('');
+const isAdmin = ref(false);
 
-    const submitForm = async () => {
-      // Perform signup logic here
-      console.log('Name:', name.value);
-      console.log('Email:', email.value);
-      console.log('Password:', password.value);
-      console.log('Is Admin:', isAdmin.value);
+const mockGroups: Group[] = [
+  { name: '말랑보드', id: 1 },
+  { name: '서원정보', id: 2 }
+]
+const submitForm = async () => {
+  // Perform signup logic here
+  console.log('Name:', name.value);
+  console.log('Email:', email.value);
+  console.log('GroupName:', groupName.value);
+  console.log('Password:', password.value);
+  console.log('Is Admin:', isAdmin.value);
 
-      try {
-        // 회원가입 API 호출
-        await API.createUser({
-          name: name.value,
-          email: email.value,
-          password: password.value,
-          isAdmin: isAdmin.value
-        });
+  try {
+    // 회원가입 API 호출
+    await API.createUser({
+      name: name.value,
+      email: email.value,
+      password: password.value,
+      groupName: groupName.value,
+      isAdmin: isAdmin.value
+    });
 
-        // 회원가입 성공
-        ElMessage.success('회원가입이 완료되었습니다.');
+    // 회원가입 성공
+    ElMessage.success('회원가입이 완료되었습니다.');
 
-        // 로그인 페이지로 이동
-        $router.push('/login');
-      } catch (error) {
-        console.error(error);
-        ElMessage.error('회원가입에 실패했습니다.');
-      }
-    };
-
-    return {
-      name,
-      email,
-      password,
-      isAdmin,
-      submitForm
-    };
+    // 로그인 페이지로 이동
+    $router.push('/login');
+  } catch (error) {
+    console.error(error);
+    ElMessage.error('회원가입에 실패했습니다.');
   }
 }
+
 </script>
 
 <style lang="scss" scoped>
@@ -106,6 +108,11 @@ form {
 
 .el-input {
   margin-bottom: 20px;
+}
+
+.el-select {
+  margin-bottom: 20px;
+  width: 100%;
 }
 
 label {

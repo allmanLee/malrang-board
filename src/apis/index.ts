@@ -1,5 +1,5 @@
 import axios, { type AxiosResponse } from 'axios';
-import { type User,  type UserId } from '../types/users.type';
+import { type UserId } from '../types/users.type';
 
 const API_URL = 'http://localhost:8000'; // Replace with your API URL
 
@@ -59,11 +59,11 @@ const del = async <T>(url: string): Promise<T> => {
 const userApi = {
 
   // 사용자 (CRUD) 및 로그인
-  getUsers: () => get<User[]>(apiEndpoints.users),
-  getUser: (userId: UserId) => get<User>(apiEndpoints.user(userId)),
-  createUser: (userData: User) => post<User>(apiEndpoints.users, userData),
-  updateUser: (userId: UserId, userData: User) => put<User>(apiEndpoints.user(userId), userData),
-  deleteUser: (userId: UserId) => del<User>(apiEndpoints.user(userId)),
+  getUsers: () => get(apiEndpoints.users),
+  getUser: (userId: UserId) => get(apiEndpoints.user(userId)),
+  createUser: (userData: userRequestDto) => post(apiEndpoints.users, userData),
+  updateUser: (userId: UserId, userData: userRequestDto) => put(apiEndpoints.user(userId), userData),
+  deleteUser: (userId: UserId) => del(apiEndpoints.user(userId)),
   login: (userData: {email: string, password: string}) => post(`${apiEndpoints.users}/login`, userData),
 
   // 사용자 퍼미션 (RU)

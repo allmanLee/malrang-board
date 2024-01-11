@@ -6,10 +6,14 @@ export interface Project {
   name: string;
   teams: Team[];
   group_id: string;
+  createUser_Id: string;
+	isDeleted: boolean;
 }
 
 export interface Team {
   id: number;
   name: string;
   members: User[];
+  createUser_Id: string;
+	isDeleted: boolean;
 }
