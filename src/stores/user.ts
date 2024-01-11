@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
-import API from '../apis'
-import { UserState } from '../types/users.type'
+import { type UserState } from '../types/users.type'
 
 interface User {
   id: number
@@ -25,11 +24,14 @@ export const useUserStore = defineStore('user', {
       id: 0,
       name: 'Alice',
       email: '',
-      team: {
+      teams: [{
         id: 1,
         name: 'team1',
         members: [],
-      },
+        createUser_Id: '',
+        isDeleted: false,
+      }],
+
       projects: []
     }
   }),
