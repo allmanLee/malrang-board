@@ -93,3 +93,4 @@ const login = async () => {
   }
 }
 </style>
+@/types/users.type

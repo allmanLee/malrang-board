@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import API from '../apis'
-import { UserState } from '../types/users'
+import { UserState } from '../types/users.type'
 
 interface User {
   id: number

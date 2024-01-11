@@ -1,8 +1,11 @@
+import { type Team, type Project } from './projects.type';
+
 export interface User {
   id: number;
   name: string;
   email: string;
   password?: string;
+  group_id?: string;
 }
 
 export interface UserState {
@@ -13,16 +16,10 @@ export interface UserState {
   projects: Project[];
 }
 
-export interface Team {
+export interface Group {
   id: number;
   name: string;
-  members: User[];
-}
-
-export interface Project {
-  id: number;
-  name: string;
-  team: Team;
+  domain?: string;
 }
 
 export type UserId = string; // number | string;
