@@ -18,7 +18,6 @@ import API from '@/apis';
 import { ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
-import { User } from '@/types/users';
 const email = ref('');
 const password = ref('');
 
@@ -37,7 +36,7 @@ const login = async () => {
 
     ElMessage.success('로그인이 완료되었습니다.'); // 로그인 성공
     $router.push('/'); // 메인 페이지로 이동
-    userStore.fetchUser(result as User); // Store userState 업데이트
+    userStore.fetchUser(result); // Store userState 업데이트
   } catch (error) {
     console.error(error);
     ElMessage.error('로그인에 실패하였습니다.');

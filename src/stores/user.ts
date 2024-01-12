@@ -1,12 +1,14 @@
 import { defineStore } from 'pinia'
 import { type UserState } from '../types/users.type'
 import { type User } from '../types/users.type'
-import { type Team, type Project } from '../types/projects.type'
+import { type Project } from '../types/projects.type'
+import type { ProjectRequestDto } from '@/types/dto/project.dto.type'
 
+import router from '../router'
 import API from '../apis'
 interface UserStore {
   users: User[],
-  userState: UserState,
+  userState: UserState | null,
   mockUsers: User[],
 }
 
@@ -16,19 +18,12 @@ export const useUserStore = defineStore('user', {
     users: [],
     mockUsers: [
       {
-        id: 1,
-        name: 'Alice',
+        id: '',
+        name: '',
         email: '',
       },
     ],
-    userState: {
-      id: 0,
-      name: 'Alice',
-      email: '',
-      teams: [],
-      groupName: '',
-      projects: []
-    }
+    userState: null, // null 이면 로그인 안한 상태
   }),
   getters: {
     getUsers:(state) => {
@@ -39,7 +34,7 @@ export const useUserStore = defineStore('user', {
       return  state.mockUsers
     },
     isLogin: (state) => {
-      return state.userState.id !== 0
+      return state.userState !== null
     },
     getUserState: (state) => {
       return state.userState
@@ -55,32 +50,40 @@ export const useUserStore = defineStore('user', {
     addUser(user: User) {
       this.users.push(user)
     },
-    findUserNameById(id: number) {
+    findUserNameById(id: string) {
       return this.users.find((user) => user.id === id)?.name
     },
+    /** @function 유저 정보 패치
+     * @param {User} user
+     * @returns {void}
+     * @description 유저 정보를 패치하고, 유저 상태를 업데이트 합니다. 최신의 팀 정보와 프로젝트 정보를 패치합니다.
+     */
     async fetchUser(user: User) {
-      const teams: Team[] = await API.getTeams(user.id)
-      const projects: Project[] = await API.getProjects(user.id)
+      const projects = await API.getProjects({groupId: user.groupId}).catch((err) => { console.log(err) })
+      let _userState: UserState = null
 
-      const _userState: UserState = {
+      const teams = projects?.map((project: Project) => project.teams).flat()
+
+      _userState = {
         id: user.id,
         name: user.name,
         email: user.email,
         groupName: user.groupName || null,
+        groupId: user.groupId || null,
         teams: teams || [],
         projects: projects || [],
       }
       this.userState = _userState
     },
+    async createProject(projectData: ProjectRequestDto) {
+      const result = await API.createProject(projectData)
+      
+      this.userState?.projects.push(result)
+      return result
+    },
     logout() {
-      this.userState = {
-        id: 0,
-        name: 'Alice',
-        email: '',
-        teams: [],
-        projects: [],
-        groupName: '',
-      }
+      this.userState = null
+      router.push({ name: 'Login' })
     }
   }
 })

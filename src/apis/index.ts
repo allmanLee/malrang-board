@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from 'axios';
-import type { UserId,ProjectId,  } from '../types/users.type';
-import type { Project } from '../types/projects.type';
+import type { UserId,ProjectId, User } from '../types/users.type';
+import type { Project, Team } from '../types/projects.type';
 import type { ProjectRequestDto } from '../types/dto/project.dto.type';
 import type { UserRequestDto } from '../types/users.type';
 const API_URL = 'http://localhost:8000'; // Replace with your API URL
@@ -24,9 +24,9 @@ const api = axios.create({
 });
 
 // Define your API methods here (get, post, put, delete, etc)
-const get = async <T>(url: string): Promise<T> => {
+const get = async <T>(url: string, params?: any): Promise<T> => {
   try {
-    const response: AxiosResponse<T> = await api.get(url);
+    const response: AxiosResponse<T> = await api.get(url, {params});
     return response.data;
   } catch (error) {
     console.error(error)
@@ -67,12 +67,12 @@ const del = async <T>(url: string): Promise<T> => {
 const userApi = {
 
   // 사용자 (CRUD) 및 로그인
-  getUsers: <T>(params: T) => get(`${apiEndpoints.users}/?${params}`),
+  getUsers: <T>(params: T) => get(`${apiEndpoints.users}`, params),
   getUser: (userId: UserId) => get(apiEndpoints.user(userId)),
   createUser: (userData: UserRequestDto) => post(apiEndpoints.users, userData),
   updateUser: (userId: UserId, userData: UserRequestDto) => put(apiEndpoints.user(userId), userData),
   deleteUser: (userId: UserId) => del(apiEndpoints.user(userId)),
-  login: (userData: {email: string, password: string}) => post(`${apiEndpoints.users}/login`, userData),
+  login: (userData: {email: string, password: string}): Promise<User> => post(`${apiEndpoints.users}/login`, userData),
 
   // 그룹 (CRUD)
   getGroups: () => get(apiEndpoints.users),
@@ -82,14 +82,14 @@ const userApi = {
 
 
   // 프로젝트 (CRUD)
-  getProjects: <T>(params: T): Promise<Project[]> => get(`${apiEndpoints.projects}/?${params}`),
+  getProjects: <T>(params: T): Promise<Project[]> => get(`${apiEndpoints.projects}`, params),
   getProject: (projectId: ProjectId) => get(apiEndpoints.user(projectId)),
-  createProject: (projectData: ProjectRequestDto) => post(apiEndpoints.users, projectData),
+  createProject: (projectData: ProjectRequestDto): Promise<Project> => post(apiEndpoints.projects, projectData),
   updateProject: (projectId: ProjectId, projectData: ProjectRequestDto) => put(apiEndpoints.user(projectId), projectData),
   deleteProject: (projectId: ProjectId) => del(apiEndpoints.user(projectId)),
 
   // 팀 (CRUD)
-  getTeams: <T>(params: T) => get(`${apiEndpoints.teams}/?${params}`),
+  getTeams: <T>(params: T):Promise<Team[]> => get(`${apiEndpoints.teams}/?${params}`),
 
   // 사용자 퍼미션 (RU)
   getUserPermissions: (userId: UserId) => get<string[]>(apiEndpoints.userPermissions(userId)),

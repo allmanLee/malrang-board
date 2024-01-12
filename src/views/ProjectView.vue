@@ -6,7 +6,7 @@
         <h3 class="project-magage-title">
           <el-tooltip content="소속은 마이페이지에서 변경 가능합니다." placement="top">
             <div class="tooltip-container">
-              <span class="-border">서원정보</span>
+              <span class="-border">{{ user.groupName }}</span>
               <el-icon>
                 <QuestionFilled />
               </el-icon>
@@ -143,10 +143,18 @@ import { ref, computed } from 'vue';
 import { useUserStore } from '@/stores/user';
 import CountUser from '@/components/CountUser.vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { ProjectRequestDto } from '@/types/dto/project.dto.type';
+
+// Store
+const store = useUserStore();
+const userId = computed(() => store.getUserState.id);
+const user = computed(() => store.getUserState);
+
 
 // Project data
 const projects = ref([]);
 const newProjectName = ref('');
+projects.value = user.value.projects;
 
 // User data
 const userStore = useUserStore();
@@ -163,22 +171,25 @@ const showMemberFormFlag = ref(false);
 const selectedTeamId = ref(0);
 
 // API call
-const fetchUser = () => {
-  userStore.fetchUsers();
-};
+// const fetchUser = () => {
+//   userStore.fetchUsers();
+// };
 
-fetchUser();
+
 
 // Add Project
 const addProject = async () => {
   try {
-    const project = {
-      id: projects.value.length + 1 || 0,
+    const project: ProjectRequestDto = {
       name: newProjectName.value,
-      teams: []
+      createUserId: userId.value,
+      groupId: user.value.groupId,
     };
-    projects.value.push(project);
 
+    projects.value.push(project);
+    showTeamFormFlag.value = false;
+
+    store.createProject(project);
     ElMessage(`${newProjectName.value} 프로젝트가 추가되었습니다.`);
     newProjectName.value = '';
   } catch (error) {

@@ -1,18 +1,19 @@
 import { type Team, type Project } from './projects.type';
 export type groupName = 'team1' | 'team2' | 'team3'
 export interface User {
-  id: number;
+  id: string,
   name: string;
   email: string;
   password?: string;
   groupName?: string;
+  groupId?: string;
 }
 
 export type UserRequestDto = {
   name: string;
   email: string;
   password: string;
-  groupName: string | null;
+  groupName: string | null,
 }
 
 export type GroupRequestDto = {
@@ -29,16 +30,17 @@ export type TeamRequestDto = {
 }
 
 export type UserState = {
-  id: number;
+  id: string,
   name: string;
   email: string;
   teams: Team[];
   projects: Project[];
   groupName: string | null;
-}
+  groupId: string | null;
+} | null;
 
 export interface Group {
-  id: number;
+  id: string;
   name: string;
   domain?: string;
 }

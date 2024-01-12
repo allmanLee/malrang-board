@@ -3,4 +3,5 @@ export type UserRequestDto = {
     email: string;
     password: string;
     groupName: string | null;
+    groupId: string | null;
 };
