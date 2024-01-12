@@ -63,7 +63,7 @@ export const useUserStore = defineStore('user', {
     findUserNameById(id: number) {
       return this.users.find((user) => user.id === id)?.name
     },
-    async fetchUser(userState: User) {
+    async fetchUser(userState: UserState) {
       const _userState: UserState = userState
       this.userState = _userState
     },

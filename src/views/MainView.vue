@@ -55,7 +55,9 @@ const boards = ref<Board[]>(
 .main-container {
   display: flex;
   width: 100%;
-  gap: 20px;
+  // gap: 20px;
+  margin-left: 270px; // 사이드바 너비 (250px) + 마진 20px
+
 }
 
 .container {
@@ -84,6 +86,7 @@ const boards = ref<Board[]>(
 
 // 사이드 메뉴
 .navigation-side-bar {
+  position: fixed;
   // display: flex;
   top: 40px;
   left: 0;
