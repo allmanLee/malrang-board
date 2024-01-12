@@ -2,18 +2,18 @@
 import { type User } from './users.type';
 
 export interface Project {
-  id: number;
+  id?: number | null;
   name: string;
   teams: Team[];
-  group_id: string;
-  createUser_Id: string;
+  groupId: string;
+  createUserId: string;
 	isDeleted: boolean;
 }
 
 export interface Team {
-  id: number;
+  id?: number | null;
   name: string;
   members: User[];
-  createUser_Id: string;
+  createUserId: string;
 	isDeleted: boolean;
 }

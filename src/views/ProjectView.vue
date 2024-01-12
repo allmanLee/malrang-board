@@ -170,14 +170,20 @@ const fetchUser = () => {
 fetchUser();
 
 // Add Project
-const addProject = () => {
-  const project = {
-    id: projects.value.length + 1 || 0,
-    name: newProjectName.value,
-    teams: []
-  };
-  projects.value.push(project);
-  newProjectName.value = '';
+const addProject = async () => {
+  try {
+    const project = {
+      id: projects.value.length + 1 || 0,
+      name: newProjectName.value,
+      teams: []
+    };
+    projects.value.push(project);
+
+    ElMessage(`${newProjectName.value} 프로젝트가 추가되었습니다.`);
+    newProjectName.value = '';
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const filteredTeams = computed(() => {
