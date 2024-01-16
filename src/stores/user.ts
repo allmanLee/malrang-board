@@ -4,6 +4,8 @@ import { type User } from '../types/users.type'
 import { type Project } from '../types/projects.type'
 import type { ProjectRequestDto } from '@/types/dto/project.dto.type'
 
+import { watch } from 'vue'
+
 import router from '../router'
 import API from '../apis'
 interface UserStore {
@@ -64,6 +66,8 @@ export const useUserStore = defineStore('user', {
 
       const teams = projects?.map((project: Project) => project.teams).flat()
 
+      localStorage.setItem('userState', JSON.stringify(user))
+
       _userState = {
         id: user.id,
         name: user.name,
@@ -84,6 +88,9 @@ export const useUserStore = defineStore('user', {
     logout() {
       this.userState = null
       router.push({ name: 'Login' })
+
+      localStorage.removeItem('userState')
     }
   }
 })
+

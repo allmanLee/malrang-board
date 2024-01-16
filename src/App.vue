@@ -22,6 +22,12 @@ const handleClickToLogout = () => {
   userStore.logout();
 }
 
+// localStorage에 저장된 userState 가져와서 업데이트
+const userState = localStorage.getItem('userState');
+if (userState) {
+  userStore.fetchUser(JSON.parse(userState));
+}
+
 // 로그인한 사용자명
 const userName = computed(() => {
   return userStore.getUserState.name;
