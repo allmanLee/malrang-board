@@ -24,8 +24,8 @@
           <!-- 아이콘과 같이 팀 갯수 / 팀원 수 표기 -->
 
 
-          <el-card v-for="(project, index) in projects" :key="project.id" class="card"
-            :class="{ 'highlighted': project.id === selectedPrjId }" @click="selectProject(project.id)">
+          <el-card v-for="(project, index) in projects" :key="project._id" class="card"
+            :class="{ 'highlighted': project._id === selectedPrjId }" @click="selectProject(project._id)">
             <div class="card-header">
               <section class="project-card-column">
                 <p class="project-card-column-title">
@@ -33,9 +33,9 @@
                 </p>
                 <span class="project-card-title">{{ project.name }}</span>
               </section>
-              <count-user :member="project.teams.reduce((acc, cur) => acc + cur.members.length, 0)"
-                :team="project.teams.length" class="count-user"></count-user>
-              <el-button @click="deleteProject(project.id)" class="delete-button">
+              <count-user :member="project?.teams?.reduce((acc, cur) => acc + cur.members.length, 0, 0)"
+                :team="project?.teams?.length" class="count-user"></count-user>
+              <el-button @click="deleteProject(project._id)" class="delete-button">
                 <el-icon>
                   <Delete />
                 </el-icon>
@@ -143,7 +143,8 @@ import { ref, computed } from 'vue';
 import { useUserStore } from '@/stores/user';
 import CountUser from '@/components/CountUser.vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { ProjectRequestDto } from '@/types/dto/project.dto.type';
+import { ProjectRequestDto, TeamRequestDto } from '@/types/dto/project.dto.type';
+
 
 // Store
 const store = useUserStore();
@@ -152,9 +153,28 @@ const user = computed(() => store.getUserState);
 
 
 // Project data
-const projects = ref([]);
+const projects: any = ref([]);
 const newProjectName = ref('');
-projects.value = user.value.projects;
+
+
+/** @function 프로젝트 세팅 */
+const setProject = () => {
+  projects.value = user.value.projects;
+
+
+  projects.value.map((prj) => {
+    // 프로젝트 아이디가 일치하는 팀 추가
+    const filterTeam = user.value.teams.filter(team => team?.projectId === prj._id);
+
+    console.log(filterTeam)
+
+    // 팀 추가
+    prj.teams = filterTeam || [];
+    console.log(projects.value.teams)
+  })
+};
+
+setProject();
 
 // User data
 const userStore = useUserStore();
@@ -170,26 +190,24 @@ const newMember = ref('');
 const showMemberFormFlag = ref(false);
 const selectedTeamId = ref(0);
 
-// API call
-// const fetchUser = () => {
-//   userStore.fetchUsers();
-// };
-
+// 프로젝트 조회
+// const 
 
 
 // Add Project
 const addProject = async () => {
   try {
-    const project: ProjectRequestDto = {
+    const request: ProjectRequestDto = {
       name: newProjectName.value,
       createUserId: userId.value,
       groupId: user.value.groupId,
     };
 
-    projects.value.push(project);
+    // projects.value.push(project);
     showTeamFormFlag.value = false;
 
-    store.createProject(project);
+    store.createProject(request);
+    store.fetchUser(store.getUserState);
     ElMessage(`${newProjectName.value} 프로젝트가 추가되었습니다.`);
     newProjectName.value = '';
   } catch (error) {
@@ -198,13 +216,13 @@ const addProject = async () => {
 };
 
 const filteredTeams = computed(() => {
-  const project = projects.value.find(project => project.id === selectedPrjId.value);
+  const project = projects.value.find(project => project._id === selectedPrjId.value);
   return project ? project.teams : [];
 });
 
 const filteredMembers = computed(() => {
-  const project = projects.value.find(project => project.id === selectedPrjId.value);
-  if (project) {
+  const project = projects.value.find(project => project._id === selectedPrjId.value);
+  if (project && project?.teams?.length > 0) {
     const team = project.teams.find(team => team.id === selectedTeamId.value);
     if (team) {
       return team.members;
@@ -225,8 +243,8 @@ const beforeDeleteMessage = async () => {
 // Delete Project
 const deleteProject = async (projectId) => {
   const confirm = await beforeDeleteMessage();
-  if (confirm && projectId && projects.value.find(project => project.id === projectId)) {
-    projects.value = projects.value.filter(project => project.id !== projectId);
+  if (confirm && projectId && projects.value.find(project => project._id === projectId)) {
+    projects.value = projects.value.filter(project => project._id !== projectId);
     selectedPrjId.value = 0; // Reset selected project
     selectedTeamId.value = 0; // Reset selected team
   }
@@ -234,7 +252,7 @@ const deleteProject = async (projectId) => {
 
 // Show Team Form
 const showTeamForm = (projectId) => {
-  const project = projects.value.find(project => project.id === projectId);
+  const project = projects.value.find(project => project._id === projectId);
   if (project) {
     selectedPrjId.value = projectId;
     showTeamFormFlag.value = true;
@@ -248,24 +266,32 @@ const hideTeamForm = () => {
 };
 
 // Add Team
-const addTeam = () => {
-  const project = projects.value.find(project => project.id === selectedPrjId.value);
-  if (project) {
-    const team = {
-      id: project.teams.length + 1,
+const addTeam = async () => {
+  try {
+    const request: TeamRequestDto = {
       name: newTeamName.value,
-      members: []
+      createUserId: userId.value,
+      projectId: selectedPrjId.value,
     };
-    project.teams.push(team);
-    newTeamName.value = '';
+
+    // projects.value.push(project);
     showTeamFormFlag.value = false;
+
+    store.createTeam(request);
+    store.fetchUser(store.getUserState);
+    ElMessage(`${newTeamName.value} 팀이 추가되었습니다.`);
+    newTeamName.value = '';
+  } catch (error) {
+    console.error(error);
   }
 };
+
+
 
 // Delete Team
 const deleteTeam = async (projectId, teamId) => {
   const confirm = await beforeDeleteMessage();
-  const project = projects.value.find(project => project.id === projectId);
+  const project = projects.value.find(project => project._id === projectId);
   if (confirm && project) {
     project.teams = project.teams.filter(team => team.id !== teamId);
     selectedTeamId.value = 0; // Reset selected team
@@ -274,7 +300,7 @@ const deleteTeam = async (projectId, teamId) => {
 
 // Show Member Form
 const showMemberForm = (projectId, teamId) => {
-  const project = projects.value.find(project => project.id === projectId);
+  const project = projects.value.find(project => project._id === projectId);
   if (project) {
     const team = project.teams.find(team => team.id === teamId);
     if (team) {
@@ -292,7 +318,7 @@ const hideMemberForm = () => {
 
 // Add Member
 const addMember = (projectId, teamId) => {
-  const project = projects.value.find(project => project.id === projectId);
+  const project = projects.value.find(project => project._id === projectId);
   if (project) {
     const team = project.teams.find(team => team.id === teamId);
     if (team) {
@@ -315,7 +341,7 @@ const addMember = (projectId, teamId) => {
 
 // Delete Member
 const deleteMember = (projectId, teamId, memberId) => {
-  const project = projects.value.find(project => project.id === projectId);
+  const project = projects.value.find(project => project._id === projectId);
   if (project) {
     const team = project.teams.find(team => team.id === teamId);
     if (team) {

@@ -2,10 +2,7 @@ import { defineStore } from 'pinia'
 import { type UserState } from '../types/users.type'
 import { type User } from '../types/users.type'
 import { type Project } from '../types/projects.type'
-import type { ProjectRequestDto } from '@/types/dto/project.dto.type'
-
-import { watch } from 'vue'
-
+import type { ProjectRequestDto, TeamRequestDto } from '@/types/dto/project.dto.type'
 import router from '../router'
 import API from '../apis'
 interface UserStore {
@@ -81,10 +78,16 @@ export const useUserStore = defineStore('user', {
     },
     async createProject(projectData: ProjectRequestDto) {
       const result = await API.createProject(projectData)
-      
       this.userState?.projects.push(result)
       return result
     },
+
+    async createTeam(teamData: TeamRequestDto) {
+      const result = await API.createTeam(teamData)
+      this.userState?.teams.push(result)
+      return result
+    },
+
     logout() {
       this.userState = null
       router.push({ name: 'Login' })

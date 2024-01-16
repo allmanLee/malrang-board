@@ -1,7 +1,7 @@
 import axios, { type AxiosResponse } from 'axios';
 import type { UserId,ProjectId, User } from '../types/users.type';
 import type { Project, Team } from '../types/projects.type';
-import type { ProjectRequestDto } from '../types/dto/project.dto.type';
+import type { ProjectRequestDto, TeamRequestDto } from '../types/dto/project.dto.type';
 import type { UserRequestDto } from '../types/users.type';
 const API_URL = 'http://localhost:8000'; // Replace with your API URL
 
@@ -14,7 +14,7 @@ const apiEndpoints = {
   projects: '/projects',
   project: (projectId: string) => `/projects/${projectId}`,
 
-  teams: '/teams',
+  teams: '/projects/teams',
   team: (teamId: string) => `/teams/${teamId}`,
 };
 
@@ -90,6 +90,8 @@ const userApi = {
 
   // 팀 (CRUD)
   getTeams: <T>(params: T):Promise<Team[]> => get(`${apiEndpoints.teams}/?${params}`),
+  getTeam: (teamId: UserId) => get(apiEndpoints.user(teamId)),
+  createTeam: (teamData: TeamRequestDto):Promise<Team> => post(apiEndpoints.teams, teamData),
 
   // 사용자 퍼미션 (RU)
   getUserPermissions: (userId: UserId) => get<string[]>(apiEndpoints.userPermissions(userId)),

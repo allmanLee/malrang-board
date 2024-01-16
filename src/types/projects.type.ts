@@ -15,5 +15,6 @@ export interface Team {
   name: string;
   members: User[];
   createUserId: string;
+  projectId: string;
 	isDeleted: boolean;
 }
