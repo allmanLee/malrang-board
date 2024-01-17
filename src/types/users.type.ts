@@ -1,4 +1,4 @@
-import { type Team, type Project } from './projects.type';
+import type { Team, Project } from './projects.type';
 export type groupName = 'team1' | 'team2' | 'team3'
 export interface User {
   id: string,
@@ -46,4 +46,3 @@ export interface Group {
 }
 
 export type UserId = string; // number | string;
-export type ProjectId = string; // number | string;

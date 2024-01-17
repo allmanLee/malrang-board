@@ -57,14 +57,16 @@ router.beforeEach((to:any, from:any, next:any) => {
   const isLoggedIn = localStorage.getItem('userState');
 
   // 로그인이 필요한 페이지인데 로그인이 안된 경우
-  if (authRequired && !isLoggedIn) {
-    next('/login');
+  if ((to.name=== 'login') && authRequired && !isLoggedIn) {    
 
-    ElMessage({
-      showClose: true,
-      message: '로그인이 필요합니다.',
-      type: 'warning'
-    });
+    if(to.name !== 'login') {
+      next('/login');
+      ElMessage({
+        showClose: true,
+        message: '로그인이 필요합니다.',
+        type: 'warning'
+      });
+    }
     
   } else {
     next();

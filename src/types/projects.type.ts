@@ -2,7 +2,7 @@
 import { type User } from './users.type';
 
 export interface Project {
-  id?: number | null;
+  _id?: ProjectId;
   name: string;
   teams: Team[];
   groupId: string;
@@ -11,10 +11,13 @@ export interface Project {
 }
 
 export interface Team {
-  id?: number | null;
+  _id?: TeamId;
   name: string;
   members: User[];
   createUserId: string;
-  projectId: string;
+  projectId: ProjectId;
 	isDeleted: boolean;
 }
+
+export type ProjectId = string; // number | string;
+export type TeamId = string; // number | string;

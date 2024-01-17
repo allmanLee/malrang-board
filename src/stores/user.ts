@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { type UserState } from '../types/users.type'
 import { type User } from '../types/users.type'
-import { type Project } from '../types/projects.type'
+import type {  Project, ProjectId } from '../types/projects.type'
 import type { ProjectRequestDto, TeamRequestDto } from '@/types/dto/project.dto.type'
 import router from '../router'
 import API from '../apis'
@@ -63,7 +63,7 @@ export const useUserStore = defineStore('user', {
 
       const teams = projects?.map((project: Project) => project.teams).flat()
 
-      localStorage.setItem('userState', JSON.stringify(user))
+      
 
       _userState = {
         id: user.id,
@@ -75,10 +75,22 @@ export const useUserStore = defineStore('user', {
         projects: projects || [],
       }
       this.userState = _userState
+      localStorage.setItem('userState', JSON.stringify(this.userState))
     },
     async createProject(projectData: ProjectRequestDto) {
       const result = await API.createProject(projectData)
+      
       this.userState?.projects.push(result)
+      localStorage.setItem('userState', JSON.stringify(this.userState))
+      return result
+    },
+
+    async deleteProject(projectId: ProjectId) {
+      const result = await API.deleteProject(projectId)
+      if(!this.userState) return
+      this.userState.projects = this.userState?.projects.filter((project) => project._id !== projectId)
+      console.log('this.userState.projects', this.userState.projects)
+      localStorage.setItem('userState', JSON.stringify(this.userState))
       return result
     },
 
@@ -89,10 +101,9 @@ export const useUserStore = defineStore('user', {
     },
 
     logout() {
+      localStorage.removeItem('userState')
       this.userState = null
       router.push({ name: 'Login' })
-
-      localStorage.removeItem('userState')
     }
   }
 })

@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from 'axios';
-import type { UserId,ProjectId, User } from '../types/users.type';
-import type { Project, Team } from '../types/projects.type';
+import type { UserId, User } from '../types/users.type';
+import type { Project, ProjectId, Team } from '../types/projects.type';
 import type { ProjectRequestDto, TeamRequestDto } from '../types/dto/project.dto.type';
 import type { UserRequestDto } from '../types/users.type';
 const API_URL = 'http://localhost:8000'; // Replace with your API URL
@@ -86,7 +86,7 @@ const userApi = {
   getProject: (projectId: ProjectId) => get(apiEndpoints.user(projectId)),
   createProject: (projectData: ProjectRequestDto): Promise<Project> => post(apiEndpoints.projects, projectData),
   updateProject: (projectId: ProjectId, projectData: ProjectRequestDto) => put(apiEndpoints.user(projectId), projectData),
-  deleteProject: (projectId: ProjectId) => del(apiEndpoints.user(projectId)),
+  deleteProject: (projectId: ProjectId) => del(apiEndpoints.project(projectId)),
 
   // 팀 (CRUD)
   getTeams: <T>(params: T):Promise<Team[]> => get(`${apiEndpoints.teams}/?${params}`),

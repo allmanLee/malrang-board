@@ -144,6 +144,7 @@ import { useUserStore } from '@/stores/user';
 import CountUser from '@/components/CountUser.vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { ProjectRequestDto, TeamRequestDto } from '@/types/dto/project.dto.type';
+import { cloneDeep } from 'lodash';
 
 
 // Store
@@ -159,7 +160,7 @@ const newProjectName = ref('');
 
 /** @function 프로젝트 세팅 */
 const setProject = () => {
-  projects.value = user.value.projects;
+  projects.value = cloneDeep(user.value.projects);
 
 
   projects.value.map((prj) => {
@@ -203,13 +204,16 @@ const addProject = async () => {
       groupId: user.value.groupId,
     };
 
-    // projects.value.push(project);
     showTeamFormFlag.value = false;
 
-    store.createProject(request);
-    store.fetchUser(store.getUserState);
+    const result = await store.createProject(request);
     ElMessage(`${newProjectName.value} 프로젝트가 추가되었습니다.`);
     newProjectName.value = '';
+
+    // 프로젝트 추가
+    projects.value = [...projects.value, result];
+
+
   } catch (error) {
     console.error(error);
   }
@@ -244,6 +248,9 @@ const beforeDeleteMessage = async () => {
 const deleteProject = async (projectId) => {
   const confirm = await beforeDeleteMessage();
   if (confirm && projectId && projects.value.find(project => project._id === projectId)) {
+
+    await store.deleteProject(projectId);
+
     projects.value = projects.value.filter(project => project._id !== projectId);
     selectedPrjId.value = 0; // Reset selected project
     selectedTeamId.value = 0; // Reset selected team
@@ -274,11 +281,9 @@ const addTeam = async () => {
       projectId: selectedPrjId.value,
     };
 
-    // projects.value.push(project);
     showTeamFormFlag.value = false;
 
     store.createTeam(request);
-    store.fetchUser(store.getUserState);
     ElMessage(`${newTeamName.value} 팀이 추가되었습니다.`);
     newTeamName.value = '';
   } catch (error) {
@@ -292,6 +297,7 @@ const addTeam = async () => {
 const deleteTeam = async (projectId, teamId) => {
   const confirm = await beforeDeleteMessage();
   const project = projects.value.find(project => project._id === projectId);
+
   if (confirm && project) {
     project.teams = project.teams.filter(team => team.id !== teamId);
     selectedTeamId.value = 0; // Reset selected team
