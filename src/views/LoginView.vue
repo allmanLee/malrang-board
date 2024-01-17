@@ -35,8 +35,14 @@ const login = async () => {
     });
 
     ElMessage.success('로그인이 완료되었습니다.'); // 로그인 성공
-    $router.push('/'); // 메인 페이지로 이동
+
     userStore.fetchUser(result); // Store userState 업데이트
+
+
+    setTimeout(() => {
+      $router.push('/'); // 메인 페이지로 이동
+    }, 1000);
+
   } catch (error) {
     console.error(error);
     ElMessage.error('로그인에 실패하였습니다.');

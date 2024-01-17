@@ -57,7 +57,7 @@ router.beforeEach((to:any, from:any, next:any) => {
   const isLoggedIn = localStorage.getItem('userState');
 
   // 로그인이 필요한 페이지인데 로그인이 안된 경우
-  if ((to.name=== 'login') && authRequired && !isLoggedIn) {    
+  if (authRequired && !isLoggedIn) {    
 
     if(to.name !== 'login') {
       next('/login');

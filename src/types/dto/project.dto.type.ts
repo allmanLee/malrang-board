@@ -7,5 +7,5 @@ export type ProjectRequestDto = {
 export type TeamRequestDto = {
   name: string;
   createUserId: string;
-  projectId: number;
+  projectId: string;
 }

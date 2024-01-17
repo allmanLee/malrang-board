@@ -61,7 +61,7 @@ export const useUserStore = defineStore('user', {
       const projects = await API.getProjects({groupId: user.groupId}).catch((err) => { console.log(err) })
       let _userState: UserState = null
 
-      const teams = projects?.map((project: Project) => project.teams).flat()
+      const teams = projects?.map((project: Project) => project.teams).flat() || []
 
       
 
@@ -96,7 +96,15 @@ export const useUserStore = defineStore('user', {
 
     async createTeam(teamData: TeamRequestDto) {
       const result = await API.createTeam(teamData)
+
+      const project = this.userState?.projects.find((project) => project._id === teamData.projectId)
+      if(!project) return
+
+      if(project?.teams === undefined)  project.teams = []
+
+      project.teams.push(result)
       this.userState?.teams.push(result)
+      localStorage.setItem('userState', JSON.stringify(this.userState))
       return result
     },
 
