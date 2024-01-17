@@ -1,10 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import MainView from '../views/MainView.vue'
+import { ElMessage } from 'element-plus'
 
 
 
-const router = createRouter({
+ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
@@ -48,5 +49,26 @@ const router = createRouter({
     },
   ]
 })
+
+router.beforeEach((to:any, from:any, next:any) => {
+  // 로그인이 필요한 페이지인지 확인
+  const authPages = ['main', 'project'];
+  const authRequired = authPages.includes(to.name as string);
+  const isLoggedIn = localStorage.getItem('userState');
+
+  // 로그인이 필요한 페이지인데 로그인이 안된 경우
+  if (authRequired && !isLoggedIn) {
+    next('/login');
+
+    ElMessage({
+      showClose: true,
+      message: '로그인이 필요합니다.',
+      type: 'warning'
+    });
+    
+  } else {
+    next();
+  }
+});
 
 export default router
