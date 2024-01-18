@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { type UserState } from '../types/users.type'
 import { type User } from '../types/users.type'
-import type {  Project, ProjectId } from '../types/projects.type'
+import type {  Project, ProjectId, TeamId } from '../types/projects.type'
 import type { ProjectRequestDto, TeamRequestDto } from '@/types/dto/project.dto.type'
 import router from '../router'
 import API from '../apis'
@@ -38,17 +38,35 @@ export const useUserStore = defineStore('user', {
     getUserState: (state) => {
       return state.userState
     },
+    getProjects: (state) => {
+      return state.userState?.projects
+    }
   },
   actions: {
-    fetchUsers() {
-      // TODO: 팀 맴버만 불로오도록 API 개발 필요
-      // const response = await API.get('/users')
-
-      this.users = this.mockUsers
-    },
     addUser(user: User) {
       this.users.push(user)
     },
+
+    async addMember(params: { projectId: string, teamId: string , userId: string}, req: any) {
+      try {
+        const result = await API.addMember(params, req)
+        const team = this.userState?.teams.find((team) => team._id === params.teamId)
+        if(!team) return
+        
+        // 해당 프로젝트 팀에 맴버 추가
+        const project = this.userState?.projects.find((project) => project._id === params.projectId)
+        if(!project) return
+        const projectTeam = project.teams?.find((team) => team._id === params.teamId)
+        if(!projectTeam) return
+        projectTeam.members?.push(result)
+        // team.members?.push(result)
+        localStorage.setItem('userState', JSON.stringify(this.userState))
+        return result
+      } catch (error) {
+        console.error(error)
+      }
+    },
+
     findUserNameById(id: string) {
       return this.users.find((user) => user.id === id)?.name
     },
@@ -58,12 +76,10 @@ export const useUserStore = defineStore('user', {
      * @description 유저 정보를 패치하고, 유저 상태를 업데이트 합니다. 최신의 팀 정보와 프로젝트 정보를 패치합니다.
      */
     async fetchUser(user: User) {
+      // 프로젝트 및 팀 정보를 가져옵니다.
       const projects = await API.getProjects({groupId: user.groupId}).catch((err) => { console.log(err) })
       let _userState: UserState = null
-
       const teams = projects?.map((project: Project) => project.teams).flat() || []
-
-      
 
       _userState = {
         id: user.id,
@@ -75,7 +91,14 @@ export const useUserStore = defineStore('user', {
         projects: projects || [],
       }
       this.userState = _userState
+
+
+      const users = await API.getUsers({groupId: user.groupId}).catch((err) => { console.log(err) })
+      this.users = users || []
+
       localStorage.setItem('userState', JSON.stringify(this.userState))
+      localStorage.setItem('users', JSON.stringify(this.users))
+
     },
     async createProject(projectData: ProjectRequestDto) {
       const result = await API.createProject(projectData)
@@ -106,6 +129,48 @@ export const useUserStore = defineStore('user', {
       this.userState?.teams.push(result)
       localStorage.setItem('userState', JSON.stringify(this.userState))
       return result
+    },
+    async deleteTeam(projectId: ProjectId,teamId: TeamId) {
+      try {
+        const result = await API.deleteTeam(projectId, teamId)
+        const project = this.userState?.projects.find((project) => project._id === projectId)
+        if(!project) return
+        project.teams = project.teams?.filter((team) => team._id !== teamId)
+
+
+        // 사용자 상태의 프로젝트에서도 팀을 삭제합니다.
+        if(!this.userState) return
+        this.userState.projects = this.userState?.projects.map((project) => {
+          if(project._id === projectId) {
+            project.teams = project.teams?.filter((team) => team._id !== teamId)
+          }
+          return project
+        })
+
+        this.userState.teams = this.userState?.teams.filter((team) => team._id !== teamId) || []
+        localStorage.setItem('userState', JSON.stringify(this.userState))
+        return result
+      } catch (error) {
+        console.error(error)
+      }
+    },
+
+    async deleteMember(params: { projectId: string, teamId: string , userId: string}) {
+      try {
+        console.log('params', params)
+        const result = await API.deleteMember(params)
+
+        const project = this.userState?.projects.find((project) => project._id === params.projectId)
+        if(!project) return
+        const projectTeam = project.teams?.find((team) => team._id === params.teamId)
+        if(!projectTeam) return
+        
+        projectTeam.members = projectTeam.members?.filter((member) => member.id !== params.userId)
+        localStorage.setItem('userState', JSON.stringify(this.userState))
+        return result
+      } catch (error) {
+        console.error(error)
+      }
     },
 
     logout() {

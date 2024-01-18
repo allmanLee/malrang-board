@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from 'axios';
 import type { UserId, User } from '../types/users.type';
-import type { Project, ProjectId, Team } from '../types/projects.type';
+import type { Project, ProjectId, Team, TeamId } from '../types/projects.type';
 import type { ProjectRequestDto, TeamRequestDto } from '../types/dto/project.dto.type';
 import type { UserRequestDto } from '../types/users.type';
 const API_URL = 'http://localhost:8000'; // Replace with your API URL
@@ -67,7 +67,7 @@ const del = async <T>(url: string): Promise<T> => {
 const userApi = {
 
   // 사용자 (CRUD) 및 로그인
-  getUsers: <T>(params: T) => get(`${apiEndpoints.users}`, params),
+  getUsers: <T>(params: T): Promise<User[]> => get(`${apiEndpoints.users}`, params),
   getUser: (userId: UserId) => get(apiEndpoints.user(userId)),
   createUser: (userData: UserRequestDto) => post(apiEndpoints.users, userData),
   updateUser: (userId: UserId, userData: UserRequestDto) => put(apiEndpoints.user(userId), userData),
@@ -92,6 +92,9 @@ const userApi = {
   getTeams: <T>(params: T):Promise<Team[]> => get(`${apiEndpoints.teams}/?${params}`),
   getTeam: (teamId: UserId) => get(apiEndpoints.user(teamId)),
   createTeam: (teamData: TeamRequestDto):Promise<Team> => post(apiEndpoints.teams, teamData),
+  deleteTeam: (projectId: ProjectId, teamId: TeamId) :Promise<Team> => del(`${apiEndpoints.projects}/${projectId}/teams/${teamId}`),
+  addMember: (params:{projectId: ProjectId, teamId: TeamId, userId: UserId}, req: any):Promise<User> => post(`${apiEndpoints.projects}/${params.projectId}/teams/${params.teamId}/members/${params.userId}`, req),
+  deleteMember: (params:{projectId: ProjectId, teamId: TeamId, userId: UserId}):Promise<User> => del(`${apiEndpoints.projects}/${params.projectId}/teams/${params.teamId}/members/${params.userId}`),
 
   // 사용자 퍼미션 (RU)
   getUserPermissions: (userId: UserId) => get<string[]>(apiEndpoints.userPermissions(userId)),

@@ -5,7 +5,7 @@
     <section class="form-items__base-info">
       <el-form-item label-width="60px" size="large" label="담당자 (복수 선택 가능)">
         <el-select v-model="customForm.user_idx" placeholder="담당자를 선택하세요" class="select-user">
-          <el-option v-for="user in mockUsers" :key="user.id" :label="user.name" :value="user.id"></el-option>
+          <el-option v-for="user in users" :key="user.id" :label="user.name" :value="user.id"></el-option>
         </el-select>
       </el-form-item>
       <!-- 필수  -->
@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, toRef, watch, defineEmits } from "vue";
+import { defineProps, ref, toRef, watch, defineEmits, computed } from "vue";
 // import { cloneDeep } from "lodash";
 import { MdEditor } from 'md-editor-v3';
 import { cloneDeep } from "lodash";
@@ -54,7 +54,7 @@ const editorRef = ref(null);
 // Store
 const userStore = useUserStore();
 // const users = userStore.users;
-const mockUsers = userStore.getMockUsers;
+const users = computed(() => userStore.users);
 
 // form 데이터
 const props = defineProps({

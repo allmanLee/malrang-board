@@ -13,7 +13,7 @@ export interface Project {
 export interface Team {
   _id?: TeamId;
   name: string;
-  members: User[];
+  members?: User[];
   createUserId: string;
   projectId: ProjectId;
 	isDeleted: boolean;

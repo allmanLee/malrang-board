@@ -67,7 +67,7 @@
                 </section>
 
                 <count-user :member="team?.members?.length" class="count-user"></count-user>
-                <el-button @click="deleteTeam(selectedPrjId, selectedTeamId)" class="delete-button">
+                <el-button @click="deleteTeam(selectedPrjId, team._id)" class="delete-button">
                   <el-icon>
                     <Delete />
                   </el-icon>
@@ -114,7 +114,7 @@
           </el-card>
           <!-- 선택 -->
           <el-card v-if="showMemberFormFlag" class="avator">
-            <el-form @submit.prevent="addMember(selectedPrjId, selectedTeamId)" class="form">
+            <el-form @submit.prevent="addMember(selectedPrjId, selectedTeamId, newMember.id)" class="form">
               <!-- <el-input v-model="newMember" placeholder="Member Name" required></el-input> -->
               <!-- 팀원을 선택할 수 있음 -->
               <el-select v-model="newMember" placeholder="Member Name" value-key="id" required class="form-select">
@@ -144,7 +144,6 @@ import { useUserStore } from '@/stores/user';
 import CountUser from '@/components/CountUser.vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { ProjectRequestDto, TeamRequestDto } from '@/types/dto/project.dto.type';
-import { cloneDeep } from 'lodash';
 
 
 // Store
@@ -154,30 +153,8 @@ const user = computed(() => store.getUserState);
 
 
 // Project data
-const projects: any = ref([]);
+let projects: any = ref([]);
 const newProjectName = ref('');
-
-
-/** @function 프로젝트 세팅 */
-const setProject = () => {
-  projects.value = cloneDeep(user.value.projects);
-
-
-  projects.value.map((prj) => {
-    // 프로젝트 아이디가 일치하는 팀 추가
-    const filterTeam = user.value.teams.filter(team => team?.projectId === prj._id);
-
-    console.log(filterTeam)
-
-    // 팀 추가
-    prj.teams = filterTeam || [];
-  })
-};
-
-setProject();
-
-// User data
-const userStore = useUserStore();
 
 // Team data
 const newTeamName = ref('');
@@ -185,16 +162,33 @@ const showTeamFormFlag = ref(false);
 const selectedPrjId = ref('');
 
 // Team member data
-const memberOptions = computed(() => userStore.getUsers);
-const newMember = ref('');
+const memberOptions = computed(() => store.getUsers);
+const newMember = ref(null);
 const showMemberFormFlag = ref(false);
 const selectedTeamId = ref('');
 
-// 프로젝트 조회
-// const 
+
+/** (스토어)프로젝트세팅 */
+projects = computed(() => store.getProjects);
+
+const filteredTeams = computed(() => {
+  const project = projects.value.find(project => project._id === selectedPrjId.value);
+  if (project) return project.teams;
+  return [];
+});
+const filteredMembers = computed(() => {
+  const project = projects.value.find(project => project._id === selectedPrjId.value);
+  if (project) {
+    const team = project.teams.find(team => team._id === selectedTeamId.value);
+    if (team) {
+      return team.members;
+    }
+  }
+  return [];
+});
 
 
-// Add Project
+/** 프로젝트를 추가합니다. */
 const addProject = async () => {
   try {
     const request: ProjectRequestDto = {
@@ -206,35 +200,21 @@ const addProject = async () => {
     showTeamFormFlag.value = false;
 
     const result = await store.createProject(request);
-    ElMessage(`${newProjectName.value} 프로젝트가 추가되었습니다.`);
-    newProjectName.value = '';
 
     // 프로젝트 추가
-    projects.value = [...projects.value, result];
+    // projects.value = [...projects.value, result];
 
+    ElMessage(`${newProjectName.value} 프로젝트가 추가되었습니다.`);
+    newProjectName.value = '';
 
   } catch (error) {
     console.error(error);
   }
 };
 
-const filteredTeams = computed(() => {
-  const project = projects.value.find(project => project._id === selectedPrjId.value);
-  return project ? project.teams : [];
-});
 
-const filteredMembers = computed(() => {
-  const project = projects.value.find(project => project._id === selectedPrjId.value);
-  if (project && project?.teams?.length > 0) {
-    const team = project.teams.find(team => team._id === selectedTeamId.value);
-    if (team) {
-      return team.members;
-    }
-  }
-  return [];
-});
 
-const beforeDeleteMessage = async () => {
+const beforeDeleteMessage = async (): Promise<Boolean> => {
   const result = await ElMessageBox.confirm('정말로 삭제하시겠습니까?', '알림', {
     confirmButtonText: '삭제',
     cancelButtonText: '취소',
@@ -288,7 +268,8 @@ const addTeam = async () => {
     const project = projects.value.find(project => project._id === selectedPrjId.value);
 
     if (project) {
-      project.teams = [...project.teams || [], result];
+      // project.teams.push(result);
+      console.log('??')
     }
 
     ElMessage(`${newTeamName.value} 팀이 추가되었습니다.`);
@@ -302,12 +283,19 @@ const addTeam = async () => {
 
 // Delete Team
 const deleteTeam = async (projectId, teamId) => {
-  const confirm = await beforeDeleteMessage();
-  const project = projects.value.find(project => project._id === projectId);
+  try {
+    const confirm = await beforeDeleteMessage();
+    if (confirm && projectId && teamId) {
+      await store.deleteTeam(projectId, teamId);
 
-  if (confirm && project) {
-    project.teams = project.teams.filter(team => team._id !== teamId);
-    selectedTeamId.value = ''; // Reset selected team
+      const project = projects.value.find(project => project._id === projectId);
+      if (project) {
+        project.teams = project.teams.filter(team => team._id !== teamId);
+      }
+      selectedTeamId.value = ''; // Reset selected team
+    }
+  } catch (error) {
+    console.error(error);
   }
 };
 
@@ -319,7 +307,7 @@ const showMemberForm = (projectId, teamId) => {
     if (team) {
       showMemberFormFlag.value = true;
       selectedTeamId.value = teamId;
-      newMember.value = '';
+      newMember.value = null;
     }
   }
 };
@@ -330,36 +318,26 @@ const hideMemberForm = () => {
 };
 
 // Add Member
-const addMember = (projectId, teamId) => {
-  const project = projects.value.find(project => project._id === projectId);
-  if (project) {
-    const team = project.teams.find(team => team._id === teamId);
-    if (team) {
-      const member = {
-        id: team.members.length + 1,
-        name: newMember.value,
-      };
+const addMember = async (projectId, teamId, userId) => {
+  try {
+    await store.addMember({ projectId, teamId, userId }, {});
 
-      if (!newMember?.value) {
-        ElMessage('팀원을 선택해주세요.');
-        return false;
-      }
-
-      team.members.push(member);
-      newMember.value = '';
-      showMemberFormFlag.value = false;
-    }
+    newMember.value = null;
+    showMemberFormFlag.value = false;
+  } catch (error) {
+    console.error(error);
   }
 };
 
 // Delete Member
-const deleteMember = (projectId, teamId, memberId) => {
-  const project = projects.value.find(project => project._id === projectId);
-  if (project) {
-    const team = project.teams.find(team => team._id === teamId);
-    if (team) {
-      team.members = team.members.filter(member => member.id !== memberId);
+const deleteMember = async (projectId, teamId, userId) => {
+  try {
+    const confirm = await beforeDeleteMessage();
+    if (confirm && projectId && teamId && userId) {
+      await store.deleteMember({ projectId, teamId, userId });
     }
+  } catch (error) {
+    console.error(error);
   }
 };
 
