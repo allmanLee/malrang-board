@@ -33,7 +33,7 @@
       </el-menu>
     </el-col>
 
-    <el-col class="prj-searched" v-if="filteredProjects.length && searchText">
+    <el-col class="prj-searched" v-if="filteredProjects?.length && searchText">
       <h5 class="mb-2">프로젝트 검색 결과</h5>
       <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
         <el-menu-item v-for="(prj, index) in filteredProjects" :key="index" @click="handleClickPrj" :index="`${index}`">
@@ -47,7 +47,7 @@
       </el-menu>
     </el-col>
 
-    <el-col class="team-searched" v-if="filteredTeams.length && searchText">
+    <el-col class="team-searched" v-if="filteredTeams?.length && searchText">
       <h5 class="mb-2">팀 검색 결과</h5>
       <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
         <el-menu-item v-for="(t, index) in  filteredTeams" :key="index" :index="`${index}`">
@@ -58,7 +58,7 @@
 
 
 
-    <el-col class="prj" v-show="filteredProjects.length && !searchText">
+    <el-col class="prj" v-show="filteredProjects?.length && !searchText">
       <h5 class="mb-2">전체 프로젝트</h5>
       <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
         ref="projectAllRef">
@@ -67,11 +67,20 @@
             <el-icon>
               <icon-menu />
             </el-icon>
-            <span>{{ prj.name }}</span>
+            <span class="ti">{{ prj.name }}</span>
           </template>
-          <el-menu-item v-for="(t, index) in  filterByProject(prj.id, filteredTeams)" :key="index" :index="`${index}`">
-            <span>{{ t.name }}</span>
+          <el-menu-item v-for="(t, index) in  prj.teams" :key="index" :index="`${index}`" class="test">
+            <div class="border-left">
+              <span class="team-name">{{ t.name }}</span>
+            </div>
+
           </el-menu-item>
+          <div v-if="isEmpty(prj.teams)" class="is-empty">
+            <el-menu-item disabled>
+              <span class="team-name">팀이 없습니다.</span>
+            </el-menu-item>
+
+          </div>
         </el-sub-menu>
       </el-menu>
     </el-col>
@@ -80,6 +89,13 @@
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
+import { useUserStore } from '@/stores/user';
+import { isEmpty } from 'lodash';
+
+// 스토어 프로젝트 목록
+const userStore = useUserStore()
+const projects = computed(() => userStore.getProjects)
+const teams = computed(() => userStore.getTeams)
 
 const handleOpen = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
@@ -89,9 +105,6 @@ const handleClose = (key: string, keyPath: string[]) => {
 }
 
 // 프로젝트 별 팀 목록
-const filterByProject = (projectIdx: number, filteredTeam) => {
-  return filteredTeam.filter(team => team.prj_id === projectIdx)
-}
 const projectAllRef = ref(null)
 
 
@@ -104,7 +117,7 @@ const handleClickPrj = () => {
 
 // 전부 닫는다.
 const closeAll = () => {
-  projects.forEach((prj, index) => {
+  projects.value.forEach((prj, index) => {
     console.log(index)
     projectAllRef.value.close(index)
   })
@@ -124,74 +137,17 @@ const bookmarkTeam = [
   }
 ]
 
-const projects = [
-  {
-    name: '프로젝트1',
-    id: 1,
-  },
-  {
-    name: '프로젝트2',
-    id: 2,
-  },
-  {
-    name: '프로젝트3',
-    id: 3,
-  },
-  {
-    name: '프로젝트4',
-    id: 4,
-  },
-  {
-    name: '프로젝트5',
-    id: 5,
-  },
-  {
-    name: '프로젝트6',
-    id: 6,
-  }
-]
-
-const teams = [
-  {
-    name: '팀1',
-    id: 1,
-    prj_id: 1,
-  },
-  {
-    name: '팀2',
-    id: 2,
-    prj_id: 2,
-  },
-  {
-    name: '팀3',
-    id: 3,
-    prj_id: 3,
-  },
-  {
-    name: '팀4',
-    id: 4,
-    prj_id: 2,
-  },
-  {
-    name: '팀5',
-    id: 5,
-    prj_id: 4,
-  },
-  {
-    name: '팀6',
-    id: 6,
-    prj_id: 3,
-  }
-]
 
 let searchText = ref('')
 
 const filteredProjects = computed(() => {
-  return projects.filter(project => project.name.includes(searchText.value))
+  console.log(projects.value)
+  return projects?.value?.filter(project => project.name.includes(searchText.value))
 })
 
 const filteredTeams = computed(() => {
-  return teams.filter(team => team.name.includes(searchText.value))
+  console.log(teams.value)
+  return teams?.value?.filter(team => team.name.includes(searchText.value))
 })
 
 const filteredTeamsByBookmark = computed(() => {
@@ -215,16 +171,31 @@ const filteredTeamsByBookmark = computed(() => {
     background-color: transparent;
     color: #fff;
 
-    &::v-deep(.el-submenu__title) {
+
+    &::v-deep(.el-sub-menu__title) {
       color: #fff;
+      // border-radius: 8px;
+      padding: 4px !important;
+      font-family: 'Noto Sans KR', sans-serif;
+      // margin: 0 12px;
+      height: 40px;
+      font-size: 14px;
+
+
+      &:hover {
+        background-color: #232427;
+      }
+    }
+
+    .is-empty {
+      margin-left: 20px;
     }
 
     &::v-deep(.el-menu-item) {
       color: #fff;
       height: 40px;
-      // background-color: red;
+      padding-left: 20px !important;
       font-size: 14px;
-      font-weight: 700 !important;
     }
 
     .el-menu-item-group__title {
@@ -266,9 +237,71 @@ const filteredTeamsByBookmark = computed(() => {
     margin-bottom: 20px;
 
     &:hover {
-      background-color: #6b6b6b;
+      background-color: #202020;
       border: none;
     }
   }
+
+  .ti {
+    font-weight: 700 !important;
+  }
+
+  // 팀 아이템 색
+  .el-menu-item {
+    color: #fff;
+    margin-right: 10px;
+
+
+    &:active {
+      background-color: none !important;
+    }
+  }
+
+  .border-left {
+    // TODO 추 후 액티브했을 때로 스타일 변경 예정
+    display: flex;
+    // border-left: 4px solid rgb(60, 110, 171);
+    padding-left: 20px;
+    padding-right: 0px;
+    height: 100%;
+    width: 100%;
+    vertical-align: middle;
+
+
+
+
+    .team-name {
+      display: flex;
+      justify-self: center;
+      align-self: center;
+      width: 100%;
+      height: 100%;
+      // padding-left: 10px;
+      border-radius: 12px;
+      line-height: 40px;
+    }
+  }
+}
+</style>
+<style lang="scss">
+.el-sub-menu {
+  &.is-opened {
+    .el-sub-menu__title {
+      background-color: #253042 !important;
+    }
+  }
+}
+
+.el-menu-item {
+  padding: 0px !important;
+
+  &:hover {
+    background-color: unset;
+
+  }
+}
+
+.el-sub-menu.is-opened {
+  background-color: #253042;
 }
 </style>

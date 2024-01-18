@@ -38,6 +38,9 @@ export const useUserStore = defineStore('user', {
     getUserState: (state) => {
       return state.userState
     },
+    getTeams: (state) => {
+      return state.userState?.teams
+    },
     getProjects: (state) => {
       return state.userState?.projects
     }

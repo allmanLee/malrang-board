@@ -11,11 +11,13 @@
 // 스크롤 스타일
 ::-webkit-scrollbar {
   width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
   background: var(--vt-c-indigo);
-  border-radius: 10px;
+  border-radius: 100px;
+  
 }
 
 ::-webkit-scrollbar-thumb {
