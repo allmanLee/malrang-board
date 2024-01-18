@@ -44,10 +44,10 @@
           <!-- 추가기능 아이콘 (추가하기) -->
         </header>
         <KanbanBoardCard @click="handleClickToUpdate(card, board.title)" ref="kanbanBoardCard"
-          @delete="handleDeleteCard(card.id)" v-for="card in filterCards.filter(el => el.board_idx === board.id)"
+          @delete="handleDeleteCard(card.id)" v-for="card in filterCards.filter(el => el.boardIdx === board.id)"
           @dragstart="handleDragStart($event, card)" draggable="true" :key="card.id" :card="card" />
 
-        <EmptyKanbanCard v-if="filterCards.filter(el => el.board_idx === board.id).length === 0"
+        <EmptyKanbanCard v-if="filterCards.filter(el => el.boardIdx === board.id).length === 0"
           @add="handleClickToAdd(board)" />
       </div>
     </div>
@@ -97,9 +97,9 @@ const cards = ref<Card[]>([
     title: "테스트 카드",
     description: "카드 내용",
     created_date: "2021-10-10",
-    user_idx: 1,
-    user_name: '김말랑',
-    board_idx: 1,
+    userIdx: 1,
+    userName: '김말랑',
+    boardIdx: 1,
     tags: [{
       id: 1,
       title: 'Commit',
@@ -113,9 +113,9 @@ const initForm = () => ({
   title: "",
   description: "",
   created_date: "",
-  user_idx: 1,
-  user_name: '김말랑',
-  board_idx: 1,
+  userIdx: 1,
+  userName: '김말랑',
+  boardIdx: 1,
   tags: [],
   commit: [],
 });
@@ -130,7 +130,7 @@ class CardActions {
     cards.value.push({
       ...form.value,
       id: cardId,
-      board_idx: boardId,
+      boardIdx: boardId,
       created_date: new Date().toISOString().slice(0, 10),
     });
 
@@ -187,7 +187,7 @@ class CardActions {
             id: modalKanban.openType === 'create' ? cards.value[cardIdx].commit.length + 1 : form.id,
             title: commitMessage,
             created_date: new Date().toISOString().slice(0, 10),
-            user_idx: element.user_idx,
+            userIdx: element.userIdx,
             card_idx: element.id,
           });
         }
@@ -264,7 +264,7 @@ const handleClickToAdd = (board) => {
   const boardTitle = board.title;
   selectedBoardId.value = board.id;
   form.value = initForm();
-  form.value.user_idx = selectedWorker.value;
+  form.value.userIdx = selectedWorker.value;
   modalKanban.open("create", boardTitle)
 };
 
@@ -276,7 +276,7 @@ const handleDeleteCard = (cardId) => {
 // 카드 드래그 (다른 보드의 카드로 이동 가능)
 const handleDragStart = (e, card) => {
   e.dataTransfer.setData("cardId", card.id);
-  // e.dataTransfer.setData("cardBoardIdx", card.board_idx);
+  // e.dataTransfer.setData("cardBoardIdx", card.boardIdx);
 };
 
 // 카드 드랍 (다른 보드의 카드로 이동 가능)
@@ -285,7 +285,7 @@ const onDrop = (e, boardId) => {
   // const cardBoardIdx = e.dataTransfer.getData("cardBoardIdx");
 
   const cardIdx = cards.value.findIndex((card) => card.id === Number(cardId));
-  cards.value[cardIdx].board_idx = boardId;
+  cards.value[cardIdx].boardIdx = boardId;
 
   // 만약 커밋에 #mb-1 이런식으로 카드 번호가 붙어있으면 해당 카드의 커밋에 추가
   cardActions.addCommit(cardId, cards.value)

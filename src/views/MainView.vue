@@ -22,7 +22,7 @@ import KanbanBoard from "@/components/KanbanBoard.vue";
 // import Github from "@/components/Github.vue";
 
 import { ref } from "vue";
-import { Board } from "@/types/KanbanBoard.ts";
+import type { Board } from "@/types/KanbanBoard.ts";
 import SideBar from "@/components/SideBar.vue";
 
 // 목업 데이터
@@ -32,19 +32,28 @@ const boards = ref<Board[]>(
       id: 1,
       status: "todo",
       title: "할일",
-      user_idx: 1
+      kanbanId: 'asdfasvd',
+      permission: "admin",
+      order: 1,
+      teamId: 'asdf',
     },
     {
       id: 2,
       status: "pending",
       title: "보류",
-      user_idx: 1
+      kanbanId: 'asdfasvd',
+      permission: "admin",
+      order: 2,
+      teamId: 'asdf',
     },
     {
       id: 3,
       status: "done",
       title: "한일",
-      user_idx: 1
+      kanbanId: 'asdfasvd',
+      permission: "admin",
+      order: 3,
+      teamId: 'asdf',
     },
   ]
 )

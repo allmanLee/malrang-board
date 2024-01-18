@@ -10,19 +10,22 @@ export interface Board {
   id: number;
   status: BoardStatus;
   title: string;
-  user_idx: number;
+  kanbanId: string;
+  teamId: string;
+  permission: string;
+  order: number;
 }
 
-
+ 
 // 카드 배열 타입
 export interface Card {
   id: number;
-  title: string;
+  title: string; 
   description: string;
   created_date: string;
-  user_idx: number;
-  user_name: string;
-  board_idx: number;
+  userIdx: number;
+  userName: string;
+  boardIdx: number;
   tags: Tag[];
   commit: Commit[];
 }
@@ -39,6 +42,6 @@ export interface Commit {
   id: number;
   title: string;
   created_date: string;
-  user_idx: number;
+  userIdx: number;
   card_idx: number;
 }

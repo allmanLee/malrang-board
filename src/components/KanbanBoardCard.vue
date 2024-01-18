@@ -29,7 +29,7 @@
       <el-avatar shape="square" class="header__user-avatar" :size="20"
         src="https://avatars.githubusercontent.com/u/26598542?v=4" alt="avatar" />
       <span class="header__user-name">
-        {{ card.user_name }}
+        {{ card.userName }}
       </span>
     </section>
     <div class="kanban-board-card-header-title">
@@ -110,7 +110,7 @@ const props = defineProps<{
 const cardRef = ref(null);
 
 // const userName = computed(() => {
-//   const userIdx = props.card.user_idx;
+//   const userIdx = props.card.userIdx;
 //   return users.value.find((user) => user.id === userIdx)?.name || "이름없음";
 // });
 
