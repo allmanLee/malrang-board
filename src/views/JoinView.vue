@@ -20,6 +20,14 @@
       <el-label for="password">Password:</el-label>
       <el-input type="password" id="password" v-model="password" required />
 
+      <!-- 비밀번호 중복검사 -->
+      <el-label for="password">Password Confirm:</el-label>
+      <el-input type="password" id="password" v-model="rePassword" required />
+      <el-alert title="비밀번호가 일치하지 않습니다." type="error" v-if="!isPasswordMatch && password && rePassword" show-icon center
+        :closable="false"></el-alert>
+
+      <br />
+
       <!-- 임시 PL 여부 -->
       <el-checkbox v-model="isAdmin" id="isAdmin">당신은 관리자 이신가요?</el-checkbox>
 
@@ -29,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 // API
 import API from '@/apis';
@@ -46,7 +54,15 @@ const name = ref('');
 const email = ref('');
 const groupName = ref('');
 const password = ref('');
+const rePassword = ref('');
 const isAdmin = ref(false);
+
+// 비밀번호 중복검사
+const isPasswordMatch = ref(false);
+
+watch([password, rePassword], () => {
+  isPasswordMatch.value = password.value === rePassword.value;
+});
 
 const mockGroups: Group[] = [
   { name: '말랑보드', id: 1 },
@@ -89,7 +105,8 @@ const submitForm = async () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 100px;
+  margin-top: -100px;
+  width: 100%;
 
   h1 {
     margin-bottom: 20px;

@@ -47,6 +47,12 @@ import { ElMessage } from 'element-plus'
       name: 'project',
       component: () => import('../views/ProjectView.vue')
     },
+    // 마이페이지
+    {
+      path: '/mypage',
+      name: 'mypage',
+      component: () => import('../views/MyPageView.vue')
+    },
   ]
 })
 

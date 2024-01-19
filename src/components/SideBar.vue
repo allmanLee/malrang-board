@@ -1,6 +1,37 @@
 <template>
-  <el-row class="tac">
-    <el-col>
+  <el-container class="side-bar">
+    <div class="side-wrapper">
+
+
+      <section class="admin-settings">
+        <!-- 프로젝트 관리 버튼 - solid -->
+
+        <el-tooltip content="프로젝트 및 팀 관리 화면으로 이동합니다." placement="top">
+          <el-button class="admin-settings__btn" @click="() => $router.push('/project')">
+            프로젝트 관리
+          </el-button>
+        </el-tooltip>
+
+        <!-- 마이 보드 -->
+        <el-tooltip content="마이보드로 이동합니다." placement="top">
+          <el-card size="large" class="myboard" @click="() => $router.push('/mypage')">
+            <div class="myboard-wrapper">
+              <p class="item-key">내가 진행중인 업무</p>
+              <p class="item-value">엑셀 업로드 및 다운로드기능 개발</p>
+              <p class="item-key">프로젝트/팀</p>
+              <p class="item-value">말랑보드 / 프론트엔드</p>
+              <p class="item-key">진행률</p>
+              <p class="item-value">50%</p>
+              <!-- TODO -->
+              <!-- <div class="work-buttons">
+                <el-button type="primary" size="mini" class="finish-work--btn">완료!</el-button>
+                <el-button type="primary" size="mini" class="next-work--btn">다른 업무</el-button>
+              </div> -->
+            </div>
+          </el-card>
+        </el-tooltip>
+      </section>
+      <el-divider></el-divider>
       <!-- 팀 또는 프로젝트 검색 -->
       <section class="search">
         <el-input v-model="searchText" placeholder="팀 또는 프로젝트 검색" clearable>
@@ -13,78 +44,73 @@
         </el-input>
       </section>
 
-      <section class="admin-settings">
-        <!-- 프로젝트 관리 버튼 - solid -->
-        <el-tooltip content="프로젝트 및 팀 관리 화면으로 이동합니다." placement="top">
-          <el-button class="admin-settings__btn" @click="() => $router.push('/project')">
-            프로젝트 관리
-          </el-button>
-        </el-tooltip>
-      </section>
-
-      <!-- 팀 즐겨찾기 -->
-      <h5 class="mb-2">팀 즐겨찾기</h5>
+      <el-scroll>
+        <!-- 팀 즐겨찾기 -->
+        <h5 class="mb-2">팀 즐겨찾기</h5>
 
 
-      <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
-        <el-menu-item v-for="(t, index) in  filteredTeamsByBookmark" :key="index" :index="`${index}`">
-          <span>{{ t.name }}</span>
-        </el-menu-item>
-      </el-menu>
-    </el-col>
-
-    <el-col class="prj-searched" v-if="filteredProjects?.length && searchText">
-      <h5 class="mb-2">프로젝트 검색 결과</h5>
-      <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
-        <el-menu-item v-for="(prj, index) in filteredProjects" :key="index" @click="handleClickPrj" :index="`${index}`">
-          <template #title>
-            <el-icon>
-              <icon-menu />
-            </el-icon>
-            <span>{{ prj.name }}</span>
-          </template>
-        </el-menu-item>
-      </el-menu>
-    </el-col>
-
-    <el-col class="team-searched" v-if="filteredTeams?.length && searchText">
-      <h5 class="mb-2">팀 검색 결과</h5>
-      <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
-        <el-menu-item v-for="(t, index) in  filteredTeams" :key="index" :index="`${index}`">
-          <span>{{ t.name }}</span>
-        </el-menu-item>
-      </el-menu>
-    </el-col>
-
-
-
-    <el-col class="prj" v-show="filteredProjects?.length && !searchText">
-      <h5 class="mb-2">전체 프로젝트</h5>
-      <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
-        ref="projectAllRef">
-        <el-sub-menu :index="`${index}`" v-for="(prj, index) in filteredProjects" :key="index">
-          <template #title>
-            <el-icon>
-              <icon-menu />
-            </el-icon>
-            <span class="ti">{{ prj.name }}</span>
-          </template>
-          <el-menu-item v-for="(t, index) in  prj.teams" :key="index" :index="`${index}`" class="test">
-            <div class="border-left">
-              <span class="team-name">{{ t.name }}</span>
-            </div>
-
+        <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
+          <el-menu-item v-for="(t, index) in  filteredTeamsByBookmark" :key="index" :index="`${index}`">
+            <span>{{ t.name }}</span>
           </el-menu-item>
-          <div v-if="isEmpty(prj.teams)" class="is-empty">
-            <el-menu-item disabled>
-              <span class="team-name">팀이 없습니다.</span>
-            </el-menu-item>
+        </el-menu>
 
-          </div>
-        </el-sub-menu>
-      </el-menu>
-    </el-col>
-  </el-row>
+
+        <div class="prj-searched" v-if="filteredProjects?.length && searchText">
+          <h5 class="mb-2">프로젝트 검색 결과</h5>
+          <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
+            <el-menu-item v-for="(prj, index) in filteredProjects" :key="index" @click="handleClickPrj"
+              :index="`${index}`">
+              <template #title>
+                <el-icon>
+                  <icon-menu />
+                </el-icon>
+                <span>{{ prj.name }}</span>
+              </template>
+            </el-menu-item>
+          </el-menu>
+        </div>
+
+        <div class="team-searched" v-if="filteredTeams?.length && searchText">
+          <h5 class="mb-2">팀 검색 결과</h5>
+          <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
+            <el-menu-item v-for="(t, index) in  filteredTeams" :key="index" :index="`${index}`">
+              <span>{{ t.name }}</span>
+            </el-menu-item>
+          </el-menu>
+        </div>
+
+
+
+        <div class="prj" v-show="filteredProjects?.length && !searchText">
+          <h5 class="mb-2">전체 프로젝트</h5>
+          <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
+            ref="projectAllRef">
+            <el-sub-menu :index="`${index}`" v-for="(prj, index) in filteredProjects" :key="index">
+              <template #title>
+                <el-icon>
+                  <icon-menu />
+                </el-icon>
+                <span class="ti">{{ prj.name }}</span>
+              </template>
+              <el-menu-item v-for="(t, index) in  prj.teams" :key="index" :index="`${index}`" class="test">
+                <div class="border-left">
+                  <span class="team-name">{{ t.name }}</span>
+                </div>
+
+              </el-menu-item>
+              <div v-if="isEmpty(prj.teams)" class="is-empty">
+                <el-menu-item disabled>
+                  <span class="team-name">팀이 없습니다.</span>
+                </el-menu-item>
+
+              </div>
+            </el-sub-menu>
+          </el-menu>
+        </div>
+      </el-scroll>
+    </div>
+  </el-container>
 </template>
 
 <script lang="ts" setup>
@@ -156,9 +182,14 @@ const filteredTeamsByBookmark = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-.tac {
-  width: 240px;
+.side-bar {
+  width: 100% !important;
+  height: 100% !important;
   gap: 40px;
+
+  .side-wrapper {
+    width: 100% !important;
+  }
 
   h5 {
     margin-left: 20px;
@@ -208,6 +239,8 @@ const filteredTeamsByBookmark = computed(() => {
   .search {
     margin-bottom: 20px;
     margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
     padding: 0 4px;
 
     .el-input {
@@ -225,20 +258,88 @@ const filteredTeamsByBookmark = computed(() => {
   }
 
 
-  // 프로젝트 관리 (관리자 메뉴)
-  .admin-settings__btn {
-    width: 100%;
-    background-color: #2b2b2b;
-    color: #fff;
-    font-size: 14px;
-    font-weight: 700;
-    border-radius: 0;
-    border: none;
-    margin-bottom: 20px;
 
-    &:hover {
-      background-color: #202020;
+
+  // 프로젝트 관리 (관리자 메뉴)
+  .admin-settings {
+    margin: 20px;
+
+    .admin-settings__btn {
+      width: 100%;
+      background-color: hsl(191, 79%, 46%);
+      color: #fff;
+      border-radius: 4px;
       border: none;
+      margin: 0px;
+      margin-bottom: 20px;
+      padding: 2px;
+
+      &:hover {
+        background-color: hsl(191, 79%, 36%);
+        border: none;
+      }
+
+      // 폰트
+      // color: red;
+
+    }
+  }
+
+  .myboard-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    height: 100%;
+    padding: 0 10px;
+
+    .item-key {
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .item-value {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    // 버튼
+    // .el-button {
+    //   border-radius: 4px;
+    //   border: none;
+    //   background-color: hsl(191, 79%, 46%);
+    //   color: #fff;
+    //   font-size: 12px;
+    //   font-weight: 700;
+    //   padding: 2px;
+
+    //   &:hover {
+    //     background-color: hsl(191, 79%, 36%);
+    //     border: none;
+    //   }
+    // }
+
+    .work-buttons {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+
+      // 가운데 정렬
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+
+      .finish-work--btn {
+        display: flex;
+      }
+
+      .next-work--btn {
+        display: flex;
+        margin-left: 0px;
+      }
     }
   }
 
@@ -267,9 +368,6 @@ const filteredTeamsByBookmark = computed(() => {
     width: 100%;
     vertical-align: middle;
 
-
-
-
     .team-name {
       display: flex;
       justify-self: center;
@@ -285,11 +383,7 @@ const filteredTeamsByBookmark = computed(() => {
 </style>
 <style lang="scss">
 .el-sub-menu {
-  &.is-opened {
-    .el-sub-menu__title {
-      background-color: #253042 !important;
-    }
-  }
+  &.is-opened {}
 }
 
 .el-menu-item {
@@ -301,7 +395,18 @@ const filteredTeamsByBookmark = computed(() => {
   }
 }
 
+.el-sub-menu__title {
+  border: 8px;
+  background-color: none;
+  ;
+}
+
+.el-sub-menu {
+  margin: 10px;
+  border-radius: 8px;
+}
+
 .el-sub-menu.is-opened {
-  background-color: #253042;
+  background-color: #232427;
 }
 </style>

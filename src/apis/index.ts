@@ -28,9 +28,10 @@ const get = async <T>(url: string, params?: any): Promise<T> => {
   try {
     const response: AxiosResponse<T> = await api.get(url, {params});
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error(error)
-    throw error;
+    const response: AxiosResponse<T> = error.response;
+    throw response.data;
   }
 };
 
@@ -38,9 +39,10 @@ const post = async <T>(url: string, data: any): Promise<T> => {
   try {
     const response: AxiosResponse<T> = await api.post(url, data);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error(error)
-    throw error;
+    const response: AxiosResponse<T> = error.response;
+    throw response.data;
   }
 };
 
@@ -48,9 +50,10 @@ const put = async <T>(url: string, data: any): Promise<T> => {
   try {
     const response: AxiosResponse<T> = await api.put(url, data);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error(error)
-    throw error;
+    const response: AxiosResponse<T> = error.response;
+    throw response.data;
   }
 };
 
@@ -58,9 +61,10 @@ const del = async <T>(url: string): Promise<T> => {
   try {
     const response: AxiosResponse<T> = await api.delete(url);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error(error)
-    throw error;
+    const response: AxiosResponse<T> = error.response;
+    throw response.data;
   }
 };
 

@@ -3,29 +3,29 @@
 <!-- 오늘 할일 한일 기록 및 깃연동으로 인원별 커밋 내용을 확인할 수 있습니다. -->
 <template>
   <div class="main-container">
-    <div class="navigation-side-bar">
-      <SideBar />
-    </div>
-    <div>
+    <div class="navigation-side">
 
-      <!-- 드래그엔 드랍이 가능한 칸반보드(할일, 보류, 한일, 칸반 추가 기능) -->
-      <section>
-        <KanbanBoard :boards="boards" />
-      </section>
     </div>
+
+    <!-- 드래그엔 드랍이 가능한 칸반보드(할일, 보류, 한일, 칸반 추가 기능) -->
+    <section class="container">
+      <board-empty v-if="!boards.length"></board-empty>
+      <KanbanBoard v-else :boards="boards" />
+    </section>
   </div>
 </template>
 <script setup lang="ts">
 import KanbanBoard from "@/components/KanbanBoard.vue";
+import BoardEmpty from "@/components/BoardEmpty.vue";
 // import Today from "@/components/Today.vue";
 // import Link from "@/components/Link.vue";
 // import Github from "@/components/Github.vue";
 
 import { ref } from "vue";
 import type { Board } from "@/types/KanbanBoard.ts";
-import SideBar from "@/components/SideBar.vue";
 
 // 목업 데이터
+// const boards = ref([])
 const boards = ref<Board[]>(
   [
     {
@@ -64,9 +64,7 @@ const boards = ref<Board[]>(
 .main-container {
   display: flex;
   width: 100%;
-  // gap: 20px;
-  margin-left: 270px; // 사이드바 너비 (250px) + 마진 20px
-
+  padding: 20px;
 }
 
 .container {
@@ -74,9 +72,7 @@ const boards = ref<Board[]>(
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 20px;
-  margin-top: 100px;
-  margin-bottom: 100px;
+  width: 100%;
 
   section {
     width: 100%;
@@ -91,18 +87,5 @@ const boards = ref<Board[]>(
     font-size: 20px;
     font-weight: 500;
   }
-}
-
-// 사이드 메뉴
-.navigation-side-bar {
-  position: fixed;
-  // display: flex;
-  top: 40px;
-  left: 0;
-  height: 100vh;
-  z-index: 100;
-  background-color: black;
-  overflow-y: scroll;
-  padding: 0px;
 }
 </style>

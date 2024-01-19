@@ -7,8 +7,10 @@
       <el-label v-show="false" for="password">비밀번호</el-label>
       <!-- 비밀번호에서 엔터 시 로그인 -->
       <el-input @keyup.enter="login" type="password" id="password" placeholder="비밀번호" v-model="password" />
+      <el-alert :title="errorMessage" type="error" v-if="isLoginError" show-icon center :closable="false"></el-alert>
       <el-button @click="login">Login</el-button>
     </el-form>
+
   </div>
 </template>
 
@@ -24,6 +26,10 @@ const password = ref('');
 const $router = useRouter();
 const userStore = useUserStore();
 
+// 로그인 에러 메시지
+const isLoginError = ref(false);
+const errorMessage = ref('');
+
 const login = async () => {
   // Add your login logic here
   console.log('email:', email.value);
@@ -37,15 +43,15 @@ const login = async () => {
     ElMessage.success('로그인이 완료되었습니다.'); // 로그인 성공
 
     userStore.fetchUser(result); // Store userState 업데이트
-
-
+    isLoginError.value = false;
     setTimeout(() => {
       $router.push('/'); // 메인 페이지로 이동
     }, 1000);
 
   } catch (error) {
     console.error(error);
-    ElMessage.error('로그인에 실패하였습니다.');
+    isLoginError.value = true;
+    errorMessage.value = error.error;
   };
 };
 </script>
@@ -56,7 +62,8 @@ const login = async () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 100px;
+  width: 100%;
+  margin-top: -100px;
 
   h1 {
     margin-bottom: 20px;

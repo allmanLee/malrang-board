@@ -1,33 +1,40 @@
 @import './base.css';
 
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+}
+
+html *  {
+  font-family: 'Pretendard', sans-serif;
+
+}
+
 #app {
-  // max-width: 1280px;
-  // margin: 0 auto;
-  // padding: 2rem;
   position: relative;
   font-weight: normal;
 }
 
 // 스크롤 스타일
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
+// ::-webkit-scrollbar {
+//   width: 10px;
+//   height: 10px;
+// }
 
-::-webkit-scrollbar-track {
-  background: var(--vt-c-indigo);
-  border-radius: 100px;
+// ::-webkit-scrollbar-track {
+//   background: var(--vt-c-indigo);
+//   border-radius: 100px;
   
-}
+// }
 
-::-webkit-scrollbar-thumb {
-  background: var(--vt-c-text-dark-2);
-  border-radius: 10px;
+// ::-webkit-scrollbar-thumb {
+//   background: var(--vt-c-text-dark-2);
+//   border-radius: 10px;
 
-  &:hover {
-    background: var(--vt-c-text-dark-1);
-  }
-}
+//   &:hover {
+//     background: var(--vt-c-text-dark-1);
+//   }
+// }
 
 .el-input {
   background: var(--vt-c-black-mute);

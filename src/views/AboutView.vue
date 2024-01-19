@@ -5,8 +5,8 @@
   <div id="MainView" class="container">
     <section class="main">
       <h1>말랑보드</h1>
-      <p>말랑보드는 링크를 모아볼수 있습니다.</p>
-      <p>오늘 할일 한일 기록 및 깃연동으로 인원별 커밋 내용을 확인할 수 있습니다.</p>
+      <p>관리자 중심의 프로젝트 메니저가 아닌 구성원 중심의 매니저</p>
+
     </section>
     <section class="function">
       <h1>말랑보드 기능</h1>
@@ -33,7 +33,7 @@
   align-items: center;
   justify-content: center;
   gap: 100px;
-  margin-top: 100px;
+  width: 100%;
   margin-bottom: 100px;
   text-align: center;
 

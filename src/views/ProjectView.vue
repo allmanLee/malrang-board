@@ -357,10 +357,10 @@ const selectTeam = (teamId) => {
 .project-manager-view {
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  width: 100%;
   gap: 100px;
-  margin-top: 100px;
   margin-bottom: 100px;
   text-align: center;
 }
