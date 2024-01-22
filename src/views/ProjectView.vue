@@ -62,7 +62,6 @@
                   <p class="project-card-column-title --team">
                     팀 명
                   </p>
-
                   <span class="project-card-title">{{ team.name }}</span>
                 </section>
 
@@ -543,6 +542,8 @@ const selectTeam = (teamId) => {
       margin-bottom: 10px;
     }
   }
+
+
 }
 
 .highlighted {
@@ -559,6 +560,7 @@ const selectTeam = (teamId) => {
     color: #fff;
   }
 }
+
 
 .member-list {
   display: flex;

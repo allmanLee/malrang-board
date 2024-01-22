@@ -95,7 +95,7 @@
                 </el-icon>
                 <span class="ti">{{ prj.name }}</span>
               </template>
-              <el-menu-item v-for="(t, index) in  prj.teams" :key="index" :index="`${index}`" class="test">
+              <el-menu-item v-for="(t, index) in  prj.teams" :key="index" :index="`${index}`" class="items-menu--team">
                 <div class="border-left">
                   <span class="team-name">{{ t.name }}</span>
                 </div>
@@ -214,7 +214,6 @@ const filteredTeamsByBookmark = computed(() => {
       height: 40px;
       font-size: 14px;
 
-
       &:hover {
         background-color: #232427;
       }
@@ -234,6 +233,13 @@ const filteredTeamsByBookmark = computed(() => {
     .el-menu-item-group__title {
       color: #fff;
       font-size: 16px;
+    }
+  }
+
+
+  .items-menu--team {
+    &:hover {
+      background-color: #34363a;
     }
   }
 
@@ -316,23 +322,6 @@ const filteredTeamsByBookmark = computed(() => {
       }
     }
 
-
-    // 버튼
-    // .el-button {
-    //   border-radius: 4px;
-    //   border: none;
-    //   background-color: hsl(191, 79%, 46%);
-    //   color: #fff;
-    //   font-size: 12px;
-    //   font-weight: 700;
-    //   padding: 2px;
-
-    //   &:hover {
-    //     background-color: hsl(191, 79%, 36%);
-    //     border: none;
-    //   }
-    // }
-
     .work-buttons {
       position: absolute;
       width: 100%;
@@ -362,8 +351,6 @@ const filteredTeamsByBookmark = computed(() => {
   // 팀 아이템 색
   .el-menu-item {
     color: #fff;
-    margin-right: 10px;
-
 
     &:active {
       background-color: none !important;
