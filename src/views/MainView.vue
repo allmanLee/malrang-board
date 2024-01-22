@@ -9,23 +9,35 @@
 
     <!-- 드래그엔 드랍이 가능한 칸반보드(할일, 보류, 한일, 칸반 추가 기능) -->
     <section class="container">
-      <board-empty v-if="!boards.length"></board-empty>
-      <KanbanBoard v-else :boards="boards" />
+      <KanbanBoard :boards="boards" />
     </section>
   </div>
 </template>
 <script setup lang="ts">
 import KanbanBoard from "@/components/KanbanBoard.vue";
-import BoardEmpty from "@/components/BoardEmpty.vue";
 // import Today from "@/components/Today.vue";
 // import Link from "@/components/Link.vue";
 // import Github from "@/components/Github.vue";
 
-import { ref } from "vue";
+import { computed, ref, watch } from "vue";
+import { useCommonStore } from "@/stores/common";
 import type { Board } from "@/types/KanbanBoard.ts";
 
+
+// 보드 데이터 가져오기 (팀별)
+// 팀 ID로 보드를 조회합니다.
+const commonStore = useCommonStore();
+const teamId = computed(() => commonStore.getSbSelectedTeamId);
+
+watch(teamId, (newVal) => {
+  console.log("watch teamId", newVal);
+
+
+  // 조회
+  // getBoards(newVal);
+});
+
 // 목업 데이터
-// const boards = ref([])
 const boards = ref<Board[]>(
   [
     {

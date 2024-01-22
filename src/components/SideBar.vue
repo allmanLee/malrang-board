@@ -52,7 +52,7 @@
 
 
         <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
-          <el-menu-item v-for="(t, index) in  filteredTeamsByBookmark" :key="index" :index="`${index}`">
+          <el-menu-item v-for="(t, index) in  filteredTeamsByBookmark" :key="index" :index="`rt-${index}`">
             <span>{{ t.name }}</span>
           </el-menu-item>
         </el-menu>
@@ -61,8 +61,7 @@
         <div class="prj-searched" v-if="filteredProjects?.length && searchText">
           <h5 class="mb-2">프로젝트 검색 결과</h5>
           <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
-            <el-menu-item v-for="(prj, index) in filteredProjects" :key="index" @click="handleClickPrj"
-              :index="`${index}`">
+            <el-menu-item v-for="(prj, i) in filteredProjects" :key="`p-${i}`" @click="handleClickPrj" :index="`sp-${i}`">
               <template #title>
                 <el-icon>
                   <icon-menu />
@@ -76,7 +75,7 @@
         <div class="team-searched" v-if="filteredTeams?.length && searchText">
           <h5 class="mb-2">팀 검색 결과</h5>
           <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
-            <el-menu-item v-for="(t, index) in  filteredTeams" :key="index" :index="`${index}`">
+            <el-menu-item v-for="(t, index) in  filteredTeams" :key="`t-${index}`" :index="`st-${index}`">
               <span>{{ t.name }}</span>
             </el-menu-item>
           </el-menu>
@@ -86,21 +85,23 @@
 
         <div class="prj" v-show="filteredProjects?.length && !searchText">
           <h5 class="mb-2">전체 프로젝트</h5>
-          <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
-            ref="projectAllRef">
-            <el-sub-menu :index="`${index}`" v-for="(prj, index) in filteredProjects" :key="index">
+          <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @select="handleSelectMenu"
+            @close="handleClose" ref="projectAllRef">
+            <el-sub-menu :index="prj?._id" v-for="(prj) in filteredProjects" :key="prj?._id">
               <template #title>
                 <el-icon>
                   <icon-menu />
                 </el-icon>
                 <span class="ti">{{ prj.name }}</span>
               </template>
-              <el-menu-item v-for="(t, index) in  prj.teams" :key="index" :index="`${index}`" class="items-menu--team">
-                <div class="border-left">
-                  <span class="team-name">{{ t.name }}</span>
-                </div>
-
-              </el-menu-item>
+              <el-menu-item-group @open="handleOpen">
+                <el-menu-item v-for="(t) in  prj.teams" :key="`team-${t?._id}`" :index="`team-${t._id}`"
+                  @click="handleClickTeam" class="items-menu--team">
+                  <div class="border-left">
+                    <span class="team-name">{{ t.name }}</span>
+                  </div>
+                </el-menu-item>
+              </el-menu-item-group>
               <div v-if="isEmpty(prj.teams)" class="is-empty">
                 <el-menu-item disabled>
                   <span class="team-name">팀이 없습니다.</span>
@@ -118,16 +119,30 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useUserStore } from '@/stores/user';
+import { useCommonStore } from '@/stores/common';
 import { isEmpty } from 'lodash';
 
 // 스토어 프로젝트 목록
 const userStore = useUserStore()
+const commonStore = useCommonStore()
 const projects = computed(() => userStore.getProjects)
 const teams = computed(() => userStore.getTeams)
 
 const handleOpen = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
 }
+const handleClickTeam = () => {
+  console.log('click', 'team')
+}
+
+// common 스토어에 team 아이디 저장
+const handleSelectMenu = (index: string, indexPath: string[]) => {
+  // 선택한 팀 아이디 team-{아이디}
+  const teamId = index.split('-')[1]
+  const teamName = teams.value.find(team => team._id === teamId)?.name
+  commonStore.changeTeamSelected(teamId, teamName)
+}
+
 const handleClose = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
 }
@@ -351,9 +366,32 @@ const filteredTeamsByBookmark = computed(() => {
   // 팀 아이템 색
   .el-menu-item {
     color: #fff;
+  }
 
-    &:active {
-      background-color: none !important;
+
+  // 팀 선택 시
+  .items-menu--team {
+    &.is-active {
+      background-color: #34363a;
+
+      // open 가상 클래스
+      &::before {
+        content: '선택됨';
+        position: absolute;
+        right: 10px;
+        // primary color
+        background-color: hsl(191, 79%, 46%);
+        border-radius: 4px;
+
+        width: 40px;
+        height: 20px;
+        line-height: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        vertical-align: middle;
+        text-align: center;
+
+      }
     }
   }
 

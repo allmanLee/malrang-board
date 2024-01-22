@@ -3,6 +3,7 @@ import type { UserId, User } from '../types/users.type';
 import type { Project, ProjectId, Team, TeamId } from '../types/projects.type';
 import type { ProjectRequestDto, TeamRequestDto } from '../types/dto/project.dto.type';
 import type { UserRequestDto } from '../types/users.type';
+import type { Board } from '@/types/KanbanBoard';
 const API_URL = 'http://localhost:8000'; // Replace with your API URL
 
 // Define your API endpoints here
@@ -16,6 +17,9 @@ const apiEndpoints = {
 
   teams: '/projects/teams',
   team: (teamId: string) => `/teams/${teamId}`,
+
+  boards: '/boards',
+  board: (boardId: string) => `/boards/${boardId}`,
 };
 
 // Create an instance of Axios with the base URL
@@ -102,7 +106,10 @@ const userApi = {
 
   // 사용자 퍼미션 (RU)
   getUserPermissions: (userId: UserId) => get<string[]>(apiEndpoints.userPermissions(userId)),
-  updateUserPermissions: (userId: UserId, permissions: string[]) => put<string[]>(apiEndpoints.userPermissions(userId), permissions)
+  updateUserPermissions: (userId: UserId, permissions: string[]) => put<string[]>(apiEndpoints.userPermissions(userId), permissions),
+
+  // 보드 (CRUD)
+  getBoards: (params: any) : Promise<Board[]> => get(`${apiEndpoints.boards}`, params),
 };
 
 // 모듈 
