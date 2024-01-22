@@ -16,12 +16,14 @@
         <el-tooltip content="마이보드로 이동합니다." placement="top">
           <el-card size="large" class="myboard" @click="() => $router.push('/mypage')">
             <div class="myboard-wrapper">
-              <p class="item-key">내가 진행중인 업무</p>
-              <p class="item-value">엑셀 업로드 및 다운로드기능 개발</p>
-              <p class="item-key">프로젝트/팀</p>
-              <p class="item-value">말랑보드 / 프론트엔드</p>
-              <p class="item-key">진행률</p>
-              <p class="item-value">50%</p>
+              <artice class='myboard-text'>
+                <p class="item-key">내가 진행중인 업무</p>
+                <p class="item-value">엑셀 업로드 및 다운로드기능 개발</p>
+              </artice>
+              <article class="myboard-text">
+                <p class="item-key">프로젝트/팀</p>
+                <p class="item-value">말랑보드 / 프론트엔드</p>
+              </article>
               <!-- TODO -->
               <!-- <div class="work-buttons">
                 <el-button type="primary" size="mini" class="finish-work--btn">완료!</el-button>
@@ -295,15 +297,25 @@ const filteredTeamsByBookmark = computed(() => {
     height: 100%;
     padding: 0 10px;
 
-    .item-key {
-      font-size: 14px;
-      font-weight: 900;
+    .myboard-text {
+      margin-bottom: 10px;
+
+      // 마지막 요소
+      &:last-child {
+        margin-bottom: 0px;
+      }
+
+      .item-key {
+        font-size: 14px;
+        font-weight: 900;
+      }
+
+      .item-value {
+        font-size: 14px;
+        font-weight: 500;
+      }
     }
 
-    .item-value {
-      font-size: 14px;
-      font-weight: 500;
-    }
 
     // 버튼
     // .el-button {
