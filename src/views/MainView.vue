@@ -9,7 +9,7 @@
 
     <!-- 드래그엔 드랍이 가능한 칸반보드(할일, 보류, 한일, 칸반 추가 기능) -->
     <section class="container">
-      <KanbanBoard :boards="boards" />
+      <kanban-board />
     </section>
   </div>
 </template>
@@ -19,57 +19,21 @@ import KanbanBoard from "@/components/KanbanBoard.vue";
 // import Link from "@/components/Link.vue";
 // import Github from "@/components/Github.vue";
 
-import { computed, ref, watch } from "vue";
-import { useCommonStore } from "@/stores/common";
-import type { Board } from "@/types/KanbanBoard.ts";
+// import { ref } from "vue";
+// import { useBoardStore } from "@/stores/board";
+// import type { Board } from "@/types/KanbanBoard.ts";
 
 
 // 보드 데이터 가져오기 (팀별)
 // 팀 ID로 보드를 조회합니다.
-const commonStore = useCommonStore();
-const teamId = computed(() => commonStore.getSbSelectedTeamId);
+// const boardStore = useBoardStore();
+// let boards = ref([] as Board[]);
 
-watch(teamId, (newVal) => {
-  console.log("watch teamId", newVal);
+// boards.value = await boardStore.getBoards;
 
 
-  // 조회
-  // getBoards(newVal);
-});
 
-// 목업 데이터
-const boards = ref<Board[]>(
-  [
-    {
-      id: 1,
-      status: "todo",
-      title: "할일",
-      kanbanId: 'asdfasvd',
-      permission: "admin",
-      order: 1,
-      teamId: 'asdf',
-    },
-    {
-      id: 2,
-      status: "pending",
-      title: "보류",
-      kanbanId: 'asdfasvd',
-      permission: "admin",
-      order: 2,
-      teamId: 'asdf',
-    },
-    {
-      id: 3,
-      status: "done",
-      title: "한일",
-      kanbanId: 'asdfasvd',
-      permission: "admin",
-      order: 3,
-      teamId: 'asdf',
-    },
-  ]
-)
-
+console.log('test')
 
 </script>
 <style scoped lang="scss">

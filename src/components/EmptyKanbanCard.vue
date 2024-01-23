@@ -27,7 +27,7 @@ const handleClickToAdd = () => {
 .emptyKanbanCard {
   width: 100%;
   height: 100%;
-  border: 1px dashed #c0c4cc;
+  border: 1px dashed #242527;
   border-radius: 4px;
   display: flex;
   justify-content: center;
@@ -42,12 +42,12 @@ const handleClickToAdd = () => {
 
     .emptyKanbanCard__icon {
       font-size: 40px;
-      color: #c0c4cc;
+      color: #797979;
     }
 
     .emptyKanbanCard__text {
       font-size: 14px;
-      color: #c0c4cc;
+      color: #797979;
       margin-top: 10px;
     }
   }

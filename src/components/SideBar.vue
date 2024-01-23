@@ -96,7 +96,7 @@
               </template>
               <el-menu-item-group @open="handleOpen">
                 <el-menu-item v-for="(t) in  prj.teams" :key="`team-${t?._id}`" :index="`team-${t._id}`"
-                  @click="handleClickTeam" class="items-menu--team">
+                  class="items-menu--team">
                   <div class="border-left">
                     <span class="team-name">{{ t.name }}</span>
                   </div>
@@ -131,16 +131,13 @@ const teams = computed(() => userStore.getTeams)
 const handleOpen = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
 }
-const handleClickTeam = () => {
-  console.log('click', 'team')
-}
 
 // common 스토어에 team 아이디 저장
-const handleSelectMenu = (index: string, indexPath: string[]) => {
+const handleSelectMenu = async (id: string) => {
   // 선택한 팀 아이디 team-{아이디}
-  const teamId = index.split('-')[1]
+  const teamId = id.split('-')[1]
   const teamName = teams.value.find(team => team._id === teamId)?.name
-  commonStore.changeTeamSelected(teamId, teamName)
+  await commonStore.changeTeamSelected(teamId, teamName)
 }
 
 const handleClose = (key: string, keyPath: string[]) => {

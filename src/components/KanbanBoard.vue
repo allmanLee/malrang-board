@@ -73,6 +73,7 @@ import KanbanBoardCard from "@/components/KanbanBoardCard.vue";
 import EmptyKanbanCard from "@/components/EmptyKanbanCard.vue";
 import { cloneDeep } from "lodash";
 import { useUserStore } from "@/stores/user";
+import { useBoardStore } from "@/stores/board";
 
 import "md-editor-v3/lib/style.css";
 
@@ -81,16 +82,16 @@ const users = computed(() => useUserStore().getMockUsers)
 
 // const findUserNameById = useUserStore().findUserNameById
 
-
-const props = defineProps<{
-  boards: Board[];
-}>();
+const boards = computed(() => useBoardStore().getBoards)
+// const props = defineProps<{
+//   boards: Board[];
+// }>();
 
 const selectedBoardId = ref(0);
 const selectedWorker = ref(null);
 const activeName = ref("전체 담당자");
 const searchValue = ref("");
-const boards = props.boards;
+// const boards = ref<Board[]>(props.boards);
 const cards = ref<Card[]>([
   {
     id: 1,
@@ -339,7 +340,8 @@ const onDrop = (e, boardId) => {
     justify-content: flex-start;
     gap: 10px;
     width: 100%;
-    height: 500px;
+    height: 100%;
+    overflow-x: scroll;
   }
 
   .kanban-container-boards__panel {
@@ -349,6 +351,12 @@ const onDrop = (e, boardId) => {
     justify-content: flex-start;
     gap: 10px;
     width: 300px;
+    // 높이 화면 채우기
+    height: 96%;
+
+
+    // 넓이 고정
+    flex-shrink: 0;
     min-height: 60%;
     background-color: black;
     padding: 4px 20px;

@@ -200,6 +200,7 @@ nav {
 .main {
   display: flex;
   width: 100%;
+  overflow: hidden;
 }
 
 .navigation-side__bar {

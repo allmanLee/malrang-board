@@ -18,8 +18,8 @@ const apiEndpoints = {
   teams: '/projects/teams',
   team: (teamId: string) => `/teams/${teamId}`,
 
-  boards: '/boards',
-  board: (boardId: string) => `/boards/${boardId}`,
+  boards: '/kanban/boards',
+  board: (boardId: string) => `/kanban/boards/${boardId}`,
 };
 
 // Create an instance of Axios with the base URL
@@ -27,9 +27,17 @@ const api = axios.create({
   baseURL: API_URL,
 });
 
+api.interceptors.request.use((config) => {
+  // Add your interceptors here
+  console.log('Request was sent', config);
+  return config;
+}
+);
+
 // Define your API methods here (get, post, put, delete, etc)
 const get = async <T>(url: string, params?: any): Promise<T> => {
   try {
+    console.log('get', url, params)
     const response: AxiosResponse<T> = await api.get(url, {params});
     return response.data;
   } catch (error: any) {
