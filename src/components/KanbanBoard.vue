@@ -328,7 +328,7 @@ const onDrop = (e, boardId) => {
     right: 0px;
     width: 400px;
     height: 40px;
-    color: #ffffff;
+    // color: #ffffff;
     padding: 0 0px;
 
   }
@@ -358,7 +358,7 @@ const onDrop = (e, boardId) => {
     // 넓이 고정
     flex-shrink: 0;
     min-height: 60%;
-    background-color: black;
+    // background-color: black;
     padding: 4px 20px;
     padding-bottom: 16px;
     border-radius: 10px;
@@ -372,7 +372,7 @@ const onDrop = (e, boardId) => {
     gap: 20px;
     width: 100%;
     height: 50px;
-    color: white;
+    // color: #ffffff;;
     font-size: 20px;
     font-weight: 700;
     padding: 0 10px;
@@ -381,14 +381,14 @@ const onDrop = (e, boardId) => {
   .kanban-class {
     font-size: 20px;
     font-weight: 700;
-    color: #ffffff;
+    // color: #ffffff;
   }
 
   // 확장 메뉴 버튼
   .kanban-menu {
     // font-size: 14px;
     font-weight: 700;
-    color: #ffffff;
+    // color: #ffffff;
   }
 
 
@@ -399,12 +399,12 @@ const onDrop = (e, boardId) => {
   }
 
   .el-form-item__content {
-    color: #ffffff;
+    // color: #ffffff;
   }
 
   .el-form-item__content .el-input__inner {
     background-color: #2b2b2b;
-    color: #ffffff;
+    // color: #ffffff;
   }
 
   // 첫번째 태그 마진 제거
@@ -413,9 +413,9 @@ const onDrop = (e, boardId) => {
   }
 
   .el-form-item__content .el-tag {
-    background-color: #2b2b2b;
+    // background-color: #2b2b2b;b
     margin-left: 10px;
-    color: #ffffff;
+    // color: #ffffff;
   }
 
   .tag-container {
@@ -432,7 +432,7 @@ const onDrop = (e, boardId) => {
   gap: 10px;
   width: 100%;
   height: 30px;
-  color: white;
+  // color: #ffffff;;
   font-size: 20px;
   font-weight: 700;
 }
@@ -440,7 +440,7 @@ const onDrop = (e, boardId) => {
 .md-editor {
   width: 100%;
   height: 300px;
-  background-color: black;
+  // background-color: black;
   border: none;
   border-radius: 10px;
   padding: 10px;
@@ -454,7 +454,7 @@ const onDrop = (e, boardId) => {
   gap: 10px;
   width: 100%;
   height: 50px;
-  color: white;
+  // color: #ffffff;;
   font-size: 20px;
   font-weight: 700;
 }

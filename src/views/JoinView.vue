@@ -1,38 +1,41 @@
 <template>
-  <div class="join-view">
-    <h1>말랑보드에 회원가입 해주세요!</h1>
-    <article class="description-text">
-      <p>회원가입을 위해 아래 정보를 입력해주세요.</p>
-      <p>팀, 프로젝트 정보는 관리자(팀장, PL) 계정이 설정할 수 있습니다.</p>
-    </article>
-    <el-form @submit.prevent="submitForm" class="form">
-      <el-label for="name">Name:</el-label>
-      <el-input type="text" id="name" v-model="name" required />
+  <div class="joinview">
+    <section class="joinview__left">
+      <h1><span class="--welcome">Welcome to </span>말랑보드</h1>
+    </section>
+    <section class="joinview__right">
+      <header>
+        <h1>회원가입</h1>
+      </header>
 
-      <el-label for="group">Group (테스트용)</el-label>
-      <el-select v-model="groupName" filterable allow-create placeholder="소속을 선택하세요" class="select-user">
-        <el-option v-for="group in mockGroups" :key="group.id" :label="group.name" :value="group.name"></el-option>
-      </el-select>
-
-      <el-label for="email">Email (테스트용)</el-label>
-      <el-input type="email" id="email" v-model="email" required />
-
-      <el-label for="password">Password:</el-label>
-      <el-input type="password" id="password" v-model="password" required />
-
-      <!-- 비밀번호 중복검사 -->
-      <el-label for="password">Password Confirm:</el-label>
-      <el-input type="password" id="password" v-model="rePassword" required />
-      <el-alert title="비밀번호가 일치하지 않습니다." type="error" v-if="!isPasswordMatch && password && rePassword" show-icon center
-        :closable="false"></el-alert>
-
-      <br />
-
-      <!-- 임시 PL 여부 -->
-      <el-checkbox v-model="isAdmin" id="isAdmin">당신은 관리자 이신가요?</el-checkbox>
-
-      <el-button type="primary" color="primary" @click="submitForm">완료</el-button>
-    </el-form>
+      <el-form @submit.prevent="submitForm" class="form" :label-position="'top'">
+        <el-form-item label="이름" prop="name">
+          <el-input type="text" id="name" v-model="name" required />
+        </el-form-item>
+        <el-form-item label="이메일" prop="email">
+          <el-input type="email" id="email" v-model="email" required />
+        </el-form-item>
+        <el-form-item label="비밀번호" prop="password">
+          <el-input type="password" id="password" v-model="password" required />
+        </el-form-item>
+        <el-form-item label="비밀번호 확인" prop="rePassword">
+          <el-input type="password" id="rePassword" v-model="rePassword" required />
+          <el-alert title="비밀번호가 일치하지 않습니다." type="error" v-if="!isPasswordMatch && password && rePassword" show-icon
+            center :closable="false"></el-alert>
+        </el-form-item>
+        <el-form-item label="소속 그룹 (입력하여 추가할 수 있어요!)" prop="groupName">
+          <el-select v-model="groupName" filterable allow-create placeholder="소속을 선택하세요" class="select-user">
+            <el-option v-for="group in mockGroups" :key="group.id" :label="group.name" :value="group.name"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item prop="isAdmin">
+          <el-checkbox v-model="isAdmin" id="isAdmin">당신은 관리자 이신가요?</el-checkbox>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" color="primary" @click="submitForm">완료</el-button>
+        </el-form-item>
+      </el-form>
+    </section>
   </div>
 </template>
 
@@ -100,31 +103,78 @@ const submitForm = async () => {
 </script>
 
 <style lang="scss" scoped>
-.join-view {
+.joinview {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  margin-top: -100px;
+
   width: 100%;
+  margin: 40px;
+  margin-top: -100px;
 
-  h1 {
-    margin-bottom: 20px;
-    color: #fff;
-    font-weight: 700;
+  .el-form {
+    width: 100%;
   }
-}
 
-// 폼
-form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+  .joinview__left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    // width: 240px;
+    width: 100%;
+    padding: 20px;
 
+    h1 {
+      margin-bottom: 20px;
+      font-size: 40px;
+      font-family: 'malang-board-bold';
+      font-weight: 700;
 
-.el-input {
-  margin-bottom: 20px;
+      .--welcome {
+        font-size: 20px;
+        font-weight: 200;
+        font-family: 'malang-board-bold';
+      }
+    }
+
+    .description-text {
+      margin-bottom: 40px;
+      text-align: center;
+    }
+  }
+
+  .joinview__right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 500px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+
+    header {
+      h1 {
+        margin-bottom: 20px;
+        font-weight: 200;
+        font-family: 'malang-board-bold';
+        font-size: 30px;
+      }
+    }
+
+    // 폼
+    form {
+      display: flex;
+      flex-direction: column;
+
+      .el-input {
+        margin-bottom: 20px;
+      }
+    }
+
+  }
 }
 
 .el-select {
@@ -134,13 +184,6 @@ form {
 
 label {
   display: block;
-}
-
-form {
-  width: 300px;
-  margin: 0 auto;
-
-
 }
 
 h1 {

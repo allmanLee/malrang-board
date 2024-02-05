@@ -2,15 +2,17 @@
   <div class="login-view">
     <h1>로그인</h1>
     <el-form @submit.prevent="login">
-      <el-label v-show="false" for="email">email</el-label>
-      <el-input type="text" id="username" placeholder="이메일" v-model="email" />
-      <el-label v-show="false" for="password">비밀번호</el-label>
-      <!-- 비밀번호에서 엔터 시 로그인 -->
-      <el-input @keyup.enter="login" type="password" id="password" placeholder="비밀번호" v-model="password" />
+      <el-form-item label="이메일" prop="email">
+        <el-input type="text" id="username" placeholder="이메일" v-model="email" />
+      </el-form-item>
+      <el-form-item label="비밀번호" prop="password">
+        <el-input @keyup.enter="login" type="password" id="password" placeholder="비밀번호" v-model="password" />
+      </el-form-item>
       <el-alert :title="errorMessage" type="error" v-if="isLoginError" show-icon center :closable="false"></el-alert>
-      <el-button @click="login">Login</el-button>
+      <el-form-item>
+        <el-button @click="login">Login</el-button>
+      </el-form-item>
     </el-form>
-
   </div>
 </template>
 
@@ -67,7 +69,7 @@ const login = async () => {
 
   h1 {
     margin-bottom: 20px;
-    color: #fff;
+    // color: #ffffff;
     font-weight: 700;
   }
 
@@ -98,4 +100,3 @@ const login = async () => {
   }
 }
 </style>
-@/types/users.type

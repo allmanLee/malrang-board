@@ -224,7 +224,7 @@ const handleClickDelete = () => {
     cursor: pointer;
 
     .linked-icon__icon {
-      color: #ffffff;
+      // color: #ffffff;
       margin-top: 0px;
       right: 4px;
     }
@@ -232,7 +232,7 @@ const handleClickDelete = () => {
     .icon-link__text {
       font-size: 14px;
       font-weight: 500;
-      color: #ffffff;
+      // color: #ffffff;
     }
 
     &:hover {
@@ -253,7 +253,7 @@ const handleClickDelete = () => {
     .header__user-name {
       font-size: 14px;
       font-weight: 500;
-      color: #ffffff;
+      // color: #ffffff;
       margin-left: 10px;
     }
   }
@@ -267,7 +267,7 @@ const handleClickDelete = () => {
     height: 30px;
     font-size: 16px;
     font-weight: 700;
-    color: #ffffff;
+    // color: #ffffff;
     margin-top: 12px;
 
     .kanban-board-copy-icons {
@@ -283,7 +283,7 @@ const handleClickDelete = () => {
         height: 10px;
         font-size: 14px;
         font-weight: 500;
-        color: white;
+        // color: #ffffff;;
         z-index: 2;
       }
 
@@ -291,7 +291,7 @@ const handleClickDelete = () => {
         box-sizing: content-box;
         // margin-left: 10px;
         cursor: pointer;
-        color: #ffffff;
+        // color: #ffffff;
         padding: 4px;
         // background-color: #434242;
         border-radius: 12px;
@@ -317,10 +317,10 @@ const handleClickDelete = () => {
       height: 10px;
       font-size: 16px;
       font-weight: 700;
-      color: #ffffff;
+      // color: #ffffff;
 
       .card-num__link {
-        color: #ffffff;
+        // color: #ffffff;
         font-size: 12px;
         text-decoration: none;
       }
@@ -334,7 +334,7 @@ const handleClickDelete = () => {
       display: flex;
       font-size: 16px;
       font-weight: 700;
-      color: #ffffff;
+      // color: #ffffff;
 
 
       border-radius: 12px;
@@ -356,12 +356,12 @@ const handleClickDelete = () => {
       cursor: pointer;
 
       .kanban-delete {
-        color: #ffffff;
+        // color: #ffffff;
         border-radius: 0 12px 12px 0;
       }
 
       .kanban-menu {
-        color: #ffffff;
+        // color: #ffffff;
         border-radius: 12px 0 0 12px;
       }
     }
@@ -378,13 +378,13 @@ const handleClickDelete = () => {
     align-items: flex-start;
     font-size: 16px;
     font-weight: 700;
-    color: #ffffff;
+    // color: #ffffff;
 
     .title-text {
       margin-right: 10px;
       font-size: 14px;
       font-weight: 700;
-      color: #ffffff;
+      // color: #ffffff;
       width: 220px;
     }
   }
@@ -403,7 +403,7 @@ const handleClickDelete = () => {
     .kanban-board-card-body-title {
       font-size: 20px;
       font-weight: 700;
-      color: #ffffff;
+      // color: #ffffff;
     }
   }
 }
@@ -524,7 +524,7 @@ div.solid {
 }
 
 .kanban-board-card:hover {
-  background-color: black;
+  // background-color: black;
   border: 1px solid #4a536b;
 }
 
@@ -552,7 +552,7 @@ div.solid {
     width: 100%;
     height: 30px;
     font-weight: 700;
-    color: #ffffff;
+    // color: #ffffff;
     overflow: hidden;
 
 
@@ -560,7 +560,7 @@ div.solid {
       margin-right: 10px;
       font-size: 14px;
       font-weight: 700;
-      color: #ffffff;
+      // color: #ffffff;
       padding: 10px;
       width: 160px;
       text-wrap: nowrap;

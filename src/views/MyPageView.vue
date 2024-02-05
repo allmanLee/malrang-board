@@ -153,7 +153,7 @@ const getBoards = async () => {
             height: 40px;
             border-radius: 10px 10px 0 0;
             background-color: #409eff;
-            color: #fff;
+            // color: #ffffff;
             font-size: 16px;
             font-weight: 700;
             display: flex;
@@ -167,7 +167,7 @@ const getBoards = async () => {
             height: 260px;
             border-radius: 0 0 10px 10px;
             background-color: rgba($color: #000000, $alpha: 0.1);
-            color: #fff;
+            // color: #ffffff;
             font-size: 16px;
             font-weight: 700;
             display: flex;
@@ -201,7 +201,7 @@ const getBoards = async () => {
     text-align: center;
     height: 100%;
     width: 500px;
-    color: white;
+    // color: #ffffff;;
     font-weight: 700;
     margin-bottom: 20px;
 
@@ -220,7 +220,7 @@ const getBoards = async () => {
   margin-top: 20px;
   width: 100%;
   height: 100%;
-  color: #fff;
+  // color: #ffffff;
   font-size: 16px;
   font-weight: 700;
 

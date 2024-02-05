@@ -30,7 +30,7 @@
     </section>
     <el-form-item>
       <!-- 에디이터 -->
-      <md-editor ref="editorRef" language="en-US" :scrollAuto="true" :disabled="false" theme="dark" :preview="true"
+      <md-editor ref="editorRef" language="en-US" :scrollAuto="true" :disabled="false" :preview="true"
         v-model="customForm.description" />
     </el-form-item>
     <el-button v-show="false" type="primary">등록</el-button>
@@ -148,11 +148,11 @@ const handleCloseTag = (tag: any) => {
 }
 
 .el-form-item__content {
-  color: #ffffff;
+  // color: #ffffff;
 }
 
 .el-form-item__content .el-input__inner {
-  color: #ffffff;
+  // color: #ffffff;
 }
 
 .el-form-item__content .el-tag {
@@ -166,15 +166,15 @@ const handleCloseTag = (tag: any) => {
 
 .el-form-item__content .el-tag {
   // margin-left: 10px;
-  color: #ffffff;
+  // color: #ffffff;
   background-color: #2b2b2b;
 
   &:hover {
-    color: #ffffff;
+    // color: #ffffff;
     border: 1px solid #9e9e9e;
 
     .el-tag__close {
-      color: #ffffff;
+      // color: #ffffff;
     }
   }
 }
@@ -189,7 +189,7 @@ const handleCloseTag = (tag: any) => {
   .tag__input {
     width: 140px;
     // background-color: #2b2b2b;
-    color: #ffffff;
+    // color: #ffffff;
   }
 }
 
@@ -202,7 +202,7 @@ const handleCloseTag = (tag: any) => {
   gap: 10px;
   width: 100%;
   height: 50px;
-  color: white;
+  // color: #ffffff;;
   font-size: 20px;
   font-weight: 700;
 }
@@ -210,7 +210,7 @@ const handleCloseTag = (tag: any) => {
 .md-editor {
   width: 100%;
   height: 300px;
-  background-color: black;
+  // background-color: black;
   border: none;
   border-radius: 10px;
   padding: 10px;
@@ -220,7 +220,7 @@ const handleCloseTag = (tag: any) => {
   font-size: 12px;
   // margin-left: 5px;
   margin-top: 6px;
-  color: #ffffff;
+  // color: #ffffff;
   font-weight: 700;
 }
 </style>

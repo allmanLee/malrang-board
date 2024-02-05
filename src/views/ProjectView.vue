@@ -376,7 +376,7 @@ const selectTeam = (teamId) => {
   h1 {
     font-size: 40px;
     font-weight: 700;
-    color: white;
+    // color: #ffffff;;
   }
 
   .project-manager-view__wrapper {
@@ -388,7 +388,7 @@ const selectTeam = (teamId) => {
 
 .project-magage-title {
   display: flex;
-  color: white;
+  // color: #ffffff;;
   vertical-align: middle;
   width: 100%;
 
@@ -435,13 +435,13 @@ const selectTeam = (teamId) => {
 
 .column {
   flex: 1;
-  background-color: #000;
+  // background-color: black;
   padding: 20px;
   border-radius: 10px;
   width: 400px;
 
   &-title {
-    color: #fff;
+    // color: #ffffff;
     font-size: 16px;
     font-weight: bold;
     margin-bottom: 10px;
@@ -548,16 +548,16 @@ const selectTeam = (teamId) => {
 
 .highlighted {
   background-color: #f5f5f5;
-  color: #000;
+  // color: black;
 
   .el-icon {
-    color: #000 !important;
+    // color: #000 !important;
   }
 
   .new-badge {
     background-color: #2196f3;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
-    color: #fff;
+    // color: #ffffff;
   }
 }
 
@@ -575,7 +575,7 @@ const selectTeam = (teamId) => {
   }
 
   .delete-button--danger {
-    color: #fff;
+    // color: #ffffff;
     background-color: #f44336;
     border-color: #f44336;
   }
@@ -603,7 +603,7 @@ const selectTeam = (teamId) => {
   top: 0;
   right: 0;
   background-color: #1973bd;
-  color: #fff;
+  // color: #ffffff;
   padding: 2px 10px;
   border-radius: 0 0 0 4px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);

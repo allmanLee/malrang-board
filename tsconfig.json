@@ -4,7 +4,7 @@
     "module": "esnext",
     "target": "esnext",
     "moduleResolution": "node",
-    "types": ["node"],
+    "types": ["node", "element-plus/global"],
     "sourceMap": true,
     "allowJs": true,
     "baseUrl": "./", // Required for absolute imports

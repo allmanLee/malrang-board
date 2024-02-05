@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import { useDark } from '@vueuse/core'
 import { useUserStore } from '@/stores/user';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import SideBar from '@/components/SideBar.vue';
+import SubSideBar from './components/SubSideBar.vue';
 
 const router = useRouter();
 const isShowSide = computed(() => {
@@ -36,8 +36,6 @@ const userName = computed(() => {
   return userStore.getUserState.name;
 });
 
-// 다크모드
-useDark()
 
 </script>
 <template>
@@ -85,6 +83,9 @@ useDark()
       </div>
     </el-header>
     <el-container>
+      <el-aside class="navigation-side__bar">
+        <sub-side-bar />
+      </el-aside>
       <el-aside v-if="isShowSide" class="navigation-side__bar">
         <SideBar />
       </el-aside>
@@ -103,7 +104,7 @@ useDark()
 
 .header {
   display: flex;
-  background-color: black;
+  // background-color: black;
   top: 0;
   left: 0;
   z-index: 100;
@@ -126,7 +127,7 @@ useDark()
     margin-right: 20px;
 
     a {
-      color: #fff;
+      // color: #ffffff;
       text-decoration: none;
 
       &:hover {
@@ -140,7 +141,7 @@ useDark()
       display: flex;
       align-items: center;
       gap: 10px;
-      color: #fff;
+      // color: #ffffff;
       text-decoration: none;
 
       &:hover {
@@ -157,7 +158,7 @@ useDark()
 
       .el-dropdown-item {
 
-        color: #fff;
+        // color: #ffffff;
         text-decoration: none;
 
         &:hover {
@@ -176,7 +177,7 @@ useDark()
 
 .logo {
   h1 {
-    color: #fff;
+    // color: #ffffff;
     font-size: 24px;
     font-weight: 700;
     margin-left: 20px;
@@ -188,7 +189,7 @@ nav {
   gap: 20px;
 
   a {
-    color: #fff;
+    // color: #ffffff;
     text-decoration: none;
 
     &:hover {
@@ -205,6 +206,12 @@ nav {
 
 .navigation-side__bar {
   height: 100%;
-  border-right: #2b2b2b 1px solid;
+  border-right: 1px solid #eaeaea;
+}
+
+// 첫번째
+.navigation-side__bar:first-child {
+  border-right: none;
+  width: 66px;
 }
 </style>
