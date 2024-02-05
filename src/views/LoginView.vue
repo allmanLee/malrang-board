@@ -1,16 +1,16 @@
 <template>
   <div class="login-view">
     <h1>로그인</h1>
-    <el-form @submit.prevent="login">
-      <el-form-item label="이메일" prop="email">
+    <el-form @submit.prevent="login" label-position="top" class="login-view__form">
+      <el-form-item :size="'large'" prop="email">
         <el-input type="text" id="username" placeholder="이메일" v-model="email" />
       </el-form-item>
-      <el-form-item label="비밀번호" prop="password">
+      <el-form-item :size="'large'" prop="password">
         <el-input @keyup.enter="login" type="password" id="password" placeholder="비밀번호" v-model="password" />
       </el-form-item>
       <el-alert :title="errorMessage" type="error" v-if="isLoginError" show-icon center :closable="false"></el-alert>
       <el-form-item>
-        <el-button @click="login">Login</el-button>
+        <el-button size="large" type="primary" @click="login">로그인</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -69,25 +69,19 @@ const login = async () => {
 
   h1 {
     margin-bottom: 20px;
-    // color: #ffffff;
+    font-size: 40px;
+    font-family: 'malang-board-bold';
     font-weight: 700;
   }
 
-  form {
-    display: flex;
+  .login-view__form {
     flex-direction: column;
     align-items: center;
-    width: 300px;
     margin: 0 auto;
+    width: 400px;
+  }
 
-    .el-input {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-    }
-
+  form {
     .el-button {
       width: 100%;
       margin-top: 20px;

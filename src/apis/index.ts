@@ -85,7 +85,7 @@ const userApi = {
   // 사용자 (CRUD) 및 로그인
   getUsers: <T>(params: T): Promise<User[]> => get(`${apiEndpoints.users}`, params),
   getUser: (userId: UserId) => get(apiEndpoints.user(userId)),
-  createUser: (userData: UserRequestDto) => post(apiEndpoints.users, userData),
+  createUser: (userData: UserRequestDto): Promise <User> => post(apiEndpoints.users, userData),
   updateUser: (userId: UserId, userData: UserRequestDto) => put(apiEndpoints.user(userId), userData),
   deleteUser: (userId: UserId) => del(apiEndpoints.user(userId)),
   login: (userData: {email: string, password: string}): Promise<User> => post(`${apiEndpoints.users}/login`, userData),

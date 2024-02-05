@@ -1,24 +1,20 @@
 $--colors: (
   "primary": (
-    "base": pink,
-
+    // 민트
+    "base": #00b5ad,
   ),
   "success": (
     "base": #21ba45,
   ),
   "warning": (
-    "base": #f2711c,
+    "base": #ea9156,
   ),
   "danger": (
-    "base": #db2828,
-  ),
-  "error": (
-    "base": #db2828,
-  ),
-  "info": (
-    "base": #42b8dd,
+    "base": #ff4400,
   ),
 );
+
+
 
 // we can add this to custom namespace, default is 'el'
 // @forward "element-plus/theme-chalk/src/mixins/config.scss" with (
@@ -30,7 +26,14 @@ $--colors: (
 @forward "element-plus/theme-chalk/src/common/var.scss" with (
   // do not use same name, it will override.
   $colors: $--colors,
-  $button-padding-horizontal: ("default": 50px)
+
+  // element-plus input style
+  $input: (
+    "border-color": none,
+    "bg-color": #f5f7fa10,
+    "border-hover-color": #c0c4cc,
+    "border-focus-color": #00b5ad,
+  ),
 );
 
 // if you want to import all

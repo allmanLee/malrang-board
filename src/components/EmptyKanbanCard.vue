@@ -41,13 +41,13 @@ const handleClickToAdd = () => {
     align-items: center;
 
     .emptyKanbanCard__icon {
-      font-size: 40px;
-      color: #797979;
+      font-size: 20px;
+      color: $gray-300;
     }
 
     .emptyKanbanCard__text {
       font-size: 14px;
-      color: #797979;
+      color: $gray-300;
       margin-top: 10px;
     }
   }
@@ -55,7 +55,7 @@ const handleClickToAdd = () => {
 
 /* -------------------------------- Hover 스타일 ------------------------------- */
 .emptyKanbanCard:hover {
-  border: 1px dashed #409eff;
+  border-color: $primary;
   cursor: pointer;
 }
 </style>

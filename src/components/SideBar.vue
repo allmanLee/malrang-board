@@ -259,7 +259,6 @@ const filteredTeamsByBookmark = computed(() => {
 
     .el-input {
       width: 100%;
-      border-bottom: 1px solid #fff;
       border-radius: 0;
       // color: #ffffff;
       font-size: 16px;
@@ -350,16 +349,16 @@ const filteredTeamsByBookmark = computed(() => {
   // 팀 선택 시
   .items-menu--team {
     &.is-active {
-      background-color: #34363a;
 
       // open 가상 클래스
       &::before {
-        content: '선택됨';
+        content: '선택';
         position: absolute;
         right: 10px;
         // primary color
-        background-color: hsl(191, 79%, 46%);
+        background-color: $primary;
         border-radius: 4px;
+        color: white;
 
         width: 40px;
         height: 20px;
@@ -389,6 +388,7 @@ const filteredTeamsByBookmark = computed(() => {
       align-self: center;
       width: 100%;
       height: 100%;
+      font-weight: 700;
       // padding-left: 10px;
       border-radius: 12px;
       line-height: 40px;

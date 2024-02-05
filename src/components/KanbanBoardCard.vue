@@ -192,6 +192,7 @@ const handleClickDelete = () => {
 <style scoped lang="scss">
 .kanban-board-card {
   position: relative;
+  // background-color: #2b2b2b;
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;

@@ -306,6 +306,8 @@ const onDrop = (e, boardId) => {
   gap: 20px;
   width: 100%;
   height: 100%;
+  background-color: $dark-gray-500;
+  padding: 20px;
 
   .kanban-action-menue-bar {
 
@@ -325,7 +327,7 @@ const onDrop = (e, boardId) => {
 
   .kanban-search {
     position: absolute;
-    right: 0px;
+    right: 20px;
     width: 400px;
     height: 40px;
     // color: #ffffff;
@@ -349,8 +351,9 @@ const onDrop = (e, boardId) => {
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
+    // background-color: $gray-600;
     gap: 10px;
-    width: 300px;
+    width: 280px;
     // 높이 화면 채우기
     height: 96%;
 
@@ -359,7 +362,7 @@ const onDrop = (e, boardId) => {
     flex-shrink: 0;
     min-height: 60%;
     // background-color: black;
-    padding: 4px 20px;
+    padding: 4px 10px;
     padding-bottom: 16px;
     border-radius: 10px;
   }
@@ -373,15 +376,15 @@ const onDrop = (e, boardId) => {
     width: 100%;
     height: 50px;
     // color: #ffffff;;
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 700;
     padding: 0 10px;
   }
 
   .kanban-class {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 700;
-    // color: #ffffff;
+    color: $gray-500;
   }
 
   // 확장 메뉴 버튼

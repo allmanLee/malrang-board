@@ -15,22 +15,6 @@
 </template>
 <script setup lang="ts">
 import KanbanBoard from "@/components/KanbanBoard.vue";
-// import Today from "@/components/Today.vue";
-// import Link from "@/components/Link.vue";
-// import Github from "@/components/Github.vue";
-
-// import { ref } from "vue";
-// import { useBoardStore } from "@/stores/board";
-// import type { Board } from "@/types/KanbanBoard.ts";
-
-
-// 보드 데이터 가져오기 (팀별)
-// 팀 ID로 보드를 조회합니다.
-// const boardStore = useBoardStore();
-// let boards = ref([] as Board[]);
-
-// boards.value = await boardStore.getBoards;
-
 
 
 console.log('test')

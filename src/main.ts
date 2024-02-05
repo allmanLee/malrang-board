@@ -9,6 +9,10 @@ import './assets/main.scss' // global css
 
 import App from './App.vue'
 import router from './router'
+
+// If you want to use ElMessage, import it.
+import "element-plus/theme-chalk/src/message.scss";
+
 // import './styles/element/index.scss' // custom Element Plus css
 
 // import 'element-plus/dist/index.css' // global Element Plus css

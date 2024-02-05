@@ -8,31 +8,41 @@
         <h1>회원가입</h1>
       </header>
 
-      <el-form @submit.prevent="submitForm" class="form" :label-position="'top'">
-        <el-form-item label="이름" prop="name">
-          <el-input type="text" id="name" v-model="name" required />
+      <el-form ref="joinForm" :model="form" :rules="rules" @submit.prevent="nextStep" class="form"
+        :label-position="'top'">
+        <el-form-item v-if="step === 1" label="이름" prop="name">
+          <el-input type="text" id="name" v-model="form.name" required />
         </el-form-item>
-        <el-form-item label="이메일" prop="email">
-          <el-input type="email" id="email" v-model="email" required />
+        <el-form-item v-if="step === 1" label="이메일" prop="email">
+          <el-input type="email" id="email" v-model="form.email" required />
         </el-form-item>
-        <el-form-item label="비밀번호" prop="password">
-          <el-input type="password" id="password" v-model="password" required />
+        <el-form-item v-if="step === 1" label="비밀번호" prop="password">
+          <el-input type="password" id="password" v-model="form.password" required />
         </el-form-item>
-        <el-form-item label="비밀번호 확인" prop="rePassword">
-          <el-input type="password" id="rePassword" v-model="rePassword" required />
-          <el-alert title="비밀번호가 일치하지 않습니다." type="error" v-if="!isPasswordMatch && password && rePassword" show-icon
-            center :closable="false"></el-alert>
+        <el-form-item v-if="step === 1" label="비밀번호 확인" prop="rePassword">
+          <el-input type="password" id="rePassword" v-model="form.rePassword" required />
+          <!-- <el-alert title="비밀번호가 일치하지 않습니다." type="error" v-if="!isPasswordMatch && form.password && form.rePassword"
+            show-icon center :closable="false"></el-alert> -->
         </el-form-item>
-        <el-form-item label="소속 그룹 (입력하여 추가할 수 있어요!)" prop="groupName">
-          <el-select v-model="groupName" filterable allow-create placeholder="소속을 선택하세요" class="select-user">
+        <el-form-item v-if="step === 2" label="소속 그룹 (입력하여 추가할 수 있어요!)" prop="groupName">
+          <el-select v-model="form.groupName" filterable allow-create placeholder="소속을 선택하세요" class="select-user">
             <el-option v-for="group in mockGroups" :key="group.id" :label="group.name" :value="group.name"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item prop="isAdmin">
-          <el-checkbox v-model="isAdmin" id="isAdmin">당신은 관리자 이신가요?</el-checkbox>
+        <el-form-item v-if="step === 2" prop="isAdmin">
+          <el-checkbox v-model="form.isAdmin" id="isAdmin">당신은 관리자 이신가요?</el-checkbox>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" color="primary" @click="submitForm">완료</el-button>
+          <el-button v-if="step === 1" type="primary" @click="nextStep">
+            <span class="button--bold">
+              다음
+            </span>
+          </el-button>
+          <el-button v-if="step === 2" type="primary" @click="submitForm">
+            <span class="button--bold">
+              완료
+            </span>
+          </el-button>
         </el-form-item>
       </el-form>
     </section>
@@ -48,45 +58,91 @@ import { ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { type Group } from '@/types/users.type.ts';
 
-
-
 const $router = useRouter();
 
+const form = ref({
+  name: '',
+  email: '',
+  groupName: '',
+  password: '',
+  rePassword: '',
+  isAdmin: false
+});
 
-const name = ref('');
-const email = ref('');
-const groupName = ref('');
-const password = ref('');
-const rePassword = ref('');
-const isAdmin = ref(false);
+const validatePassword = (rule, value, callback) => {
+  console.log('validatePassword', value, form.value.password);
+  if (value !== form.value.password) {
+    callback(new Error('비밀번호가 일치하지 않습니다.'));
+  } else {
+    console.log('validatePassword True', value, form.value.password);
+    callback();
+  }
+};
+
+const rules = ref({
+  name: [
+    { required: true, message: '이름을 입력해주세요', trigger: 'blur' }
+  ],
+  email: [
+    { required: true, message: '이메일을 입력해주세요', trigger: 'blur' },
+    { type: 'email', message: '올바른 이메일 형식이 아닙니다', trigger: 'blur' }
+  ],
+  password: [
+    { required: true, message: '비밀번호를 입력해주세요', trigger: 'blur' }
+  ],
+  rePassword: [
+    { required: true, message: '비밀번호 확인을 입력해주세요', trigger: 'blur' },
+    { validator: validatePassword, trigger: 'blur' }
+  ],
+  groupName: [
+    { required: true, message: '소속 그룹을 선택해주세요', trigger: 'blur' }
+  ]
+});
+
+const step = ref(1);
 
 // 비밀번호 중복검사
 const isPasswordMatch = ref(false);
 
-watch([password, rePassword], () => {
-  isPasswordMatch.value = password.value === rePassword.value;
+watch(() => form.value.rePassword, (newValue) => {
+  if (form.value.password === newValue) {
+    isPasswordMatch.value = true;
+  } else {
+    isPasswordMatch.value = false;
+  }
 });
 
 const mockGroups: Group[] = [
   { name: '말랑보드', id: 1 },
   { name: '서원정보', id: 2 }
-]
+];
+
+const nextStep = () => {
+  if (step.value === 1) {
+    if (isPasswordMatch.value) {
+      step.value = 2;
+    }
+  } else if (step.value === 2) {
+    submitForm();
+  }
+};
+
 const submitForm = async () => {
   // Perform signup logic here
-  console.log('Name:', name.value);
-  console.log('Email:', email.value);
-  console.log('GroupName:', groupName.value);
-  console.log('Password:', password.value);
-  console.log('Is Admin:', isAdmin.value);
+  console.log('Name:', form.value.name);
+  console.log('Email:', form.value.email);
+  console.log('GroupName:', form.value.groupName);
+  console.log('Password:', form.value.password);
+  console.log('Is Admin:', form.value.isAdmin);
 
   try {
     // 회원가입 API 호출
     await API.createUser({
-      name: name.value,
-      email: email.value,
-      password: password.value,
-      groupName: groupName.value,
-      isAdmin: isAdmin.value
+      name: form.value.name,
+      email: form.value.email,
+      password: form.value.password,
+      groupName: form.value.groupName,
+      isAdmin: form.value.isAdmin
     });
 
     // 회원가입 성공
@@ -98,7 +154,8 @@ const submitForm = async () => {
     console.error(error);
     ElMessage.error('회원가입에 실패했습니다.');
   }
-}
+};
+
 
 </script>
 
@@ -152,7 +209,8 @@ const submitForm = async () => {
     justify-content: flex-start;
     width: 500px;
     padding: 20px;
-    background-color: rgba(255, 255, 255, 0.1);
+    margin-right: 120px;
+    background-color: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
 
     header {
@@ -168,10 +226,6 @@ const submitForm = async () => {
     form {
       display: flex;
       flex-direction: column;
-
-      .el-input {
-        margin-bottom: 20px;
-      }
     }
 
   }
@@ -194,6 +248,19 @@ h1 {
 .el-button {
   width: 100%;
   margin-top: 20px;
+
+  .button--bold {
+    font-weight: 700;
+    font-size: 16px;
+  }
+}
+
+.el-input {
+  margin-bottom: 4px;
+}
+
+.el-form-item {
+  margin-bottom: 40px;
 }
 
 .el-checkbox {

@@ -14,8 +14,6 @@
   font-family: 'malang-board-regular';
   src: url('./fonts/HancomMalangTTF/HancomMalangMalang-Regular.ttf') format('truetype');
 }
-
-
 html *  {
   font-family: 'Pretendard', sans-serif;
 }
@@ -57,12 +55,10 @@ a {
   font-weight: normal;
 }
 
-.el-input__prefix {
-  width: auto;
-  .el-input__prefix-inner {
-    color: var(--vt-c-text-dark-2);
-  }
-}
+
+// element-plus 커스터
+
+
 
 .el-form-item__label {
   // 위로
