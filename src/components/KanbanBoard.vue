@@ -46,23 +46,25 @@
         <KanbanBoardCard @click="handleClickToUpdate(card, board.title)" ref="kanbanBoardCard"
           @delete="handleDeleteCard(card.id)" v-for="card in filterCards.filter(el => el.boardIdx === board.id)"
           @dragstart="handleDragStart($event, card)" draggable="true" :key="card.id" :card="card" />
-
         <EmptyKanbanCard v-if="filterCards.filter(el => el.boardIdx === board.id).length === 0"
           @add="handleClickToAdd(board)" />
+        <el-button v-else-if="filterCards.filter(el => el.boardIdx === board.id).length > 0" type="dashed" size="large"
+          class="add-btn" text @click="handleClickToAdd(board)">추가하기</el-button>
       </div>
     </div>
     <!-- 팝업 메뉴 -->
-    <el-dialog class="dark" width="800" :title="modalKanban.boardTitle" v-model="modalKanban.dialogVisible"
+    <el-drawer class="dark" width="800" :title="modalKanban.boardTitle" v-model="modalKanban.dialogVisible"
       :before-close="modalKanban.beforeClose">
       <ModalKanbanCardCreate :isOpen="modalKanban.dialogVisible" :form="form" @enter.self="handleSave(selectedBoardId)"
         @update:form="updateForm" />
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="modalKanban.close()">취소</el-button>
-          <el-button type="primary" @click="handleSave(selectedBoardId)">저장</el-button>
+          <el-button size="large" type="primary" @click="handleSave(selectedBoardId)">
+            <span class="save__text">저장</span>
+          </el-button>
         </div>
       </template>
-    </el-dialog>
+    </el-drawer>
   </div>
 </template>
 <script setup lang="ts">
@@ -344,6 +346,13 @@ const onDrop = (e, boardId) => {
     width: 100%;
     height: 100%;
     overflow-x: scroll;
+
+    .add-btn {
+      width: 100%;
+      height: 40px;
+      margin-top: 10px;
+      border: 1px dashed $gray-700; // color: #ffffff;
+    }
   }
 
   .kanban-container-boards__panel {
@@ -429,7 +438,7 @@ const onDrop = (e, boardId) => {
 
 .dialog-footer {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
@@ -438,6 +447,17 @@ const onDrop = (e, boardId) => {
   // color: #ffffff;;
   font-size: 20px;
   font-weight: 700;
+
+  .save__text {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .el-button {
+    // color: #ffffff;
+    display: flex;
+    width: 100%;
+  }
 }
 
 .md-editor {

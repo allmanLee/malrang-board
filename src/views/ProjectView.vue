@@ -41,7 +41,7 @@
                 </el-icon>
               </el-button>
             </div>
-            <div v-if="index === projects.length - 1" class="new-badge">New</div>
+            <div v-if="index === projects.length - 1" class="new-badge" />
           </el-card>
           <el-card v-if="!showTeamFormFlag" class="card project-form-add">
             <el-form @submit.prevent="addProject" class="form">
@@ -73,7 +73,7 @@
                 </el-button>
               </div>
             </div>
-            <div v-if="index === filteredTeams.length - 1" class="new-badge">New</div>
+            <div v-if="index === filteredTeams.length - 1" class="new-badge"></div>
           </el-card>
 
           <el-card v-if="showTeamFormFlag" class="card">
@@ -431,20 +431,23 @@ const selectTeam = (teamId) => {
   display: flex;
   justify-content: space-between;
   gap: 20px;
+
 }
 
 .column {
   flex: 1;
   // background-color: black;
-  padding: 20px;
   border-radius: 10px;
   width: 400px;
+  height: 600px;
+  overflow-y: scroll;
 
   &-title {
-    // color: #ffffff;
+    color: $gray-600;
     font-size: 16px;
     font-weight: bold;
     margin-bottom: 10px;
+    text-align: left;
   }
 }
 
@@ -549,17 +552,6 @@ const selectTeam = (teamId) => {
 .highlighted {
   background-color: $dark-gray-100;
   // color: black;
-
-  .el-icon {
-    // color: #000 !important;
-  }
-
-  .new-badge {
-    background-color: #2196f3;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
-    color: #ffffff;
-    font-weight: 700;
-  }
 }
 
 
@@ -601,12 +593,14 @@ const selectTeam = (teamId) => {
 // New badge - 팀, 프로젝트 팀원 추가시 나타나는 뱃지
 .new-badge {
   position: absolute;
-  top: 0;
-  right: 0;
-  background-color: #1973bd;
+  top: 6px;
+  right: 6px;
+  // new-color
+  background-color: #f44336;
   // color: #ffffff;
-  padding: 2px 10px;
-  border-radius: 0 0 0 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 12px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
   font-size: 12px;
 }

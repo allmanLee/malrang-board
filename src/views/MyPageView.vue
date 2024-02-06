@@ -2,7 +2,7 @@
   <div class="board-empty">
     <div class="info">
       <div class="board-empty__text">
-        <p class="board-empty__text__title">유준님의 말랑보드</p>
+        <p class="board-empty__text__title">나의 보드</p>
         <p>오늘 한일로 넘긴 업무를 확인하거나<br /> 완료하지 못한 업무의 예정일을 미룰 수 있어요.</p>
       </div><br>
       <ul class="info__card-list">
@@ -152,7 +152,6 @@ const getBoards = async () => {
             padding: 0;
             height: 40px;
             border-radius: 10px 10px 0 0;
-            background-color: #409eff;
             // color: #ffffff;
             font-size: 16px;
             font-weight: 700;
@@ -166,7 +165,6 @@ const getBoards = async () => {
             padding: 20;
             height: 260px;
             border-radius: 0 0 10px 10px;
-            background-color: rgba($color: #000000, $alpha: 0.1);
             // color: #ffffff;
             font-size: 16px;
             font-weight: 700;
@@ -206,7 +204,7 @@ const getBoards = async () => {
     margin-bottom: 20px;
 
     .board-empty__text__title {
-      font-size: 54px;
+      font-size: 32px;
       font-weight: 700;
     }
   }

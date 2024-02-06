@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     BoardEmpty: typeof import('./components/BoardEmpty.vue')['default']
+    copy: typeof import('./components/KanbanBoardCard copy.vue')['default']
     CountUser: typeof import('./components/CountUser.vue')['default']
     CustomMdEditor: typeof import('./components/CustomMdEditor.vue')['default']
     ElAlert: typeof import('element-plus/es')['ElAlert']
@@ -20,6 +21,7 @@ declare module 'vue' {
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
     ElContainer: typeof import('element-plus/es')['ElContainer']
     ElDialog: typeof import('element-plus/es')['ElDialog']
+    ElDrawer: typeof import('element-plus/es')['ElDrawer']
     ElDropdown: typeof import('element-plus/es')['ElDropdown']
     ElDropdownItem: typeof import('element-plus/es')['ElDropdownItem']
     ElEmpty: typeof import('element-plus/es')['ElEmpty']
@@ -46,6 +48,7 @@ declare module 'vue' {
     IconSupport: typeof import('./components/icons/IconSupport.vue')['default']
     IconTooling: typeof import('./components/icons/IconTooling.vue')['default']
     KanbanBoard: typeof import('./components/KanbanBoard.vue')['default']
+    KanbanBoardC: typeof import('./components/KanbanBoardC.vue')['default']
     KanbanBoardCard: typeof import('./components/KanbanBoardCard.vue')['default']
     ModalKanbanCardCreate: typeof import('./components/ModalKanbanCardCreate.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
