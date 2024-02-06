@@ -92,17 +92,6 @@ const cascaderProps = {
 }
 
 const filterToday = ref([]);
-
-const setFilterToday = () => {
-  filterTodayCard.value = []
-}
-
-
-
-const getBoards = async () => {
-  // const boards = await userStore.getBoards;
-  // boards.value = boards;
-};
 </script>
 
 <style scoped lang="scss">

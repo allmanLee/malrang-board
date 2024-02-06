@@ -3,7 +3,7 @@ import type { UserId, User } from '../types/users.type';
 import type { Project, ProjectId, Team, TeamId } from '../types/projects.type';
 import type { ProjectRequestDto, TeamRequestDto } from '../types/dto/project.dto.type';
 import type { UserRequestDto } from '../types/users.type';
-import type { Board } from '@/types/KanbanBoard';
+import type { Board } from '../types/kanban.type';
 const API_URL = 'http://localhost:8000'; // Replace with your API URL
 
 // Define your API endpoints here
@@ -20,6 +20,9 @@ const apiEndpoints = {
 
   boards: '/kanban/boards',
   board: (boardId: string) => `/kanban/boards/${boardId}`,
+
+  cards: '/kanban/cards',
+  card: (boardId: string) => `/kanban/boards/${boardId}/card`,
 };
 
 // Create an instance of Axios with the base URL
@@ -118,6 +121,10 @@ const userApi = {
 
   // 보드 (CRUD)
   getBoards: (params: any) : Promise<Board[]> => get(`${apiEndpoints.boards}`, params),
+
+  // 카드 (CRUD)
+  getCards: (params: any) => get(`${apiEndpoints.cards}`, params),
+  createCard: (cardData: any) => post(apiEndpoints.card(cardData.boardId), cardData),
 };
 
 // 모듈 

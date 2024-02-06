@@ -1,5 +1,5 @@
 import API from "@/apis";
-import type { Board } from "@/types/KanbanBoard";
+import type { Board } from "@/types/kanban.type";
 import { defineStore } from "pinia";
 
 interface BoardStore {

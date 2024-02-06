@@ -58,12 +58,12 @@
           <!-- 추가기능 아이콘 (추가하기) -->
         </header>
         <KanbanBoardCard @click="handleClickToUpdate(card, board.title)" ref="kanbanBoardCard"
-          @delete="handleDeleteCard(card.id)" v-for="card in filterCards.filter(el => el.boardIdx === board.id)"
+          @delete="handleDeleteCard(card.id)" v-for="card in filterCards.filter(el => el.boardId === board.id)"
           @dragstart="handleDragStart($event, card)" draggable="true" :key="card.id" :card="card" />
-        <EmptyKanbanCard v-if="filterCards.filter(el => el.boardIdx === board.id).length === 0"
+        <EmptyKanbanCard v-if="filterCards.filter(el => el.boardId === board.id).length === 0"
           @add="handleClickToAdd(board)" />
-        <el-button v-else-if="filterCards.filter(el => el.boardIdx === board.id).length > 0" type="dashed" size="large"
-          class="add-btn" text @click="handleClickToAdd(board)">추가하기</el-button>
+        <el-button v-else-if="filterCards.filter(el => el.boardId === board.id).length > 0" size="large" class="add-btn"
+          text @click="handleClickToAdd(board)">추가하기</el-button>
       </div>
     </div>
     <!-- 팝업 메뉴 -->
@@ -83,27 +83,29 @@
 </template>
 <script setup lang="ts">
 import { ref, reactive, computed } from "vue";
-import { Board, Card } from "@/types/KanbanBoard.ts";
+// computed 타입
+import type { ComputedRef } from "vue";
+import { Board, Card } from "@/types/Kanban.type";
 import ModalKanbanCardCreate from "./ModalKanbanCardCreate.vue";
 import KanbanBoardCard from "@/components/KanbanBoardCard.vue";
 import EmptyKanbanCard from "@/components/EmptyKanbanCard.vue";
 import { cloneDeep } from "lodash";
 import { useUserStore } from "@/stores/user";
 import { useBoardStore } from "@/stores/board";
+import { useCommonStore } from "@/stores/common";
+
+// 메세지 박스
+import { ElMessageBox } from "element-plus";
 
 import "md-editor-v3/lib/style.css";
+import API from "@/apis";
 
 
 const users = computed(() => useUserStore().getMockUsers)
-
-// const findUserNameById = useUserStore().findUserNameById
-
 const boards = computed(() => useBoardStore().getBoards)
-// const props = defineProps<{
-//   boards: Board[];
-// }>();
+const selectedTeamId = computed(() => useCommonStore().getSbSelectedTeamId)
 
-const selectedBoardId = ref(0);
+const selectedBoardId = ref('');
 const selectedWorker = ref(null);
 const activeName = ref("전체 담당자");
 const searchValue = ref("");
@@ -116,7 +118,8 @@ const cards = ref<Card[]>([
     created_date: "2021-10-10",
     userIdx: 1,
     userName: '김말랑',
-    boardIdx: 1,
+    boardId: '1234',
+    teamId: selectedTeamId.value,
     tags: [{
       id: 1,
       title: 'Commit',
@@ -125,14 +128,15 @@ const cards = ref<Card[]>([
     commit: [],
   }
 ]);
-const initForm = () => ({
+const initForm = (): Card => ({
   id: 1,
   title: "",
   description: "",
   created_date: "",
   userIdx: 1,
   userName: '김말랑',
-  boardIdx: 1,
+  teamId: selectedTeamId.value,
+  boardId: '1234',
   tags: [],
   commit: [],
 });
@@ -142,17 +146,40 @@ const handleClickNameActive = (name) => {
 }
 
 class CardActions {
-  create(cardId, boardId, form) {
-    console.log(boardId);
-    cards.value.push({
-      ...form.value,
-      id: cardId,
-      boardIdx: boardId,
-      created_date: new Date().toISOString().slice(0, 10),
-    });
+  /** @function 카드 추가기능
+   * @param cardId 카드 아이디
+   * @param boardId 보드 아이디
+   * @param form 카드 폼
+   * 
+   * @returns void
+   */
+  async create(cardId, boardId, form) {
+    try {
+      cards.value.push({
+        ...form.value,
+        id: cardId,
+        boardId: boardId,
+        created_date: new Date().toISOString().slice(0, 10),
+      });
 
-    // 만약 커밋에 #mb-1 이런식으로 카드 번호가 붙어있으면 해당 카드의 커밋에 추가
-    this.addCommit(cardId, form.value);
+      // API 호출
+      await API.createCard({
+        ...form.value,
+        id: cardId,
+        teamId: selectedTeamId.value,
+        boardId: boardId,
+        created_date: new Date().toISOString().slice(0, 10),
+      });
+
+      // 만약 커밋에 #mb-1 이런식으로 카드 번호가 붙어있으면 해당 카드의 커밋에 추가
+      this.addCommit(cardId, form.value);
+
+    } catch (error) {
+      console.error(error);
+    }
+
+
+
 
   }
 
@@ -225,7 +252,6 @@ class ModalKanban {
   boardTitle = "";
   openType: ModalOpenType = "none";
 
-
   open(type: ModalOpenType = "create", boardTitle = "") {
     this.dialogVisible = true;
     this.openType = type;
@@ -236,8 +262,13 @@ class ModalKanban {
     this.dialogVisible = false;
   }
 
-  beforeClose(done) {
-    const isClose = window.confirm("작성중인 내용이 있습니다. 정말 닫으시겠습니까?");
+  async beforeClose(done) {
+    const isClose = await ElMessageBox.confirm("작성중인 내용이 있습니다. 정말 닫으시겠습니까?"
+      , {
+        confirmButtonText: "닫기",
+        cancelButtonText: "취소",
+      });
+
     if (isClose) {
       this.dialogVisible = false;
       done();
@@ -252,11 +283,12 @@ const modalKanban = reactive(new ModalKanban());
 let form = ref<Card>(initForm());
 
 // 검색한 카드를 필터링하여 보여줍니다.
-const filterCards = computed(() => {
-  return cards.value.filter((card) => {
-    return card.title.includes(searchValue.value);
+const filterCards: ComputedRef<Card[]>
+  = computed(() => {
+    return cards.value.filter((card) => {
+      return card.title.includes(searchValue.value);
+    });
   });
-});
 
 const handleClickToUpdate = (card: Card, boardTitle) => {
   form.value = cloneDeep(card);
@@ -271,7 +303,6 @@ const handleSave = (boardId) => {
   } else if (modalType === 'update') {
     cardActions.update(form.value.id, form);
   }
-  console.log(boardId);
   modalKanban.close();
   form.value = initForm();
 };
@@ -293,16 +324,16 @@ const handleDeleteCard = (cardId) => {
 // 카드 드래그 (다른 보드의 카드로 이동 가능)
 const handleDragStart = (e, card) => {
   e.dataTransfer.setData("cardId", card.id);
-  // e.dataTransfer.setData("cardBoardIdx", card.boardIdx);
+  // e.dataTransfer.setData("cardboardId", card.boardId);
 };
 
 // 카드 드랍 (다른 보드의 카드로 이동 가능)
 const onDrop = (e, boardId) => {
   const cardId = e.dataTransfer.getData("cardId");
-  // const cardBoardIdx = e.dataTransfer.getData("cardBoardIdx");
+  // const cardboardId = e.dataTransfer.getData("cardboardId");
 
   const cardIdx = cards.value.findIndex((card) => card.id === Number(cardId));
-  cards.value[cardIdx].boardIdx = boardId;
+  cards.value[cardIdx].boardId = boardId;
 
   // 만약 커밋에 #mb-1 이런식으로 카드 번호가 붙어있으면 해당 카드의 커밋에 추가
   cardActions.addCommit(cardId, cards.value)
@@ -442,8 +473,6 @@ const onDrop = (e, boardId) => {
     border-radius: 10px;
   }
 
-  .el-form-item__content {}
-
   .el-form-item__content .el-input__inner {
     background-color: #2b2b2b;
   }
@@ -463,7 +492,6 @@ const onDrop = (e, boardId) => {
     margin-bottom: 10px;
   }
 }
-
 
 .dialog-footer {
   display: flex;

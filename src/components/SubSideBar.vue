@@ -81,7 +81,7 @@ const handleClose = (key: string, keyPath: string[]) => {
 const userStore = useUserStore();
 
 // 로그인 여부
-const isLogin = computed(() => {
+computed(() => {
   return userStore.isLogin;
 });
 

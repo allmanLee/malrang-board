@@ -198,7 +198,7 @@ const addProject = async () => {
 
     showTeamFormFlag.value = false;
 
-    const result = await store.createProject(request);
+    await store.createProject(request);
 
     // 프로젝트 추가
     // projects.value = [...projects.value, result];
@@ -261,7 +261,7 @@ const addTeam = async () => {
 
     showTeamFormFlag.value = false;
 
-    const result = await store.createTeam(request);
+    await store.createTeam(request);
 
     // 프로젝트에 팀 추가
     const project = projects.value.find(project => project._id === selectedPrjId.value);
@@ -548,17 +548,6 @@ const selectTeam = (teamId) => {
 
 .highlighted {
   background-color: #f5f5f5;
-  // color: black;
-
-  .el-icon {
-    // color: #000 !important;
-  }
-
-  .new-badge {
-    background-color: #2196f3;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
-    // color: #ffffff;
-  }
 }
 
 

@@ -198,10 +198,7 @@ const addProject = async () => {
 
     showTeamFormFlag.value = false;
 
-    const result = await store.createProject(request);
-
-    // 프로젝트 추가
-    // projects.value = [...projects.value, result];
+    await store.createProject(request);
 
     ElMessage(`${newProjectName.value} 프로젝트가 추가되었습니다.`);
     newProjectName.value = '';

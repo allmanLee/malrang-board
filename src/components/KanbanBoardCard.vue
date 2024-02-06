@@ -60,7 +60,7 @@
       <div class="kanban-board-card-tags" v-if="card.tags.length">
 
         <el-tag size="small" type="info" effect="dark">{{ card.tags[0].title }}</el-tag>
-        <el-tag size="small" type="info" effect="dark">+3</el-tag>
+        <el-tag size="small" type="info" effect="dark" class="more-tag__count">+3</el-tag>
       </div>
     </div>
 
@@ -96,7 +96,7 @@
 import { ref, defineProps, defineEmits, computed, onUnmounted } from "vue";
 import { ElIcon } from "element-plus";
 import { ElTag } from "element-plus";
-import { Card } from "@/types/KanbanBoard.ts";
+import { Card } from "@/types/Kanban.type";
 import { ElMessage } from "element-plus";
 
 
@@ -192,16 +192,20 @@ const handleClickDelete = () => {
 <style scoped lang="scss">
 .kanban-board-card {
   position: relative;
-  // background-color: #2b2b2b;
+  background-color: $dark-gray-400;
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
   flex-direction: column;
   width: 100%;
   border-radius: 10px;
-  border: none;
+  border: 1px solid $dark-gray-100;
   padding: 0;
-  border: 1px solid transparent; // padding-bottom: 10px;
+  box-shadow: none;
+
+  &::v-deep(.el-card__body) {
+    padding: 12px;
+  }
 
   // 연결된 카드일 경우: 어두운 보랏빛
   &.kanban-board-card--linked {
@@ -381,30 +385,19 @@ const handleClickDelete = () => {
     font-weight: 700;
     // color: #ffffff;
 
+
+
     .title-text {
       margin-right: 10px;
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 700;
-      // color: #ffffff;
       width: 220px;
-    }
-  }
 
+      // 두줄 이상일 때 ... 처리
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
 
-  .kanban-board-card-body {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    max-height: 200px;
-    gap: 20px;
-    width: 100%;
-    margin-top: 10px;
-    // background-color: #2b2b2b;
-
-    .kanban-board-card-body-title {
-      font-size: 20px;
-      font-weight: 700;
-      // color: #ffffff;
     }
   }
 }
@@ -412,11 +405,15 @@ const handleClickDelete = () => {
 .kanban-board-card-tags {
   display: flex;
   gap: 4px;
-}
 
+  .more-tag__count {
+    font-size: 12px;
+    font-weight: 500;
+    // color: #ffffff;
+    background-color: $dark-gray-100;
+    border: none;
 
-.kanban-board-card-body {
-  font-size: 14px;
+  }
 }
 
 // 구분선
