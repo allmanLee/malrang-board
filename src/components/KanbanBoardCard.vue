@@ -209,11 +209,11 @@ const handleClickDelete = () => {
 
   // 연결된 카드일 경우: 어두운 보랏빛
   &.kanban-board-card--linked {
-    background-color: #4a536b;
+    // background-color: $primary-dark-200;
 
     // hover 했을때
     &:hover {
-      background-color: #203a51;
+      background-color: $primary-dark-300;
     }
   }
 
@@ -225,7 +225,7 @@ const handleClickDelete = () => {
     padding: 0 12px;
     height: 30px;
     border-radius: 10px;
-    background-color: #4a536b;
+    background-color: $primary-dark-200;
     cursor: pointer;
 
     .linked-icon__icon {

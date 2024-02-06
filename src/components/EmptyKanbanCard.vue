@@ -26,14 +26,12 @@ const handleClickToAdd = () => {
 <style scoped lang="scss">
 .emptyKanbanCard {
   width: 100%;
-  height: 100%;
-  border: 1px dashed #242527;
-  border-radius: 4px;
+  height: 120px;
+  border: 1px dashed $gray-700;
+  border-radius: 12px;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-top: 20px;
-  padding-bottom: 20px;
 
   .emptyKanbanCard__body {
     display: flex;
