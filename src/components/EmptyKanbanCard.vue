@@ -6,7 +6,7 @@
           <Plus />
         </el-icon>
       </div>
-      <div class="emptyKanbanCard__text">카드를 추가하세요.</div>
+      <div class="emptyKanbanCard__text">새 카드 추가</div>
     </div>
   </div>
 </template>
@@ -47,7 +47,7 @@ const handleClickToAdd = () => {
 
     .emptyKanbanCard__text {
       font-size: 14px;
-      color: $gray-300;
+      color: $gray-700;
       margin-top: 10px;
     }
   }

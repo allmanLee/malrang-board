@@ -24,7 +24,7 @@ console.log('test')
 .main-container {
   display: flex;
   width: 100%;
-  padding: 20px;
+  // padding: 20px;
 }
 
 .container {

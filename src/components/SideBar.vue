@@ -10,7 +10,7 @@
         <div class="logo">
           <h1>말랑보드</h1>
         </div>
-        <span class="groupname-text">서원정보</span>
+        <!-- <span class="groupname-text">서원정보</span> -->
       </section>
 
 
@@ -46,8 +46,7 @@
 
       <el-scrollbar class="search-items__scrollbar">
         <!-- 팀 즐겨찾기 -->
-        <h5 class="mb-2">팀 즐겨찾기</h5>
-
+        <h5>팀 즐겨찾기</h5>
 
         <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
           <el-menu-item v-for="(t, index) in  filteredTeamsByBookmark" :key="index" :index="`rt-${index}`">
@@ -226,6 +225,7 @@ const filteredTeamsByBookmark = computed(() => {
   width: 100% !important;
   height: 100% !important;
   gap: 40px;
+  background-color: $dark-gray-700;
 
   .sidebar-wrapper {
     display: flex;
@@ -242,6 +242,7 @@ const filteredTeamsByBookmark = computed(() => {
     width: 100%;
     border: none;
     background-color: transparent;
+    margin-bottom: 40px;
     // color: #ffffff;
 
 

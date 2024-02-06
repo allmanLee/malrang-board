@@ -1,10 +1,31 @@
 <template>
   <!-- 드래그엔 드랍이 가능한 칸반보드 (한일, 보류, 할일) -->
   <div class="kanban-container">
-    <!-- <h1 class="kanban-class">칸반보드</h1> -->
+    <div class="kanban-header">
+      <h2 class="kanban-header__title">
+        <!-- [그룹 > 프로젝트 > 팀] -->
+        <span>그룹</span>
+        <el-icon>
+          <ArrowRight />
+        </el-icon>
+        <span>프로젝트</span>
+        <el-icon>
+          <ArrowRight />
+        </el-icon>
+        <span>팀</span>
+      </h2>
+
+      <el-input class="kanban-search" v-model="searchValue" placeholder="티켓의 제목, 담당자, 태그를 생각나는거 있어요?" clearable>
+        <!-- prefix 검색 아이콘 -->
+        <template #prefix>
+          <el-icon>
+            <Search />
+          </el-icon>
+        </template>
+      </el-input>
+    </div>
     <!-- 검색 -->
     <section class="kanban-action-menue-bar">
-
       <el-menu v-model="activeName" class="dashboard-filter" mode="horizontal" @select="el => handleClickNameActive(el)">
         <el-sub-menu index="담당자">
           <template #title>
@@ -19,14 +40,7 @@
         </el-sub-menu>
       </el-menu>
     </section>
-    <el-input class="kanban-search" v-model="searchValue" placeholder="티켓의 제목, 담당자, 태그를 생각나는거 있어요?" clearable>
-      <!-- prefix 검색 아이콘 -->
-      <template #prefix>
-        <el-icon>
-          <Search />
-        </el-icon>
-      </template>
-    </el-input>
+
 
     <div class="kanban-container-boards">
 
@@ -311,8 +325,38 @@ const onDrop = (e, boardId) => {
   background-color: $dark-gray-500;
   padding: 20px;
 
-  .kanban-action-menue-bar {
+  .kanban-header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
 
+    .kanban-header__title {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 16px;
+      border-right: 2px solid $dark-gray-100;
+      margin-right: 20px;
+      padding-right: 20px;
+      gap: 4px;
+
+      span {
+        white-space: nowrap;
+        font-weight: 700;
+        color: $gray-200;
+      }
+    }
+
+    .kanban-search {
+      display: flex;
+      width: 100%;
+      // background-color: $dark-gray-100;
+      border-radius: 6px;
+      color: #ffffff;
+    }
+  }
+
+  .kanban-action-menue-bar {
     flex-direction: row;
     align-items: center;
     width: 100%;
@@ -327,15 +371,7 @@ const onDrop = (e, boardId) => {
     }
   }
 
-  .kanban-search {
-    position: absolute;
-    right: 20px;
-    width: 400px;
-    height: 40px;
-    // color: #ffffff;
-    padding: 0 0px;
 
-  }
 
   .kanban-container-boards {
     display: flex;
@@ -363,8 +399,7 @@ const onDrop = (e, boardId) => {
     // background-color: $gray-600;
     gap: 10px;
     width: 280px;
-    // 높이 화면 채우기
-    height: 96%;
+
 
 
     // 넓이 고정
@@ -384,7 +419,6 @@ const onDrop = (e, boardId) => {
     gap: 20px;
     width: 100%;
     height: 50px;
-    // color: #ffffff;;
     font-size: 16px;
     font-weight: 700;
     padding: 0 10px;
@@ -398,9 +432,7 @@ const onDrop = (e, boardId) => {
 
   // 확장 메뉴 버튼
   .kanban-menu {
-    // font-size: 14px;
     font-weight: 700;
-    // color: #ffffff;
   }
 
 
@@ -410,13 +442,10 @@ const onDrop = (e, boardId) => {
     border-radius: 10px;
   }
 
-  .el-form-item__content {
-    // color: #ffffff;
-  }
+  .el-form-item__content {}
 
   .el-form-item__content .el-input__inner {
     background-color: #2b2b2b;
-    // color: #ffffff;
   }
 
   // 첫번째 태그 마진 제거
@@ -444,7 +473,6 @@ const onDrop = (e, boardId) => {
   gap: 10px;
   width: 100%;
   height: 30px;
-  // color: #ffffff;;
   font-size: 20px;
   font-weight: 700;
 
@@ -454,7 +482,6 @@ const onDrop = (e, boardId) => {
   }
 
   .el-button {
-    // color: #ffffff;
     display: flex;
     width: 100%;
   }
@@ -463,7 +490,6 @@ const onDrop = (e, boardId) => {
 .md-editor {
   width: 100%;
   height: 300px;
-  // background-color: black;
   border: none;
   border-radius: 10px;
   padding: 10px;
@@ -477,7 +503,6 @@ const onDrop = (e, boardId) => {
   gap: 10px;
   width: 100%;
   height: 50px;
-  // color: #ffffff;;
   font-size: 20px;
   font-weight: 700;
 }
