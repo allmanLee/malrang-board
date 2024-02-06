@@ -10,7 +10,7 @@
       <span v-if="team && member">&nbsp;/&nbsp;</span>
       <span v-if="member">{{ member }}</span>
     </div>
-    <span v-if="!team && !member" style="color: #efac40; font-size: 12px; font-weight: bold;">팀원이 없어요</span>
+    <span v-if="!team && !member" style="font-size: 12px; font-weight: bold;" class="--empty">팀원이 없어요</span>
   </div>
 </template>
 
@@ -61,11 +61,9 @@ const props = defineProps({
   font-weight: bold;
 }
 
-
-// span {
-//   margin: 0 0.5rem;
-//   font-size: 16px;
-//   font-weight: bold;
-//   color: #ccc;
-// }
+.--empty {
+  color: $gray-700;
+  font-size: 12px;
+  font-weight: bold;
+}
 </style>

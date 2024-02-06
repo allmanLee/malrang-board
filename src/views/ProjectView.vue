@@ -547,7 +547,7 @@ const selectTeam = (teamId) => {
 }
 
 .highlighted {
-  background-color: #f5f5f5;
+  background-color: $dark-gray-100;
   // color: black;
 
   .el-icon {
@@ -557,7 +557,8 @@ const selectTeam = (teamId) => {
   .new-badge {
     background-color: #2196f3;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
-    // color: #ffffff;
+    color: #ffffff;
+    font-weight: 700;
   }
 }
 

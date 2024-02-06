@@ -12,35 +12,10 @@ const isShowSide = computed(() => {
   return router.currentRoute.value.path === '/main';
 });
 
-// Store
-const userStore = useUserStore();
-
-// 로그인 여부
-const isLogin = computed(() => {
-  return userStore.isLogin;
-});
-
-// 로그아웃
-const handleClickToLogout = () => {
-  userStore.logout();
-}
-
-// localStorage에 저장된 userState 가져와서 업데이트
-const userState = localStorage.getItem('userState');
-if (userState) {
-  userStore.fetchUser(JSON.parse(userState));
-}
-
-// 로그인한 사용자명
-const userName = computed(() => {
-  return userStore.getUserState.name;
-});
-
-
 </script>
 <template>
   <el-container class="app-container">
-    <el-header id="header" class="header">
+    <!-- <el-header id="header" class="header">
       <section class="header__left">
         <div class="logo">
           <h1>말랑보드</h1>
@@ -52,19 +27,16 @@ const userName = computed(() => {
         </nav>
       </section>
       <nav v-if="!isLogin" class="header__right">
-        <!-- 우측 - 로그인, 회원가입 -->
         <router-link to="/login">로그인</router-link> |
         <router-link to="/signup">회원가입</router-link>
       </nav>
 
       <div v-else class="header__right">
-        <!-- 우측 - 로그인 성공시 프로필 노출 -->
         <el-dropdown trigger="click" placement="bottom-end">
           <span class="el-dropdown-link">
             <el-avatar shape="square" :size="20" src="https://avatars.githubusercontent.com/u/26598542?v=4"
               alt="avatar" />
             <p>{{ userName }}</p>
-            <!-- <i class="el-icon-arrow-down el-icon--right"></i> -->
           </span>
           <template #dropdown>
             <el-dropdown-item>
@@ -81,7 +53,7 @@ const userName = computed(() => {
           </template>
         </el-dropdown>
       </div>
-    </el-header>
+    </el-header> -->
     <el-container>
       <el-aside class="navigation-side__bar">
         <sub-side-bar />
@@ -206,6 +178,7 @@ nav {
 
 .navigation-side__bar {
   height: 100%;
+  overflow: unset;
 }
 
 // 첫번째

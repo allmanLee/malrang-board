@@ -1,11 +1,17 @@
 <template>
-  <el-container class="side-bar">
-    <div class="side-wrapper">
+  <el-container class="sidebar">
+    <div class="sidebar-wrapper">
 
 
       <!-- <section class="admin-settings"> -->
       <!-- 프로젝트 관리 버튼 - solid -->
-
+      <section class="sidebar-header">
+        <!-- 로고 -->
+        <div class="logo">
+          <h1>말랑보드</h1>
+        </div>
+        <span class="groupname-text">서원정보</span>
+      </section>
 
 
       <!-- 마이 보드 -->
@@ -188,12 +194,40 @@ const filteredTeamsByBookmark = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-.side-bar {
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 20px;
+  padding-top: 10px;
+  padding-bottom: 0px;
+
+  .groupname-text {
+    font-size: 16px;
+    font-weight: 600;
+    margin-left: 20px;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .logo {
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      font-family: 'malang-board-bold';
+    }
+  }
+}
+
+.sidebar {
   width: 100% !important;
   height: 100% !important;
   gap: 40px;
 
-  .side-wrapper {
+  .sidebar-wrapper {
     display: flex;
     flex-direction: column;
     width: 100% !important;
@@ -242,7 +276,6 @@ const filteredTeamsByBookmark = computed(() => {
     }
   }
 
-
   .items-menu--team {
     &:hover {
       background-color: #34363a;
@@ -268,11 +301,6 @@ const filteredTeamsByBookmark = computed(() => {
         padding: 0;
       }
     }
-  }
-
-  .search-items__scrollbar {
-    // border: 1px solid red;
-    // height: 100%;
   }
 
 
@@ -340,11 +368,6 @@ const filteredTeamsByBookmark = computed(() => {
     font-weight: 700 !important;
   }
 
-  // 팀 아이템 색
-  .el-menu-item {
-    // color: #ffffff;
-  }
-
 
   // 팀 선택 시
   .items-menu--team {
@@ -394,11 +417,6 @@ const filteredTeamsByBookmark = computed(() => {
       line-height: 40px;
     }
   }
-}
-
-
-.el-sub-menu {
-  &.is-opened {}
 }
 
 .el-menu-item {

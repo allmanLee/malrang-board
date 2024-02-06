@@ -30,7 +30,7 @@
     </section>
     <el-form-item>
       <!-- 에디이터 (다크모드)-->
-      <md-editor ref="editorRef" language="en-US" :scrollAuto="true" :disabled="false" :preview="true"
+      <md-editor ref="editorRef" language="en-US" :scrollAuto="true" :disabled="false" :preview="true" theme="dark"
         v-model="customForm.description"></md-editor>
     </el-form-item>
     <el-button v-show="false" type="primary">등록</el-button>
