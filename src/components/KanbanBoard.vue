@@ -13,7 +13,6 @@
           <ArrowRight />
         </el-icon>
         <span>팀</span>
-        <test />
 
         <!-- 소켓 연결 여부 -->
         <el-tooltip class="item" effect="dark" content="실시간 연결됨" placement="top">
@@ -104,7 +103,6 @@ import { cloneDeep } from "lodash";
 import { useUserStore } from "@/stores/user";
 import { useBoardStore } from "@/stores/board";
 import { useCommonStore } from "@/stores/common";
-import test from "@/components/test.vue";
 
 
 import { ElMessageBox } from "element-plus"; // 메세지 박스
