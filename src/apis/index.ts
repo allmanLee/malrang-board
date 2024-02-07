@@ -23,6 +23,7 @@ const apiEndpoints = {
 
   cards: '/kanban/cards',
   card: (boardId: string) => `/kanban/boards/${boardId}/card`,
+  cardMo: (boardId: string, cardId: string) => `/kanban/boards/${boardId}/card/${cardId}`,
 };
 
 // Create an instance of Axios with the base URL
@@ -83,6 +84,17 @@ const del = async <T>(url: string): Promise<T> => {
   }
 };
 
+const patch = async <T>(url: string, data: any): Promise<T> => {
+  try {
+    const response: AxiosResponse<T> = await api.patch(url, data);
+    return response.data;
+  } catch (error: any) {
+    console.error(error)
+    const response: AxiosResponse<T> = error.response;
+    throw response.data;
+  }
+}
+
 const userApi = {
 
   // 사용자 (CRUD) 및 로그인
@@ -125,6 +137,7 @@ const userApi = {
   // 카드 (CRUD)
   getCards: (params: any) => get(`${apiEndpoints.cards}`, params),
   createCard: (cardData: any) => post(apiEndpoints.card(cardData.boardId), cardData),
+  moveCard: (cardData: any) => patch(apiEndpoints.cardMo(cardData.boardId, cardData.cardId),{}),
 };
 
 // 모듈 

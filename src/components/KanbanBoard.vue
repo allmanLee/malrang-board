@@ -68,8 +68,8 @@
           <!-- 추가기능 아이콘 (추가하기) -->
         </header>
         <KanbanBoardCard @click="handleClickToUpdate(card, board.title)" ref="kanbanBoardCard"
-          @delete="handleDeleteCard(card.id)" v-for="card in filterCards.filter(el => el.boardId === board.id)"
-          @dragstart="handleDragStart($event, card)" draggable="true" :key="card.id" :card="card" />
+          @delete="handleDeleteCard(card._id)" v-for="card in filterCards.filter(el => el.boardId === board.id)"
+          @dragstart="handleDragStart($event, card)" draggable="true" :key="card._id" :card="card" />
         <EmptyKanbanCard v-if="filterCards.filter(el => el.boardId === board.id).length === 0"
           @add="handleClickToAdd(board)" />
         <el-button v-else-if="filterCards.filter(el => el.boardId === board.id).length > 0" size="large" class="add-btn"
@@ -92,7 +92,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, watch } from "vue";
+import { ref, reactive, computed, onMounted, watch, onUnmounted } from "vue";
 // computed 타입
 import type { ComputedRef } from "vue";
 import { Board, Card } from "@/types/Kanban.type";
@@ -113,18 +113,6 @@ import API from "@/apis";
 // Socket IO (실시간 통신)
 import { state, socket } from "@/socket";
 
-// // 소켓을 연결합니다.
-function connect() {
-  socket.connect();
-}
-
-onMounted(() => {
-  connect();
-})
-
-
-
-
 const users = computed(() => useUserStore().getMockUsers)
 const boards = computed(() => useBoardStore().getBoards)
 const selectedTeamId = computed(() => useCommonStore().getSbSelectedTeamId)
@@ -136,7 +124,7 @@ const searchValue = ref("");
 // const boards = ref<Board[]>(props.boards);
 const cards = ref<Card[]>([]);
 const initForm = (): Card => ({
-  id: '',
+  _id: '',
   title: "",
   description: "",
   created_date: "",
@@ -148,14 +136,44 @@ const initForm = (): Card => ({
   commit: [],
 });
 
+// Socket IO (실시간 통신)
+const boardStore = useBoardStore();
+onMounted(() => {
+  // remove any existing listeners (after a hot module replacement)
+  socket.off();
+  boardStore.bindEvent();
+
+
+  socket.on("cards:created", (data) => {
+    const card = data?.card;
+    console.log('cards:created', card)
+    cards.value.push(card);
+  });
+
+  socket.on("cards:moved", (data) => {
+    const card = data?.card;
+    console.log('cards:moved', card)
+
+    // 보드 Id 만 변경
+    const cardIdx = cards.value.findIndex((el) => el._id === card._id);
+    cards.value[cardIdx].boardId = card.boardId;
+  });
+
+})
+
+onUnmounted(() => {
+  socket.off();
+  state.connected = false;
+})
+
 // 카드 조회 API 호출
 const getCards = async () => {
   console.log(selectedTeamId.value)
   const query = {
     teamId: selectedTeamId.value,
   }
-  const cards = await API.getCards(query);
-  cards.value = cards;
+  const result: Card[] = await API.getCards(query);
+  cards.value = result;
 };
 
 
@@ -180,20 +198,23 @@ class CardActions {
    */
   async create(cardId, boardId, form) {
     try {
-      cards.value.push({
+      const card: Card = {
         ...form.value,
-        id: cardId,
-        boardId: boardId,
-        created_date: new Date().toISOString().slice(0, 10),
-      });
-
-      // API 호출
-      await API.createCard({
-        ...form.value,
-        id: cardId,
+        // id: cardId,
         teamId: selectedTeamId.value,
         boardId: boardId,
         created_date: new Date().toISOString().slice(0, 10),
+      };
+
+      cards.value.push(card);
+
+      // API 호출
+      await API.createCard(card);
+
+
+
+      socket.emit("cards:created", { card }, (result: any) => {
+        console.log('cards:created', result)
       });
 
       // 만약 커밋에 #mb-1 이런식으로 카드 번호가 붙어있으면 해당 카드의 커밋에 추가
@@ -211,7 +232,7 @@ class CardActions {
 
 
   update(cardId, form) {
-    const cardIdx = cards.value.findIndex((card) => card.id === cardId);
+    const cardIdx = cards.value.findIndex((card) => card._id === cardId);
     cards.value.splice(cardIdx, 1, {
       ...form.value,
     });
@@ -220,7 +241,7 @@ class CardActions {
   }
 
   delete(cardId) {
-    const cardIdx = cards.value.findIndex((card) => card.id === cardId);
+    const cardIdx = cards.value.findIndex((card) => card._id === cardId);
     cards.value.splice(cardIdx, 1);
 
     this.resetCommit(cards.value)
@@ -242,7 +263,7 @@ class CardActions {
         if (element.title.includes(`#mb-`)) {
           // 띄어쓰기나 괄호까지
           const afterMb = element.title.split(`#mb-`)[1].split(' ')[0].split(')')[0].split(']')[0];
-          const cardIdx = cards.value.findIndex((card) => card.id === Number(afterMb));
+          const cardIdx = cards.value.findIndex((card) => card._id === afterMb);
           const cardTitle = element.title;
           // const cardTag = element?.tags[0]?.title || 'chore';
 
@@ -257,7 +278,7 @@ class CardActions {
             title: commitMessage,
             created_date: new Date().toISOString().slice(0, 10),
             userIdx: element.userIdx,
-            card_idx: element.id,
+            card_idx: element._id,
           });
         }
       });
@@ -324,9 +345,10 @@ const handleSave = (boardId) => {
   const modalType = modalKanban.openType;
 
   if (modalType === 'create') {
+    delete form.value._id;
     cardActions.create(cards.value.length + 1, boardId, form);
   } else if (modalType === 'update') {
-    cardActions.update(form.value.id, form);
+    cardActions.update(form.value._id, form);
   }
   modalKanban.close();
   form.value = initForm();
@@ -348,20 +370,32 @@ const handleDeleteCard = (cardId) => {
 /* -------------------------------- 드래그엔드랍기능 -------------------------------- */
 // 카드 드래그 (다른 보드의 카드로 이동 가능)
 const handleDragStart = (e, card) => {
-  e.dataTransfer.setData("cardId", card.id);
+  e.dataTransfer.setData("cardId", card._id);
   // e.dataTransfer.setData("cardboardId", card.boardId);
 };
 
 // 카드 드랍 (다른 보드의 카드로 이동 가능)
-const onDrop = (e, boardId) => {
+const onDrop = async (e, boardId) => {
   const cardId = e.dataTransfer.getData("cardId");
   // const cardboardId = e.dataTransfer.getData("cardboardId");
 
-  const cardIdx = cards.value.findIndex((card) => card.id === Number(cardId));
+  const cardIdx = cards.value.findIndex((card) => card._id === cardId);
+
   cards.value[cardIdx].boardId = boardId;
 
+  // moveCard API 호출
+  await API.moveCard({
+    cardId: cardId,
+    boardId: boardId,
+  });
+
+  socket.emit("cards:moved", {
+    card: cards.value[cardIdx],
+  }, (result: any) => {
+    console.log('cards:moved', result)
+  });
   // 만약 커밋에 #mb-1 이런식으로 카드 번호가 붙어있으면 해당 카드의 커밋에 추가
-  cardActions.addCommit(cardId, cards.value)
+  cardActions.addCommit(cardId, cards.value);
 };
 
 

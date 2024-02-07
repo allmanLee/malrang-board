@@ -9,7 +9,9 @@
 
     <!-- 드래그엔 드랍이 가능한 칸반보드(할일, 보류, 한일, 칸반 추가 기능) -->
     <section class="container">
-      <kanban-board />
+      <keep-alive include="kanban-board">
+        <kanban-board />
+      </keep-alive>
     </section>
   </div>
 </template>

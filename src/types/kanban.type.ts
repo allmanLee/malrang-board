@@ -19,7 +19,7 @@ export interface Board {
  
 // 카드 배열 타입
 export interface Card {
-  id: string;
+  _id: string;
   title: string; 
   description: string;
   created_date: string;

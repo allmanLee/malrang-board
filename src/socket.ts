@@ -3,8 +3,8 @@ import { io } from "socket.io-client";
 
 export const state = reactive({
   connected: false,
-  fooEvents: [],
-  barEvents: []
+  moveEvents: [] as { boardId: string; cardId: string }[],
+  // barEvents: []
 });
 
 // "undefined" means the URL will be computed from the `window.location` object
@@ -15,19 +15,19 @@ const URL : string | undefined
 
 export const socket = io(URL);
 
-socket.on("connect", () => {
-  console.log("connected", socket.id);
-  state.connected = true;
-});
+// socket.on("connect", () => {
+//   console.log("connected", socket.id);
+//   state.connected = true;
+// });
 
-socket.on("disconnect", () => {
-  state.connected = false;
-});
+// socket.on("disconnect", () => {
+//   state.connected = false;
+// });
 
-socket.on("foo", (...args) => {
-  state.fooEvents.push(args);
-});
+// socket.on("moveCard", (...args) => {
+//   state.moveEvents.push(args);
+// });
 
-socket.on("bar", (...args) => {
-  state.barEvents.push(args);
-});
+// socket.on("bar", (...args) => {
+//   state.barEvents.push(args);
+// });

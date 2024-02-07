@@ -82,7 +82,7 @@
 
         <div class="prj" v-show="filteredProjects?.length && !searchText">
           <h5 class="mb-2">전체 프로젝트</h5>
-          <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @select="handleSelectMenu"
+          <el-menu :default-active="teamId" class="el-menu-vertical-demo" @open="handleOpen" @select="handleSelectMenu"
             @close="handleClose" ref="projectAllRef">
             <el-sub-menu :index="prj?._id" v-for="(prj) in filteredProjects" :key="prj?._id">
               <template #title>
@@ -114,10 +114,12 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useUserStore } from '@/stores/user';
 import { useCommonStore } from '@/stores/common';
 import { isEmpty } from 'lodash';
+
+
 
 // 스토어 프로젝트 목록
 const userStore = useUserStore()
@@ -128,6 +130,9 @@ const teams = computed(() => userStore.getTeams)
 const handleOpen = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
 }
+
+
+
 
 // common 스토어에 team 아이디 저장
 const handleSelectMenu = async (id: string) => {
@@ -140,6 +145,24 @@ const handleSelectMenu = async (id: string) => {
 const handleClose = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
 }
+
+// 만약 로그인이 되어있고, localStorage에 팀이름과 아이디가 저장 되어있다면
+// 그 팀을 선택한 상태로 초기화
+
+const teamId: any = ref('')
+const initTeam = () => {
+  const _teamId = localStorage.getItem('sbSelectedTeamId')
+  const _teamName = localStorage.getItem('sbSelectedTeamName')
+  if (_teamId && _teamName) {
+    teamId.value = `team-${_teamId}`
+    commonStore.changeTeamSelected(_teamId, _teamName)
+  }
+}
+
+onMounted(() => {
+  initTeam()
+})
+
 
 // 프로젝트 별 팀 목록
 const projectAllRef = ref(null)
