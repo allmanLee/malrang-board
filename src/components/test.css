@@ -1,0 +1,128 @@
+<template>
+  <div class="container">
+    <img
+      loading="lazy"
+      src="https://cdn.builder.io/api/v1/image/assets/TEMP/9586ab147308d806f987f1e692f5001766f1c7eb1b722f47d2ece9dae099f75a?"
+      class="image"
+    />
+    <div class="content">
+      <div class="title">선택한 담당자로 적용하시겠습니까?</div>
+      <div class="buttons">
+        <div class="cancel">취소</div>
+        <div class="confirm">확인</div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped lang="scss">
+.container {
+  border-radius: 3px;
+  background-color: #161930;
+  display: flex;
+  max-width: 300px;
+  flex-direction: column;
+  color: #fff;
+  font-weight: 400;
+  white-space: nowrap;
+  text-align: center;
+  padding: 15px 0 30px;
+
+  .image {
+    aspect-ratio: 1;
+    object-fit: auto;
+    object-position: center;
+    width: 16px;
+    fill: #fff;
+    align-self: end;
+    margin-right: 15px;
+  }
+
+  .content {
+    display: flex;
+    margin-top: 14px;
+    width: 100%;
+    flex-direction: column;
+    padding: 0 15px 0 40px;
+
+    .title {
+      letter-spacing: -0.8px;
+      font: 16px/137.5% Noto Sans KR, sans-serif;
+    }
+
+    .buttons {
+      align-self: center;
+      display: flex;
+      gap: 10px;
+      font-size: 14px;
+      letter-spacing: -0.7px;
+      line-height: 26px;
+      margin: 35px 0 0 13px;
+
+      .cancel {
+        font-family: Noto Sans KR, sans-serif;
+        border-radius: 2px;
+        border: 1px solid #727797;
+        flex-grow: 1;
+        justify-content: center;
+        padding: 6px 27px;
+      }
+
+      .confirm {
+        font-family: Noto Sans KR, sans-serif;
+        border-radius: 2px;
+        border: 1px solid rgba(114, 119, 151, 0);
+        background-color: var(--main-color, #3e57c9);
+        flex-grow: 1;
+        justify-content: center;
+        padding: 6px 27px;
+      }
+    }
+  }}
+.image {
+  aspect-ratio: 1;
+  object-fit: auto;
+  object-position: center;
+  width: 16px;
+  fill: #fff;
+  align-self: end;
+  margin-right: 15px;
+}
+.content {
+  display: flex;
+  margin-top: 14px;
+  width: 100%;
+  flex-direction: column;
+  padding: 0 15px 0 40px;
+}
+.title {
+  letter-spacing: -0.8px;
+  font: 16px/137.5% Noto Sans KR, sans-serif;
+}
+.buttons {
+  align-self: center;
+  display: flex;
+  gap: 10px;
+  font-size: 14px;
+  letter-spacing: -0.7px;
+  line-height: 26px;
+  margin: 35px 0 0 13px;
+}
+.cancel {
+  font-family: Noto Sans KR, sans-serif;
+  border-radius: 2px;
+  border: 1px solid #727797;
+  flex-grow: 1;
+  justify-content: center;
+  padding: 6px 27px;
+}
+.confirm {
+  font-family: Noto Sans KR, sans-serif;
+  border-radius: 2px;
+  border: 1px solid rgba(114, 119, 151, 0);
+  background-color: var(--main-color, #3e57c9);
+  flex-grow: 1;
+  justify-content: center;
+  padding: 6px 27px;
+}
+</style>

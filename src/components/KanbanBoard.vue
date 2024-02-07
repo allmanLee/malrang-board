@@ -13,6 +13,17 @@
           <ArrowRight />
         </el-icon>
         <span>팀</span>
+        <test />
+
+        <!-- 소켓 연결 여부 -->
+        <el-tooltip class="item" effect="dark" content="실시간 연결됨" placement="top">
+          <el-icon class="kanban-menu" :class="state.connected ? 'success' : 'error'">
+            <el-icon v-if="state.connected" class="success" :icon="state.connected ? 'el-icon-success' : 'el-icon-error'"
+              :class="{ 'socket-icon': true, 'is-connect': state.connected }">
+              <Check />
+            </el-icon>
+          </el-icon>
+        </el-tooltip>
       </h2>
 
       <el-input class="kanban-search" v-model="searchValue" placeholder="티켓의 제목, 담당자, 태그를 생각나는거 있어요?" clearable>
@@ -82,7 +93,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, reactive, computed } from "vue";
+import { ref, reactive, computed, onMounted, watch } from "vue";
 // computed 타입
 import type { ComputedRef } from "vue";
 import { Board, Card } from "@/types/Kanban.type";
@@ -93,12 +104,27 @@ import { cloneDeep } from "lodash";
 import { useUserStore } from "@/stores/user";
 import { useBoardStore } from "@/stores/board";
 import { useCommonStore } from "@/stores/common";
+import test from "@/components/test.vue";
 
-// 메세지 박스
-import { ElMessageBox } from "element-plus";
+
+import { ElMessageBox } from "element-plus"; // 메세지 박스
 
 import "md-editor-v3/lib/style.css";
 import API from "@/apis";
+
+// Socket IO (실시간 통신)
+import { state, socket } from "@/socket";
+
+// // 소켓을 연결합니다.
+function connect() {
+  socket.connect();
+}
+
+onMounted(() => {
+  connect();
+})
+
+
 
 
 const users = computed(() => useUserStore().getMockUsers)
@@ -110,36 +136,37 @@ const selectedWorker = ref(null);
 const activeName = ref("전체 담당자");
 const searchValue = ref("");
 // const boards = ref<Board[]>(props.boards);
-const cards = ref<Card[]>([
-  {
-    id: 1,
-    title: "테스트 카드",
-    description: "카드 내용",
-    created_date: "2021-10-10",
-    userIdx: 1,
-    userName: '김말랑',
-    boardId: '1234',
-    teamId: selectedTeamId.value,
-    tags: [{
-      id: 1,
-      title: 'Commit',
-      color: '#ffffff'
-    }],
-    commit: [],
-  }
-]);
+const cards = ref<Card[]>([]);
 const initForm = (): Card => ({
-  id: 1,
+  id: '',
   title: "",
   description: "",
   created_date: "",
   userIdx: 1,
-  userName: '김말랑',
+  userName: '',
   teamId: selectedTeamId.value,
-  boardId: '1234',
+  boardId: '',
   tags: [],
   commit: [],
 });
+
+// 카드 조회 API 호출
+const getCards = async () => {
+  console.log(selectedTeamId.value)
+  const query = {
+    teamId: selectedTeamId.value,
+  }
+  const cards = await API.getCards(query);
+  cards.value = cards;
+};
+
+
+// selectedTeamId 변경시 카드 조회
+watch(selectedTeamId, () => {
+  getCards();
+})
+
+
 const handleClickNameActive = (name) => {
   activeName.value = name;
   selectedWorker.value = name;
@@ -375,6 +402,22 @@ const onDrop = (e, boardId) => {
         white-space: nowrap;
         font-weight: 700;
         color: $gray-200;
+      }
+
+      // 소켓
+      .socket-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        padding: 4px;
+        border-radius: 50%;
+        background-color: $dark-gray-100;
+
+        margin-left: 12px;
+
+        &.is-connect {
+          color: $success;
+        }
       }
     }
 

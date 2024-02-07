@@ -11,9 +11,12 @@ export const state = reactive({
 const URL : string | undefined
  = process.env.NODE_ENV === "production" ? undefined : "http://localhost:4001";
 
+
+
 export const socket = io(URL);
 
 socket.on("connect", () => {
+  console.log("connected", socket.id);
   state.connected = true;
 });
 
