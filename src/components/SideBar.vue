@@ -139,7 +139,9 @@ const handleSelectMenu = async (id: string) => {
   // 선택한 팀 아이디 team-{아이디}
   const teamId = id.split('-')[1]
   const teamName = teams.value.find(team => team._id === teamId)?.name
-  await commonStore.changeTeamSelected(teamId, teamName)
+  const projectId = projects.value.find(project => project.teams.find(team => team._id === teamId))?._id
+  const projectName = projects.value.find(project => project.teams.find(team => team._id === teamId))?.name
+  await commonStore.changeTeamSelected(teamId, teamName, projectId, projectName)
 }
 
 const handleClose = (key: string, keyPath: string[]) => {
@@ -153,9 +155,11 @@ const teamId: any = ref('')
 const initTeam = () => {
   const _teamId = localStorage.getItem('sbSelectedTeamId')
   const _teamName = localStorage.getItem('sbSelectedTeamName')
+  const _projectId = localStorage.getItem('sbSelectedProjectId')
+  const _projectName = localStorage.getItem('sbSelectedProjectName')
   if (_teamId && _teamName) {
+    commonStore.changeTeamSelected(_teamId, _teamName, _projectId, _projectName)
     teamId.value = `team-${_teamId}`
-    commonStore.changeTeamSelected(_teamId, _teamName)
   }
 }
 

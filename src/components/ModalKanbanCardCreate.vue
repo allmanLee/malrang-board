@@ -4,7 +4,7 @@
     <h1 class="form-title">#234 카드 생성</h1>
     <section class="form-items__base-info">
       <el-form-item label-width="60px" size="large" label="담당자 (복수 선택 가능)">
-        <el-select v-model="customForm.userIdx" placeholder="담당자를 선택하세요" class="select-user">
+        <el-select v-model="customForm.userId" placeholder="담당자를 선택하세요" class="select-user">
           <el-option v-for="user in users" :key="user.id" :label="user.name" :value="user.id"></el-option>
         </el-select>
       </el-form-item>

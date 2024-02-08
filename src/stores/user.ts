@@ -28,6 +28,9 @@ export const useUserStore = defineStore('user', {
     getUsers:(state) => {
       return state.users
     },
+    getGroupName: (state) => {
+      return state.userState?.groupName
+    },
     getMockUsers:(state) => {
       console.log('state.mockUsers', state.mockUsers)
       return  state.mockUsers

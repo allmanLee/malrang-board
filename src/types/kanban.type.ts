@@ -23,7 +23,7 @@ export interface Card {
   title: string; 
   description: string;
   created_date: string;
-  userIdx: number;
+  userId: string;
   userName: string;
   teamId: string;
   boardId: string;
@@ -43,6 +43,5 @@ export interface Commit {
   id: string;
   title: string;
   created_date: string;
-  userIdx: number;
   card_idx: number;
 }

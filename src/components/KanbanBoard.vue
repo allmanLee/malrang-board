@@ -4,15 +4,15 @@
     <div class="kanban-header">
       <h2 class="kanban-header__title">
         <!-- [그룹 > 프로젝트 > 팀] -->
-        <span>그룹</span>
+        <span>{{ kanbanInfo.groupName }}</span>
         <el-icon>
           <ArrowRight />
         </el-icon>
-        <span>프로젝트</span>
+        <span>{{ kanbanInfo.projectName }}</span>
         <el-icon>
           <ArrowRight />
         </el-icon>
-        <span>팀</span>
+        <span>{{ kanbanInfo.teamName }}</span>
 
         <!-- 소켓 연결 여부 -->
         <el-tooltip class="item" effect="dark" content="실시간 연결됨" placement="top">
@@ -116,11 +116,25 @@ import { state, socket } from "@/socket";
 const users = computed(() => useUserStore().getMockUsers)
 const boards = computed(() => useBoardStore().getBoards)
 const selectedTeamId = computed(() => useCommonStore().getSbSelectedTeamId)
+const selectedTeamName = computed(() => useCommonStore().getSbSelectedTeamName)
+const selectedProjectName = computed(() => useCommonStore().getSbSelectedProjectName)
+const selectedGroupName = computed(() => useUserStore().getGroupName)
 
 const selectedBoardId = ref('');
 const selectedWorker = ref(null);
 const activeName = ref("전체 담당자");
 const searchValue = ref("");
+
+const kanbanInfo = computed(() => {
+  return {
+    groupName: selectedGroupName.value,
+    projectName: selectedProjectName.value,
+    teamName: selectedTeamName.value,
+  }
+});
+
+
+
 // const boards = ref<Board[]>(props.boards);
 const cards = ref<Card[]>([]);
 const initForm = (): Card => ({
@@ -128,7 +142,7 @@ const initForm = (): Card => ({
   title: "",
   description: "",
   created_date: "",
-  userIdx: 1,
+  userId: "",
   userName: '',
   teamId: selectedTeamId.value,
   boardId: '',
@@ -140,10 +154,7 @@ const initForm = (): Card => ({
 // const boardStore = useBoardStore();
 onMounted(() => {
   // remove any existing listeners (after a hot module replacement)
-  socket.off();
   // boardStore.bindEvent();
-
-
   socket.on("cards:created", (data) => {
     const card = data?.card;
     console.log('cards:created', card)
@@ -214,12 +225,16 @@ class CardActions {
         created_date: new Date().toISOString().slice(0, 10),
       };
 
-      cards.value.push(card);
+
 
       // API 호출
-      await API.createCard(card);
+      const result = await API.createCard(card);
 
-      socket.emit("cards:created", { card }, (result: any) => {
+
+      cards.value.push(result);
+
+
+      socket.emit("cards:created", { card: result }, (result: any) => {
         console.log('cards:created', result)
       });
 
@@ -291,7 +306,6 @@ class CardActions {
             id: modalKanban.openType === 'create' ? cards.value[cardIdx].commit.length + 1 : form.id,
             title: commitMessage,
             created_date: new Date().toISOString().slice(0, 10),
-            userIdx: element.userIdx,
             card_idx: element._id,
           });
         }
@@ -373,7 +387,7 @@ const handleClickToAdd = (board) => {
   const boardTitle = board.title;
   selectedBoardId.value = board.id;
   form.value = initForm();
-  form.value.userIdx = selectedWorker.value;
+  form.value.userId = selectedWorker.value;
   modalKanban.open("create", boardTitle)
 };
 
