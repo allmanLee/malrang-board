@@ -137,11 +137,11 @@ const initForm = (): Card => ({
 });
 
 // Socket IO (실시간 통신)
-const boardStore = useBoardStore();
+// const boardStore = useBoardStore();
 onMounted(() => {
   // remove any existing listeners (after a hot module replacement)
   socket.off();
-  boardStore.bindEvent();
+  // boardStore.bindEvent();
 
 
   socket.on("cards:created", (data) => {
@@ -157,6 +157,14 @@ onMounted(() => {
     // 보드 Id 만 변경
     const cardIdx = cards.value.findIndex((el) => el._id === card._id);
     cards.value[cardIdx].boardId = card.boardId;
+  });
+
+  socket.on("cards:deleted", (data) => {
+    const cardId = data?.cardId;
+    console.log('cards:deleted', cardId)
+
+    const cardIdx = cards.value.findIndex((el) => el._id === cardId);
+    cards.value.splice(cardIdx, 1);
   });
 
 })
@@ -211,8 +219,6 @@ class CardActions {
       // API 호출
       await API.createCard(card);
 
-
-
       socket.emit("cards:created", { card }, (result: any) => {
         console.log('cards:created', result)
       });
@@ -223,10 +229,6 @@ class CardActions {
     } catch (error) {
       console.error(error);
     }
-
-
-
-
   }
 
 
@@ -240,12 +242,24 @@ class CardActions {
     this.addCommit(cardId, form.value);
   }
 
-  delete(cardId) {
-    const cardIdx = cards.value.findIndex((card) => card._id === cardId);
-    cards.value.splice(cardIdx, 1);
+  async delete(cardId) {
+    try {
+      const cardIdx = cards.value.findIndex((card) => card._id === cardId);
+      cards.value.splice(cardIdx, 1);
 
-    this.resetCommit(cards.value)
-    this.addCommit(cardId, cards.value)
+      this.resetCommit(cards.value)
+      this.addCommit(cardId, cards.value)
+
+      // API 호출
+      await API.deleteCard(cardId);
+      socket.emit("cards:deleted", { cardId }, (result: any) => {
+        console.log('cards:deleted', result)
+      });
+
+    } catch (error) {
+      console.error(error);
+    }
+
   }
 
   resetCommit(cards) {

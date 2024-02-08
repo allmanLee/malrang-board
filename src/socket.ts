@@ -15,10 +15,10 @@ const URL : string | undefined
 
 export const socket = io(URL);
 
-// socket.on("connect", () => {
-//   console.log("connected", socket.id);
-//   state.connected = true;
-// });
+socket.on("connect", () => {
+  console.log("connected", socket.id);
+  state.connected = true;
+});
 
 // socket.on("disconnect", () => {
 //   state.connected = false;
