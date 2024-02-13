@@ -140,7 +140,7 @@ const userApi = {
 
   createCard: (cardData: any) => post(apiEndpoints.card(cardData.boardId), cardData),
   updateCard: (cardData: any) => put(apiEndpoints.cardMo(cardData.boardId, cardData.cardId), cardData),
-  moveCard: (cardData: any) => patch(apiEndpoints.cardMo(cardData.boardId, cardData.cardId),{}),
+  moveCard: (cardData: any) => patch(apiEndpoints.cardMo(cardData.boardId, cardData.cardId),{order: cardData.order}),
 };
 
 // 모듈 

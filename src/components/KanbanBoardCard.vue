@@ -1,5 +1,6 @@
 <template>
   <el-card class="kanban-board-card" ref="cardRef" :class="{ 'kanban-board-card--linked': isLinked }" :id="linkedCardId">
+    <slot></slot>
     <div class="kanban-board-card-header">
       <div class="kanban-board-card-header__menu">
         <!-- 삭제 아이콘 버튼 -->
@@ -41,10 +42,10 @@
 
       <section class="kanban-board-copy-icons">
         <span class="header__card-num">
-          #mb-{{ card.id }}
+          #mb-{{ card.projectCardId }}
         </span> <!-- 복사 버튼 -->
         <el-tooltip content=" 번호 복사" placement="top">
-          <el-icon @click.stop="handleClickNumCopy(card.id)" class="kanban-copy">
+          <el-icon @click.stop="handleClickNumCopy(card.projectCardId)" class="kanban-copy">
             <CopyDocument />
           </el-icon>
         </el-tooltip>

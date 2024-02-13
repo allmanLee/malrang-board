@@ -67,9 +67,27 @@
           </el-tooltip>
           <!-- 추가기능 아이콘 (추가하기) -->
         </header>
-        <KanbanBoardCard @click="handleClickToUpdate(card, board.title)" ref="kanbanBoardCard"
-          @delete="handleDeleteCard(card._id)" v-for="card in filterCards.filter(el => el.boardId === board.id)"
-          @dragstart="handleDragStart($event, card)" draggable="true" :key="card._id" :card="card" />
+        <KanbanBoardCard @click="handleClickToUpdate(card, board.title)" ref="kanbanBoardCard" :id="card._id"
+          v-for="card in filterCards.filter(el => el.boardId === board.id).sort((a, b) => a.order - b.order)"
+          @delete="handleDeleteCard(card._id)" class="kanban-card" @dragleave.prevent="onDragLeave($event, card._id)"
+          @dragstart="handleDragStart($event, card)" draggable="true" :key="card._id" :card="card">
+
+
+          <!-- 드래그엔 드롭 -->
+          <div class="card-drag-wrap">
+            <!-- 위 -->
+            <div class="card-drag-wrap__top" @drop.prevent.stop="onDropOrder($event, card.boardId, card.order - 1)"
+              @dragover.prevent="onDragOver($event, card._id, 'top')">
+              <div class="card-drag-wrap__top__inner"></div>
+            </div>
+            <!-- 아래 -->
+            <div class="card-drag-wrap__bottom" @drop.prevent.stop="onDropOrder($event, card.boardId, card.order + 1)"
+              @dragover.prevent="onDragOver($event, card._id, 'bottom')">
+              <div class="card-drag-wrap__bottom__inner"></div>
+            </div>
+
+          </div>
+        </KanbanBoardCard>
         <EmptyKanbanCard v-if="filterCards.filter(el => el.boardId === board.id).length === 0"
           @add="handleClickToAdd(board)" />
         <el-button v-else-if="filterCards.filter(el => el.boardId === board.id).length > 0" size="large" class="add-btn"
@@ -99,7 +117,7 @@ import { Board, Card } from "@/types/Kanban.type";
 import ModalKanbanCardCreate from "./ModalKanbanCardCreate.vue";
 import KanbanBoardCard from "@/components/KanbanBoardCard.vue";
 import EmptyKanbanCard from "@/components/EmptyKanbanCard.vue";
-import { cloneDeep } from "lodash";
+import { cloneDeep, orderBy } from "lodash";
 import { useUserStore } from "@/stores/user";
 import { useBoardStore } from "@/stores/board";
 import { useCommonStore } from "@/stores/common";
@@ -118,6 +136,7 @@ const boards = computed(() => useBoardStore().getBoards)
 const selectedTeamId = computed(() => useCommonStore().getSbSelectedTeamId)
 const selectedTeamName = computed(() => useCommonStore().getSbSelectedTeamName)
 const selectedProjectName = computed(() => useCommonStore().getSbSelectedProjectName)
+const selectedProjectId = computed(() => useCommonStore().getSbSelectedProjectId)
 const selectedGroupName = computed(() => useUserStore().getGroupName)
 
 const selectedBoardId = ref('');
@@ -146,6 +165,8 @@ const initForm = (): Card => ({
   userName: '',
   teamId: selectedTeamId.value,
   boardId: '',
+  projectId: '',
+  order: 0,
   tags: [],
   commit: [],
 });
@@ -156,7 +177,7 @@ onMounted(() => {
   // remove any existing listeners (after a hot module replacement)
   // boardStore.bindEvent();
   socket.on("cards:created", (data) => {
-    const card = data?.card;
+    const card = data?.card
     console.log('cards:created', card)
     cards.value.push(card);
   });
@@ -168,6 +189,17 @@ onMounted(() => {
     // 보드 Id 만 변경
     const cardIdx = cards.value.findIndex((el) => el._id === card._id);
     cards.value[cardIdx].boardId = card.boardId;
+
+    // 순서 변경
+    cards.value
+      .filter(el => el.boardId === card.boardId)
+      .forEach((el, idx) => {
+        if (el.order >= card.order) {
+          el.order = el.order + 1;
+        }
+      });
+
+    cards.value[cardIdx].order = card.order;
   });
 
   socket.on("cards:deleted", (data) => {
@@ -185,6 +217,39 @@ onUnmounted(() => {
   state.connected = false;
 })
 
+
+// 위에 있을떄 드래그오버 이벤트
+const onDragOver = (e, cardId, type) => {
+  const dom = document.getElementById(cardId);
+
+  // 위
+  if (type === 'top') {
+    const top = dom.querySelector('.card-drag-wrap__top__inner');
+    top.classList.add('active');
+  }
+
+  // 아래
+  if (type === 'bottom') {
+    const bottom = dom.querySelector('.card-drag-wrap__bottom__inner');
+    bottom.classList.add('active');
+  }
+
+
+};
+
+// 없어짐
+const onDragLeave = (e, cardId) => {
+  const dom = document.getElementById(cardId);
+
+  // 위
+  const top = dom.querySelector('.card-drag-wrap__top__inner');
+  top.classList.remove('active');
+
+  // 아래
+  const bottom = dom.querySelector('.card-drag-wrap__bottom__inner');
+  bottom.classList.remove('active');
+};
+
 // 카드 조회 API 호출
 const getCards = async () => {
   console.log(selectedTeamId.value)
@@ -199,7 +264,7 @@ const getCards = async () => {
 // selectedTeamId 변경시 카드 조회
 watch(selectedTeamId, () => {
   getCards();
-})
+}, { immediate: true })
 
 
 const handleClickNameActive = (name) => {
@@ -215,13 +280,14 @@ class CardActions {
    * 
    * @returns void
    */
-  async create(cardId, boardId, form) {
+  async create(order, boardId, form) {
     try {
       const card: Card = {
         ...form.value,
-        // id: cardId,
+        order,
         teamId: selectedTeamId.value,
         boardId: boardId,
+        projectId: selectedProjectId.value,
         created_date: new Date().toISOString().slice(0, 10),
       };
 
@@ -239,7 +305,7 @@ class CardActions {
       });
 
       // 만약 커밋에 #mb-1 이런식으로 카드 번호가 붙어있으면 해당 카드의 커밋에 추가
-      this.addCommit(cardId, form.value);
+      this.addCommit(form._id, form.value);
 
     } catch (error) {
       console.error(error);
@@ -369,12 +435,18 @@ const handleClickToUpdate = (card: Card, boardTitle) => {
   modalKanban.open("update", boardTitle);
 };
 
+/** function 카드 저장
+ * @param boardId 보드 아이디
+ * @returns void
+ * @description 카드를 생성, 수정합니다.
+ */
 const handleSave = (boardId) => {
   const modalType = modalKanban.openType;
 
   if (modalType === 'create') {
     delete form.value._id;
-    cardActions.create(cards.value.length + 1, boardId, form);
+    const order = filterCards.value.filter(el => el.boardId === boardId).length
+    cardActions.create(order + 1, boardId, form);
   } else if (modalType === 'update') {
     cardActions.update(form.value._id, form);
   }
@@ -402,13 +474,64 @@ const handleDragStart = (e, card) => {
   // e.dataTransfer.setData("cardboardId", card.boardId);
 };
 
-// 카드 드랍 (다른 보드의 카드로 이동 가능)
-const onDrop = async (e, boardId) => {
+const onDropOrder = async (e, boardId, toOrder) => {
   const cardId = e.dataTransfer.getData("cardId");
-  // const cardboardId = e.dataTransfer.getData("cardboardId");
+  console.log('toOrder', toOrder)
 
   const cardIdx = cards.value.findIndex((card) => card._id === cardId);
 
+  // 만약 카드가 다른 보드로 이동했을때
+  if (cards.value[cardIdx].boardId !== boardId) {
+    cards.value[cardIdx].boardId = boardId;
+  }
+
+  // 한 보드에서 카드 순서 변경
+  if (cards.value.filter(el => el.boardId === boardId).length === 0) {
+    cards.value[cardIdx].order = 1;
+  } else {
+
+    cards.value
+      .filter(el => el.boardId === boardId)
+      .forEach((el, idx) => {
+        if (el.order >= toOrder) {
+          el.order = el.order + 1;
+        }
+      });
+    cards.value[cardIdx].order = toOrder;
+  }
+
+
+
+
+  // moveCard API 호출 (순서 변경)
+  await API.moveCard({
+    cardId: cardId,
+    boardId: boardId,
+    order: toOrder
+  });
+
+  // 모든 카드 line 요소 active 상태 제거
+  const cardDom = document.querySelectorAll('.card-drag-wrap__top__inner, .card-drag-wrap__bottom__inner');
+  cardDom.forEach(el => {
+    el.classList.remove('active');
+  });
+
+
+  socket.emit("cards:moved", {
+    card: cards.value[cardIdx],
+  }, (result: any) => {
+    console.log('cards:moved', result)
+  });
+};
+
+// 카드 드랍 (다른 보드의 카드로 이동 가능)
+const onDrop = async (e, boardId) => {
+  const cardId = e.dataTransfer.getData("cardId");
+
+  console.log('onDrop', e)
+  // const cardboardId = e.dataTransfer.getData("cardboardId");
+
+  const cardIdx = cards.value.findIndex((card) => card._id === cardId);
   cards.value[cardIdx].boardId = boardId;
 
   // moveCard API 호출
@@ -422,6 +545,7 @@ const onDrop = async (e, boardId) => {
   }, (result: any) => {
     console.log('cards:moved', result)
   });
+
   // 만약 커밋에 #mb-1 이런식으로 카드 번호가 붙어있으면 해당 카드의 커밋에 추가
   cardActions.addCommit(cardId, cards.value);
 };
@@ -558,6 +682,11 @@ const onDrop = async (e, boardId) => {
     padding: 0 10px;
   }
 
+  .kanban-card {
+    transition: all 1s ease-in-out;
+    box-sizing: border-box;
+  }
+
   .kanban-class {
     font-size: 16px;
     font-weight: 700;
@@ -586,7 +715,6 @@ const onDrop = async (e, boardId) => {
   }
 
   .el-form-item__content .el-tag {
-    // background-color: #2b2b2b;b
     margin-left: 10px;
     // color: #ffffff;
   }
@@ -636,5 +764,65 @@ const onDrop = async (e, boardId) => {
   height: 50px;
   font-size: 20px;
   font-weight: 700;
+}
+
+.card-drag-wrap {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  transition: all 0.1s ease-in-out;
+
+  .card-drag-wrap__top {
+    position: absolute;
+    width: 100%;
+    height: 50%;
+    top: 0;
+    left: 0;
+    z-index: 3;
+
+    .card-drag-wrap__top__inner {
+      position: absolute;
+      width: 100%;
+      height: 8px;
+      top: 0;
+      left: 0;
+      background-color: $primary;
+      z-index: 3;
+      opacity: 0;
+
+      &.active {
+        opacity: 1;
+      }
+    }
+  }
+
+  .card-drag-wrap__bottom {
+    position: absolute;
+    width: 100%;
+    height: 50%;
+    bottom: 0;
+    left: 0;
+    z-index: 3;
+
+    .card-drag-wrap__bottom__inner {
+      position: absolute;
+      width: 100%;
+      height: 6px;
+      bottom: 0;
+      left: 0;
+      background-color: $primary;
+      z-index: 3;
+      opacity: 0;
+
+      &.active {
+        opacity: 1;
+      }
+    }
+  }
 }
 </style>

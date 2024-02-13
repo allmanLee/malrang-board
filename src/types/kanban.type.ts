@@ -26,8 +26,11 @@ export interface Card {
   userId: string;
   userName: string;
   teamId: string;
+  projectCardId?: number;
+  projectId: string;
   boardId: string;
   tags: Tag[];
+  order: number;
   commit: Commit[];
 }
 
