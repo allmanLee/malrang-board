@@ -1,7 +1,7 @@
 <template>
   <!-- 팝업 메뉴 -->
   <el-form label-position="top" class="form-wrap">
-    <h1 class="form-title">카드 생성</h1>
+    <h1 class="form-title"> {{ type === "create" ? "카드 추가" : "카드 수정" }}</h1>
     <section class="form-items__base-info">
       <el-form-item label-width="60px" size="large" label="담당자 (복수 선택 가능)">
         <el-select v-model="customForm.userId" placeholder="담당자를 선택하세요" class="select-user">
@@ -64,6 +64,11 @@ const props = defineProps({
   },
   isOpen: {
     type: Boolean,
+    required: true,
+  },
+  // openType : ['create','update'],
+  type: {
+    type: String,
     required: true,
   },
 });

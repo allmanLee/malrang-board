@@ -1,12 +1,25 @@
 <template>
   <el-card class="kanban-board-card" ref="cardRef" :class="{ 'kanban-board-card--linked': isLinked }" :id="linkedCardId">
-    <slot></slot>
+    <slot></slot> <!-- 커스텀 슬롯 (드래그 드랍으로 사용합니다.) -->
     <div class="kanban-board-card-header">
       <div class="kanban-board-card-header__menu">
         <!-- 삭제 아이콘 버튼 -->
         <el-icon class="kanban-delete menu-icon" @click.stop="handleClickDelete">
           <Delete />
         </el-icon>
+
+        <el-tooltip content=" 번호 복사" placement="top">
+          <el-icon @click.stop="handleClickNumCopy(card.projectCardId)" class="kanban-copy menu-icon">
+            <CopyDocument />
+          </el-icon>
+        </el-tooltip>
+        <el-tooltip content="커밋 메시지 복사" placement="top">
+          <el-icon @click.stop="handleClickCommitCreate(card)" class="kanban-copy menu-icon">
+            <el-icon>
+              <Ticket />
+            </el-icon>
+          </el-icon>
+        </el-tooltip>
         <!-- 메뉴 아이콘 버튼 -->
         <!-- <el-icon class="kanban-menu menu-icon">
           <MoreFilled />
@@ -27,24 +40,18 @@
 
 
     <section class="card__item--profile">
-      <el-avatar shape="square" class="header__user-avatar" :size="20"
-        src="https://avatars.githubusercontent.com/u/26598542?v=4" alt="avatar" />
+      <!-- <el-avatar shape="square" class="header__user-avatar" :size="20"
+        src="https://avatars.githubusercontent.com/u/26598542?v=4" alt="avatar" /> -->
+      <div class="kanban-board-card-header-title">
+        <span class="title-text">
+          {{ card.title }}
+        </span>
+      </div>
       <span class="header__user-name">
         {{ card.userName }}
       </span>
-    </section>
-    <div class="kanban-board-card-header-title">
-      <span class="title-text">
-        {{ card.title }}
-      </span>
-    </div>
-    <div class="kanban-board-card--num">
 
-      <section class="kanban-board-copy-icons">
-        <span class="header__card-num">
-          #mb-{{ card.projectCardId }}
-        </span> <!-- 복사 버튼 -->
-        <el-tooltip content=" 번호 복사" placement="top">
+      <!-- <el-tooltip content=" 번호 복사" placement="top">
           <el-icon @click.stop="handleClickNumCopy(card.projectCardId)" class="kanban-copy">
             <CopyDocument />
           </el-icon>
@@ -56,12 +63,22 @@
             </el-icon>
           </el-icon>
 
-        </el-tooltip>
+        </el-tooltip> -->
+    </section>
+
+    <div class="kanban-board-card--num">
+
+      <section class="kanban-board-copy-icons">
+        <span class="header__card-num">
+          #mb-{{ card.projectCardId }}
+        </span> <!-- 복사 버튼 -->
       </section>
       <div class="kanban-board-card-tags" v-if="card.tags.length">
 
-        <el-tag size="small" type="info" effect="dark">{{ card.tags[0].title }}</el-tag>
-        <el-tag size="small" type="info" effect="dark" class="more-tag__count">+3</el-tag>
+        <el-tag size="small" type="info" effect="dark" class="tag-only">{{ card.tags[0].title }}</el-tag>
+        <el-tag v-if="card.tags.length > 1" size="small" type="info" effect="dark" class="more-tag__count">
+          +{{ card.tags.length - 1 }}
+        </el-tag>
       </div>
     </div>
 
@@ -140,7 +157,7 @@ const isLinked = computed(() => {
 
 // 연결된 카드의의 id
 const linkedCardId = computed(() => {
-  return `card__item-${props.card.id}`;
+  return `card__item-${props.card._id}`;
 });
 
 // const linkedElementId = computed(() => {
@@ -249,7 +266,9 @@ const handleClickDelete = () => {
   .card__item--profile {
     display: flex;
     align-items: center;
+    flex-direction: column;
     margin-bottom: 10px;
+
 
     .header__user-avatar {
       // margin-right: 10px;
@@ -257,10 +276,12 @@ const handleClickDelete = () => {
     }
 
     .header__user-name {
+      display: flex;
       font-size: 14px;
       font-weight: 500;
-      // color: #ffffff;
-      margin-left: 10px;
+      width: 100%;
+      color: $gray-500;
+      // margin-left: 10px;
     }
   }
 
@@ -286,11 +307,14 @@ const handleClickDelete = () => {
         display: flex;
         align-items: center;
         justify-content: flex-start;
-        height: 10px;
+        padding: 4px;
+        line-height: 14px;
         font-size: 14px;
-        font-weight: 500;
-        // color: #ffffff;;
-        z-index: 2;
+        font-weight: 600;
+        border-radius: 4px;
+        color: $gray-600;
+        // background-color: $secondary-dark-100; // color: #ffffff;
+        // z-index: 3;
       }
 
       .kanban-copy {
@@ -340,12 +364,10 @@ const handleClickDelete = () => {
       display: flex;
       font-size: 16px;
       font-weight: 700;
-      // color: #ffffff;
-
-
       border-radius: 12px;
-      box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
-      background-color: #1b1b1b;
+      box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.5);
+      background-color: $dark-gray-100;
+      z-index: 5;
     }
 
     .kanban-board-card-header__menu {
@@ -384,20 +406,27 @@ const handleClickDelete = () => {
     align-items: flex-start;
     font-size: 16px;
     font-weight: 700;
+
+
     // color: #ffffff;
 
 
 
     .title-text {
       margin-right: 10px;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 700;
       width: 220px;
 
       // 두줄 이상일 때 ... 처리
       overflow: hidden;
+
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      word-break: keep-all;
       text-overflow: ellipsis;
-      white-space: nowrap;
+      // white-space: nowrap;
 
     }
   }
@@ -512,9 +541,17 @@ div.solid {
     margin-top: 6px;
   }
 
+
 }
 
 
+.tag-only {
+  display: block;
+  max-width: 120px;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 
 /* ---------------------------------- hover --------------------------------- */

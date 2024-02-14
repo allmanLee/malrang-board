@@ -74,6 +74,17 @@ a {
  left:50% !important;
  transform: translate(-50%, -50%) !important;
  margin: 0px !important;
- 
+}
 
+.el-select__wrapper {
+  background-color: $dark-gray-200 !important;
+  box-shadow: none !important;
+}
+
+
+// 버튼
+.el-button {
+  span {
+    font-weight: 700;
+  }
 }

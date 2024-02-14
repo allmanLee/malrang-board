@@ -1,6 +1,28 @@
 <template>
   <!-- 드래그엔 드랍이 가능한 칸반보드 (한일, 보류, 할일) -->
   <div class="kanban-container">
+    <!-- FAB 그룹 버튼 -->
+    <el-button-group class="fab-buttons">
+      <el-tooltip class="item" effect="dark" content="필터를 초기화합니다." placement="top">
+        <el-button text type="primary" :disabled="isOffFilter" @click="handleClickFilterReset">
+          <el-icon class="filter" :class="{ '--is-off': isOffFilter }">
+            <Filter />
+          </el-icon>
+          <span class="filter__text">필터 초기화</span>
+        </el-button>
+      </el-tooltip>
+      <el-tooltip class="item" effect="dark" content="일시적으로 필터를 끕니다." placement="top">
+        <el-button type="primary" @click="handleClickFilter" :disabled="isOffFilter">
+          <i>
+            <el-icon>
+              <MoonNight />
+            </el-icon>
+          </i>
+          <span class="filter__text">필터 숨기기</span>
+        </el-button>
+      </el-tooltip>
+    </el-button-group>
+
     <div class="kanban-header">
       <h2 class="kanban-header__title">
         <!-- [그룹 > 프로젝트 > 팀] -->
@@ -35,20 +57,60 @@
       </el-input>
     </div>
     <!-- 검색 -->
-    <section class="kanban-action-menue-bar">
-      <el-menu v-model="activeName" class="dashboard-filter" mode="horizontal" @select="el => handleClickNameActive(el)">
-        <el-sub-menu index="담당자">
-          <template #title>
-            <span>{{ activeName ? activeName : '담당자' }}</span>
+    <section class="kanban-action-menu-bar" @click="handleClickFilter(false)">
+      <section class="kanban-filter">
+        <section class="kanban-action-menu-bar__container" :class="{ '--is-off': isOffFilter }">
+          <el-form label-position="top" label-width="100px" :model="test" style="max-width: 460px; display: flex;">
+            <el-form-item v-for="(filter, index2) in filters.filter((f) => f.active)" :key="filter.filterLabel"
+              :label="filter.filterLabel" class="filter__item">
+              <el-select placeholder="" v-model="filter.selectedValue" multiple class="select-user">
+                <el-option v-for="user in users" :key="user.id" :label="user.name" :value="user.name"></el-option>
+                <template #tag> <span>{{ filter.method }}</span><el-tag v-for="(value, index) in filter.selectedValue"
+                    :key="index">{{ value }}</el-tag>
+                </template>
+              </el-select>
+            </el-form-item>
+          </el-form>
+
+        </section>
+
+
+
+        <!-- 필터 추가버튼 popover -->
+        <!-- 클릭하면 어떤조건으로 추가할지[button-group], 무엇을 필터링 할지 select -->
+        <el-popover :visible="isVisiblePop" placement="bottom" width="auto" trigger="click" @blur="isVisiblePop = false">
+          <!-- 컬럼 선택 -->
+          <el-select v-model="selectedFilterLable" placeholder="필터 선택" class="select-user">
+            <el-option v-for="filter in filters" :key="filter.filterLabel" :label="filter.filterLabel"
+              :value="filter.filterLabel">
+            </el-option>
+          </el-select>
+          <div class="kanban-filter__method">
+            <h3 class="kanban-filter__popover__title">조건</h3>
+            <el-radio-group class="kanban-filter__popover__btns" v-model="selectedfilterMetnod">
+              <el-radio-button type="primary" class="filter__btn" label="동일한" />
+              <el-radio-button type="primary" class="filter__btn" label="포함한" />
+              <el-radio-button type="primary" class="filter__btn" label="제외한 나머지" />
+              <el-radio-button type="primary" class="filter__btn" label="비어있는" />
+              <el-radio-button type="primary" class="filter__btn" label="비어있지 않은" />
+            </el-radio-group>
+          </div>
+          <div class="popover__footer">
+            <!-- 닫기 -->
+            <el-button type="text" @click="isVisiblePop = false" class="popover__confirm-btn">취소</el-button>
+            <el-button type="primary" class="popover__confirm-btn"
+              @click="handleClickFilterAdd(selectedFilterLable, selectedfilterMetnod, '동일한')">확인</el-button>
+          </div>
+          <template #reference>
+            <!-- 검색필터 추가 아이콘 버튼 -->
+            <el-button @click="isVisiblePop = !isVisiblePop" class="filter__add-btn">
+              <el-icon>
+                <Plus />
+              </el-icon> 필터 추가
+            </el-button>
           </template>
-          <el-menu-item index="전체">
-            <span>전체</span>
-          </el-menu-item>
-          <el-menu-item v-for="user in users" :key="user.id" :index="user.name">
-            <span>{{ user.name }}</span>
-          </el-menu-item>
-        </el-sub-menu>
-      </el-menu>
+        </el-popover>
+      </section>
     </section>
 
 
@@ -85,7 +147,6 @@
               @dragover.prevent="onDragOver($event, card._id, 'bottom')">
               <div class="card-drag-wrap__bottom__inner"></div>
             </div>
-
           </div>
         </KanbanBoardCard>
         <EmptyKanbanCard v-if="filterCards.filter(el => el.boardId === board.id).length === 0"
@@ -95,10 +156,9 @@
       </div>
     </div>
     <!-- 팝업 메뉴 -->
-    <el-drawer class="dark" width="800" :title="modalKanban.boardTitle" v-model="modalKanban.dialogVisible"
-      :before-close="modalKanban.beforeClose">
+    <el-drawer class="dark" width="800" :title="modalKanban.boardTitle" v-model="modalKanban.dialogVisible">
       <ModalKanbanCardCreate :isOpen="modalKanban.dialogVisible" :form="form" @enter.self="handleSave(selectedBoardId)"
-        @update:form="updateForm" />
+        @update:form="updateForm" :type="modalKanban.openType" />
       <template #footer>
         <div class="dialog-footer">
           <el-button size="large" type="primary" @click="handleSave(selectedBoardId)">
@@ -107,6 +167,43 @@
         </div>
       </template>
     </el-drawer>
+    <!-- filter setting (Flot Button) 필터 선택기능
+    다른사람이 만들어둔 필터SET을 선택하거나, 현재 필터 세팅을 'filterName'을 받아 저장할 수 있다. -->
+
+    <el-button type="primary" class="fab-button" round @click="isOpenFilterView = true">
+      <el-icon>
+        <Filter />
+      </el-icon>
+      <span>저장된 필터 보기</span>
+    </el-button>
+
+    <el-dialog title="저장된 필터 보기" v-model="isOpenFilterView" width="auto">
+      <!-- 다른 사람이 만든 필터 -->
+      <div class="filter-other-views">
+        <el-select v-model="selectedFilterLable" placeholder="필터 선택" class="select-user"
+          :class="{ '--disabled': !!filterViewName }" :disabled="!filterOtherViews.length || !!filterViewName">
+          <el-option v-for="filter in filterOtherViews" :key="filter.filterLabel" :label="filter.filterLabel"
+            :value="filter.filterLabel">
+          </el-option>
+        </el-select>
+      </div>
+
+      <!-- 내 필터 이름 -->
+      <el-input v-model="filterViewName" placeholder="내 필터 이름" clearable class="filter__input"
+        @keypress.enter="handleClickViewSave"></el-input>
+      <!-- 푸터 -->
+      <template #footer>
+        <el-button size="large" type="primary" @click="isOpenFilterView = false" :disabled="!filterViewName">
+          <span class="save__text">내 필터 등록</span>
+        </el-button>
+        <el-button size="large" type="default" @click="handleClickViewSelect" v-if="filterViewName.length"
+          @keypress.enter="handleClickViewSelect">
+          <span class="save__text">'{{ selectedFilterLable }}' 선택</span>
+        </el-button>
+      </template>
+    </el-dialog>
+
+
   </div>
 </template>
 <script setup lang="ts">
@@ -141,7 +238,7 @@ const selectedGroupName = computed(() => useUserStore().getGroupName)
 
 const selectedBoardId = ref('');
 const selectedWorker = ref(null);
-const activeName = ref("전체 담당자");
+const selectedFilterLable = ref("");
 const searchValue = ref("");
 
 const kanbanInfo = computed(() => {
@@ -151,6 +248,125 @@ const kanbanInfo = computed(() => {
     teamName: selectedTeamName.value,
   }
 });
+
+const isOffFilter = ref(false);
+const isVisiblePop = ref(false);
+const filters = ref<Filter[]>([]);
+const selectedfilterMetnod = ref('동일한');
+
+
+const isOpenFilterView = ref(false);
+const selectedFilterView = ref(null);
+const filterOtherViews = ref([]);
+const filterViewName = ref('');
+
+const getSelectedFilterView = () => {
+  // API 호출
+  // const result = await API.getFilterView();
+  // filterOtherViews.value = result;
+  filterOtherViews.value = [
+    {
+      filterLabel: '내가 만든 필터1', _id: '12asdfasd2334', filters: [
+        { filterLabel: '담당자', method: '동일한', selectedValue: '', option: [{ label: '전체 담당자', value: '전체 담당자' }], active: false },
+        { filterLabel: '프리픽스', method: '동일한', selectedValue: '', option: [{ label: '전체 프리픽스', value: '전체 프리픽스' }], active: false },
+      ]
+    },
+  ];
+};
+
+getSelectedFilterView();
+
+const handleClickViewSave = () => {
+  // 만약 내 필터 이름이 중복되면
+  // 중복된다는 문구 표시
+  // 중복되지 않으면
+  // 내가 설정한 필터가 저장됩니다. 문구 표시
+  ElMessageBox.alert("내 필터가 저장되었습니다.", "알림", {
+    confirmButtonText: "확인",
+  });
+};
+
+const handleClickViewSelect = async () => {
+
+  // 만약 내 필터가 한개라도 세팅되어있으면
+  // 내가 설정한 필터에서 해당 필터뷰로 변경됩니다. 문구 표시
+  const isConfirm = await ElMessageBox.confirm("선택한 필터로 변경하시겠습니까?"
+    , {
+      confirmButtonText: "변경",
+      cancelButtonText: "취소",
+    });
+
+  if (isConfirm) {
+
+  }
+
+  isOpenFilterView.value = false;
+};
+
+
+// 기본 필터 세팅
+filters.value.push({
+  filterLabel: '담당자',
+  method: '동일한',
+  selectedValue: '',
+  option: [
+    { label: '전체 담당자', value: '전체 담당자' },
+  ],
+  active: false,
+},
+  {
+    filterLabel: '프리픽스',
+    method: '동일한',
+    selectedValue: '',
+    option: [
+      { label: '전체 프리픽스', value: '전체 프리픽스' },
+    ],
+    active: false,
+  },
+);
+
+type Filter = {
+  selectedValue: string | string[];
+  filterLabel: string;
+  option: FilterOption[];
+  method: string;
+  active: boolean
+};
+type FilterOption = {
+  label: string;
+  value: string;
+};
+
+const handleClickFilterAdd = (label, option, method) => {
+
+  // active 상태 변경
+  filters.value.forEach((el) => {
+    if (el.filterLabel === label) {
+      el.active = true;
+      el.method = method;
+    }
+  });
+
+  isVisiblePop.value = false;
+};
+
+// 필터 보기
+const handleClickFilter = (isBtn) => {
+  if (isBtn) {
+    isOffFilter.value = !isOffFilter.value;
+    console.log('isOffFilter', isOffFilter.value)
+  } else {
+    isOffFilter.value = false;
+  }
+};
+
+const handleClickFilterReset = () => {
+  filters.value.forEach((el) => {
+    el.active = false;
+    el.selectedValue = '';
+  });
+  isOffFilter.value = false;
+};
 
 
 
@@ -268,7 +484,7 @@ watch(selectedTeamId, () => {
 
 
 const handleClickNameActive = (name) => {
-  activeName.value = name;
+  // activeName.value = name;
   selectedWorker.value = name;
 }
 
@@ -391,29 +607,28 @@ class ModalKanban {
   dialogVisible = false;
   boardTitle = "";
   openType: ModalOpenType = "none";
-
   open(type: ModalOpenType = "create", boardTitle = "") {
     this.dialogVisible = true;
     this.openType = type;
     this.boardTitle = boardTitle;
   }
-
   close() {
     this.dialogVisible = false;
   }
 
-  async beforeClose(done) {
-    const isClose = await ElMessageBox.confirm("작성중인 내용이 있습니다. 정말 닫으시겠습니까?"
-      , {
-        confirmButtonText: "닫기",
-        cancelButtonText: "취소",
-      });
+  // async beforeClose(done) { // TODO 사용성이 떨어짐 (노션도 물어보지 않습니다.)
 
-    if (isClose) {
-      this.dialogVisible = false;
-      done();
-    }
-  }
+  //   const isClose = await ElMessageBox.confirm("작성중인 내용이 있습니다. 정말 닫으시겠습니까?"
+  //     , {
+  //       confirmButtonText: "닫기",
+  //       cancelButtonText: "취소",
+  //     });
+
+  //   if(isClose) {
+  //     this.dialogVisible = false;
+  //     done();
+  //   }
+
 }
 
 
@@ -608,24 +823,85 @@ const onDrop = async (e, boardId) => {
     .kanban-search {
       display: flex;
       width: 100%;
+      height: 40px;
       // background-color: $dark-gray-100;
       border-radius: 6px;
       color: #ffffff;
     }
   }
 
-  .kanban-action-menue-bar {
-    flex-direction: row;
-    align-items: center;
-    width: 100%;
+  // 칸반보드 필터
+  .kanban-action-menu-bar {
+    display: flex;
     justify-content: flex-end;
+    flex-direction: column;
+    padding: 10px;
+    border-radius: 10px;
+    // margin-left: 10px;
+    margin-right: 10px;
+    width: 100%;
 
-    dashboard-filter {
+    .kanban-filter {
+      display: flex;
+      align-items: flex-end;
+
+      .kanban-action-menu-bar__container {
+        // margin-left: 20px;
+
+        &.--is-off {
+          opacity: 0.2;
+        }
+
+        .filter__item {
+          margin: 0px;
+        }
+
+
+      }
+    }
+
+    // 메뉴 아이콘
+    .kanban-filter__icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      // background-color: $dark-gray-200;
+      font-size: 20px;
+      color: $gray-600;
+      margin-right: 0px;
+      transition: all 0.02s ease-in-out;
+
+      &.--is-off {
+        color: $gray-600;
+        background-color: $gray-200;
+      }
+
+
+      &.filter {
+        margin-right: 20px;
+      }
+
+      &:hover {
+        cursor: pointer;
+        color: $primary;
+        background-color: $gray-200;
+      }
+    }
+
+    .kanban-action-menu-bar__container {
       display: flex;
       flex-direction: row;
       align-items: center;
-      width: 100%;
-      justify-content: flex-end;
+      gap: 10px;
+
+      .select-user {
+        border-radius: 12px;
+        margin-right: 10px;
+        width: 200px;
+      }
     }
   }
 
@@ -642,6 +918,9 @@ const onDrop = async (e, boardId) => {
     overflow-x: scroll;
 
     .add-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       width: 100%;
       height: 40px;
       margin-top: 10px;
@@ -824,5 +1103,113 @@ const onDrop = async (e, boardId) => {
       }
     }
   }
+}
+
+
+.kanban-filter__method {
+  margin-top: 10px;
+
+  .kanban-filter__popover__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: $gray-500;
+  }
+
+  // 칸반보드 검색필터 추가 팝오버
+  .kanban-filter__popover__btns {
+    align-items: center;
+    margin-top: 6px;
+    margin-bottom: 20px;
+    width: 100%;
+
+    .filter__btn {
+      padding: 0px;
+      border: none;
+    }
+  }
+}
+
+.popover__footer {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 40px;
+  font-size: 20px;
+  font-weight: 700;
+
+  .popover__confirm-btn {
+    width: 50%;
+    height: 40px;
+    margin-top: 10px;
+  }
+}
+
+.fab-buttons {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  // gap: 10px;
+  right: 20px;
+  top: 20px;
+  z-index: 10;
+  transition: all 0.1s ease-in-out;
+
+  .el-button {
+    height: 40px;
+    border: none;
+  }
+}
+
+// FAB 버튼 필터 뷰 세팅
+.filter-views-popover {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  z-index: 10;
+  transition: all 0.1s ease-in-out;
+
+  .el-button {
+    height: 40px;
+    border: none;
+  }
+}
+
+.fab-button {
+  position: absolute;
+  border: none;
+  // width: 40px;
+  // height: 40px;
+  right: 20px;
+  bottom: 20px;
+}
+
+
+
+// <!-- 다른 사람이 만든 필터 -->
+.filter-other-views {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  width: 240px;
+  height: 40px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.--disabled {
+  opacity: 0.2;
+  pointer-events: none;
 }
 </style>

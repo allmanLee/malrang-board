@@ -27,6 +27,10 @@ $--colors: (
   // do not use same name, it will override.
   $colors: $--colors,
 
+  $button: (
+    "font-weight": '700',
+  ),
+
   // element-plus input style
   $input: (
     "border-color": none,
