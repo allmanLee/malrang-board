@@ -1,7 +1,7 @@
 $--colors: (
   "primary": (
     // 민트
-    "base": #00b5ad,
+    "base": #1890ff
   ),
   "success": (
     "base": #21ba45,
@@ -33,6 +33,12 @@ $--colors: (
 
   // element-plus input style
   $input: (
+    "border-color": none,
+    "bg-color": #f5f7fa10,
+    "border-hover-color": #c0c4cc,
+    "border-focus-color": #00b5ad,
+  ),
+  $select: (
     "border-color": none,
     "bg-color": #f5f7fa10,
     "border-hover-color": #c0c4cc,

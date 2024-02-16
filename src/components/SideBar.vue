@@ -403,16 +403,16 @@ const filteredTeamsByBookmark = computed(() => {
 
       // open 가상 클래스
       &::before {
-        content: '선택';
+        content: '';
         position: absolute;
-        right: 10px;
+        // right: 10px;
         // primary color
-        background-color: $primary;
+        background-color: $primary-300;
         border-radius: 4px;
         color: white;
 
-        width: 40px;
-        height: 20px;
+        width: 4px;
+        height: 4px;
         line-height: 20px;
         font-size: 12px;
         font-weight: 600;

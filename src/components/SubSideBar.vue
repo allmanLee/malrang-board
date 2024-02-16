@@ -122,8 +122,12 @@ const userName = computed(() => {
     // 액티브 메뉴 아이콘에 배경
     .el-menu-item.is-active {
       .menu-icon {
-        background-color: $primary;
+        background-color: $gray-700;
         color: white;
+      }
+
+      span {
+        color: $gray-100;
       }
     }
 
@@ -140,10 +144,10 @@ const userName = computed(() => {
     .menu-icon {
       font-size: 40px;
       padding: 4px;
-      width: 30px;
-      height: 30px;
+      width: 40px;
+      height: 40px;
       border-radius: 8px;
-      background-color: $dark-gray-100;
+      background-color: none;
     }
 
     span {
