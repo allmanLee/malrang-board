@@ -43,7 +43,6 @@ const login = async () => {
     });
 
     ElMessage.success('로그인이 완료되었습니다.'); // 로그인 성공
-
     userStore.fetchUser(result); // Store userState 업데이트
     isLoginError.value = false;
     setTimeout(() => {

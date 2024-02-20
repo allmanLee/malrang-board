@@ -1,3 +1,4 @@
+
 $--colors: (
   "primary": (
     // 민트
@@ -31,16 +32,21 @@ $--colors: (
     "font-weight": '700',
   ),
 
+  $border-radius: 
+  (
+    'base': 8px,
+    'small': 6px,
+    'round': 20px,
+    'circle': 100%,
+  ),
   // element-plus input style
   $input: (
-    "border-color": none,
-    "bg-color": #f5f7fa10,
-    "border-hover-color": #c0c4cc,
+    // "border-color": none,
+    // "bg-color": #6a91ca24,
     "border-focus-color": #00b5ad,
   ),
   $select: (
-    "border-color": none,
-    "bg-color": #f5f7fa10,
+    "border-color": red,
     "border-hover-color": #c0c4cc,
     "border-focus-color": #00b5ad,
   ),

@@ -77,14 +77,28 @@ a {
 }
 
 .el-select__wrapper {
-  background-color: $dark-gray-200 !important;
+  // background-color: #6a91ca24 !important;
   box-shadow: none;
 }
 
+// 옵션 드롭박스 스타일
+.el-select-dropdown__list {
+  padding: 0px !important;
+}
 
 // 버튼
 .el-button {
   span {
     font-weight: 700;
+  }
+}
+
+/* -------------------------------- 다크 모드 스타일 ------------------------------- */
+
+// 다크모드 일 경우
+html.dark {
+  .el-select__wrapper {
+    // background-color: #6a91ca24 !important;
+    // box-shadow: none;
   }
 }

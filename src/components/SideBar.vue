@@ -231,7 +231,7 @@ const filteredTeamsByBookmark = computed(() => {
 
   .groupname-text {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 300;
     margin-left: 20px;
     max-width: 200px;
     white-space: nowrap;
@@ -252,7 +252,10 @@ const filteredTeamsByBookmark = computed(() => {
   width: 100% !important;
   height: 100% !important;
   gap: 40px;
-  background-color: $dark-gray-700;
+  background-color: $background-transparent;
+  border-right: 1px solid $gray-300;
+  // 오른쪽으로 그림자
+  box-shadow: 6px 0px 12px 1px rgba(0, 0, 0, 0.1);
 
   .sidebar-wrapper {
     display: flex;
@@ -281,9 +284,10 @@ const filteredTeamsByBookmark = computed(() => {
       // margin: 0 12px;
       height: 40px;
       font-size: 14px;
+      border-radius: 6px;
 
       &:hover {
-        background-color: #232427;
+        // background-color: #232427;
       }
     }
 
@@ -296,17 +300,19 @@ const filteredTeamsByBookmark = computed(() => {
       height: 40px;
       padding-left: 20px !important;
       font-size: 14px;
+      border-radius: 6px;
     }
 
     .el-menu-item-group__title {
       // color: #ffffff;
       font-size: 16px;
+
     }
   }
 
   .items-menu--team {
     &:hover {
-      background-color: #34363a;
+      // background-color: #34363a;
     }
   }
 
@@ -458,7 +464,7 @@ const filteredTeamsByBookmark = computed(() => {
 
 .el-sub-menu__title {
   border: 8px;
-  background-color: none;
+  // background-color: none;
   ;
 }
 
@@ -467,7 +473,23 @@ const filteredTeamsByBookmark = computed(() => {
   border-radius: 8px;
 }
 
+
 .el-sub-menu.is-opened {
-  background-color: #232427;
+  background-color: white;
+
+  .el-menu-item:hover {
+    background-color: $background-transparent-secondary;
+  }
+}
+
+html.dark {
+
+  .sidebar {
+    border-right: 1px solid $dark-gray-100;
+  }
+
+  .el-sub-menu.is-opened {
+    background-color: $dark-gray-300;
+  }
 }
 </style>

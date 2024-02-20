@@ -75,7 +75,7 @@
       </section>
       <div class="kanban-board-card-tags" v-if="card.tags.length">
 
-        <el-tag size="small" type="info" effect="dark" class="tag-only">{{ card.tags[0].title }}</el-tag>
+        <el-tag size="small" type="info" effect="dark" class="tag-only" round>{{ card.tags[0].title }}</el-tag>
         <el-tag v-if="card.tags.length > 1" size="small" type="info" effect="dark" class="more-tag__count">
           +{{ card.tags.length - 1 }}
         </el-tag>
@@ -210,14 +210,14 @@ const handleClickDelete = () => {
 <style scoped lang="scss">
 .kanban-board-card {
   position: relative;
-  background-color: $dark-gray-400;
+  // background-color: $background-transparent;
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
   flex-direction: column;
   width: 100%;
-  border-radius: 10px;
-  border: 1px solid $dark-gray-100;
+  border-radius: 12px;
+  // border: 1px solid rgba(186, 186, 186, 0.4);
   padding: 0;
   box-shadow: none;
 
@@ -239,7 +239,6 @@ const handleClickDelete = () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    // width: 30px;
     padding: 0 12px;
     height: 30px;
     border-radius: 10px;
@@ -247,7 +246,6 @@ const handleClickDelete = () => {
     cursor: pointer;
 
     .linked-icon__icon {
-      // color: #ffffff;
       margin-top: 0px;
       right: 4px;
     }
@@ -255,7 +253,6 @@ const handleClickDelete = () => {
     .icon-link__text {
       font-size: 14px;
       font-weight: 500;
-      // color: #ffffff;
     }
 
     &:hover {
@@ -366,7 +363,7 @@ const handleClickDelete = () => {
       font-weight: 700;
       border-radius: 12px;
       box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.5);
-      background-color: $dark-gray-100;
+      // background-color: $dark-gray-100;
       z-index: 5;
     }
 
@@ -396,7 +393,7 @@ const handleClickDelete = () => {
 
     // 칸반 카드 메뉴 아이콘 호버했을때
     .menu-icon:hover {
-      background-color: #2b2b2b;
+      background-color: $background-transparent-secondary;
     }
   }
 
@@ -546,7 +543,7 @@ div.solid {
 
 
 .tag-only {
-  display: block;
+  display: flex;
   max-width: 120px;
   font-size: 14px;
   overflow: hidden;
@@ -560,8 +557,22 @@ div.solid {
 }
 
 .kanban-board-card:hover {
-  // background-color: black;
-  border: 1px solid #4a536b;
+  border: 1px solid $background-transparent-secondary;
+  box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.1);
+
+  .card__item--profile {
+    opacity: 0.6;
+  }
+
+  .kanban-board-card-header-title {
+    .title-text {
+      opacity: 0.6;
+    }
+  }
+
+  .kanban-board-card--num {
+    opacity: 0.6;
+  }
 }
 
 
@@ -619,4 +630,11 @@ div.solid {
 }
 
 /* ---------------------------------- focus --------------------------------- */
+html.dark {
+  .kanban-board-card-header__menu {
+    background-color: $dark-gray-100;
+  }
+
+  // header
+}
 </style>

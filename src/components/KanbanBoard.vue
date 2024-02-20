@@ -4,10 +4,10 @@
     <div class="kanban-header">
       <h2 class="kanban-header__title">
         <!-- [그룹 > 프로젝트 > 팀] -->
-        <span>{{ kanbanInfo.groupName }}</span>
+        <!-- <span>{{ kanbanInfo.groupName }}</span>
         <el-icon>
           <ArrowRight />
-        </el-icon>
+        </el-icon> -->
         <span>{{ kanbanInfo.projectName }}</span>
         <el-icon>
           <ArrowRight />
@@ -15,16 +15,16 @@
         <span>{{ kanbanInfo.teamName }}</span>
 
         <!-- 소켓 연결 여부 -->
-        <el-tooltip class="item" effect="dark" content="실시간 연결됨" placement="top">
+        <!-- <el-tooltip class="item" effect="dark" content="실시간 연결됨" placement="top">
           <el-icon class="kanban-menu" :class="state.connected ? 'success' : 'error'">
             <el-icon v-if="state.connected" class="success" :icon="state.connected ? 'el-icon-success' : 'el-icon-error'"
               :class="{ 'socket-icon': true, 'is-connect': state.connected }">
               <Check />
             </el-icon>
           </el-icon>
-        </el-tooltip>
+        </el-tooltip> -->
       </h2>
-
+      <!-- <el-divider direction="vertical" class="kanban-header__divider"></el-divider> -->
       <el-input class="kanban-search" v-model="searchValue" placeholder="티켓의 제목, 담당자, 태그를 생각나는거 있어요?" clearable>
         <!-- prefix 검색 아이콘 -->
         <template #prefix>
@@ -38,37 +38,47 @@
     <section class="kanban-action-menu-bar" @click="handleClickFilter(false)">
       <!-- filter setting (Flot Button) 필터 선택기능
     다른사람이 만들어둔 필터SET을 선택하거나, 현재 필터 세팅을 'filterName'을 받아 저장할 수 있다. -->
-      <section class="kaban-fab-buttons--bottom">
+      <section class="kanban-action-btns">
+        <div class="--left">
+          <el-button type="primary" class="kanban-action-btn__item --table-view" round @click="isOpenFilterView = true">
+            <el-icon>
+              <Filter />
+            </el-icon>
+            <span>저장된 필터 보기</span>
+          </el-button>
+          <el-button text type="default" class="kanban-action-btn__item" :disabled="isOffFilter"
+            @click="handleClickFilterReset" round>
+            <el-icon class="filter" :class="{ '--is-off': isOffFilter }">
+              <Filter />
+            </el-icon>
+            <span class="filter__text">필터 초기화</span>
+          </el-button>
+          <!-- 필터 숨기기 -->
+          <el-button text type="default" round @click="handleClickFilter">
+            <el-icon>
+              <MoonNight />
+            </el-icon>
+            <span> {{ isOffFilter ? '필터 보이기' : '필터 숨기기' }}</span>
+          </el-button>
+          <!-- {{ selectedFilterView ? selectedFilterView.filterLabel : '' }} -->
+        </div>
 
-        <!-- 필터 초기화 -->
-        <el-button type="default" class="fab-button" :disabled="isOffFilter" @click="handleClickFilterReset">
-          <el-icon class="filter" :class="{ '--is-off': isOffFilter }">
-            <Filter />
-          </el-icon>
-          <span class="filter__text">필터 초기화</span>
-        </el-button>
-        <el-button text type="default" class="fab-button" round @click="isOpenFilterView = true">
-          <el-icon>
-            <Grid />
-          </el-icon>
-          <span>표로 보기</span>
-        </el-button>
-        <!-- 필터 숨기기 -->
-        <el-button text type="primary" round @click="handleClickFilter">
-          <el-icon>
-            <MoonNight />
-          </el-icon>
-          <span> {{ isOffFilter ? '필터 보이기' : '필터 숨기기' }}</span>
-        </el-button>
-        <el-button type="primary" class="fab-button --table-view" round @click="isOpenFilterView = true">
-          <el-icon>
-            <Filter />
-          </el-icon>
-          <span>저장된 필터 보기</span>
-        </el-button>
+        <div class="--right">
+
+          <el-button text type="default" class="kanban-action-btn__item" round @click="isOpenFilterView = true">
+            <el-icon>
+              <Grid />
+            </el-icon>
+            <span>표로 보기</span>
+          </el-button>
+
+
+        </div>
         <el-dialog title="저장된 필터 보기" v-model="isOpenFilterView" width="auto">
           <!-- 다른 사람이 만든 필터 -->
+          <!-- <span>필터를 저장하거나 현재 선택된 필터를 등록할 수 있습니다.</span> -->
           <div class="filter-other-views">
+
             <el-select v-model="selectedFilterView" placeholder="필터 선택" class="select-user" value-key="filterLabel"
               :class="{ '--disabled': !!filterViewName }" :disabled="!filterOtherViews.length || !!filterViewName">
               <el-option v-for="filter in filterOtherViews" :key="filter.filterLabel" :label="filter.filterLabel"
@@ -92,45 +102,46 @@
           </template>
         </el-dialog>
       </section>
+      <!-- <el-divider direction="horizontal" class="filter-divider--top"></el-divider> -->
 
 
       <section class="kanban-filter">
         <section class="kanban-action-menu-bar__container" :class="{ '--is-off': isOffFilter }">
           <el-form label-position="top" label-width="100px" :model="test"
             style="display: flex; width: 100%; flex-wrap: wrap; align-items:flex-end; gap: 10px;">
-            <el-form-item v-for="(filter) in selectedFilters" :key="filter.filterLabel" class="filter__item">
-              <p class="filter__method-icon">
-                <el-icon v-if="filter.method === '동일한'" class="icon--method">
-                  <Filter />
-                </el-icon>
-                <el-icon v-else-if="filter.method === '포함한'" class="icon--method">
-                  <Plus />
-                </el-icon>
-                <el-icon v-else-if="filter.method === '제외한 나머지'" class="icon--method">
-                  <Minus />
-                </el-icon>
-                <el-icon v-else-if="filter.method === '비어있는'" class="icon--method">
-                  <PieChart />
-                </el-icon>
-                <el-icon v-else-if="filter.method === '비어있지 않은'" class="icon--method">
-                  <HelpFilled />
-                </el-icon>
-              </p>
-              <!-- select = 동일한, 제외한 -->
-              <el-select v-if="filter.method !== '비어있는' && filter.method !== '비어있지 않은'"
-                :placeholder="filter.filterLabel + ' 선택'" v-model="filter.value" multiple :disabled="isOffFilter"
-                class="filter__select">
-                <el-option-group :label="filter.method + ': ' + filter.filterLabel">
+            <el-form-item v-for="(filter, index) in selectedFilters" :key="filter.filterLabel" class="filter__item">
+              <!-- <p class="filter__method-icon">
+                담당자
+              </p> -->
+              <el-badge :is-dot="!isHoverFilter" :value="filter.filterLabel + ': ' + filter.method"
+                :type="filter.method === '일치' ? 'success' : filter.method === '포함' ? 'warning' : filter.method === '제외' ? 'danger' : 'info'">
+                <el-select v-if="filter.method !== '비어있는' && filter.method !== '비어있지 않은'"
+                  :placeholder="filter.filterLabel + ' 선택'" v-model="filter.value" multiple :disabled="isOffFilter"
+                  class="filter__select">
+                  <template #header>
+                    <el-checkbox v-model="filter.checkAll" :indeterminate="filter.indeterminate"
+                      @change="(e) => handleCheckAll(e, filter)">
+                      전체 선택
+                    </el-checkbox>
+                  </template>
+                  <!-- <el-option-group :label="filter.method + ': ' + filter.filterLabel"> -->
                   <el-option v-for="(op, index) in filter.option" :key="index" :label="op.label" :value="op.value">
                     {{ op.label }}
                   </el-option>
-                </el-option-group>
-                <template #tag><el-tag v-for="(value, index) in filter.value" :key="index">{{ value }}</el-tag>
-                </template>
-              </el-select>
+                  <template #tag>
+                    <span class="filter__method" v-if="filter.value.length">
+                      {{ filter.method }}</span>
+                    <el-tag v-for="(value, index) in filter.value" :key="index">
+                      {{ value }}
+                    </el-tag>
+                  </template>
+                </el-select>
+                <div v-else :placeholder="filter.filterLabel" :disabled="true" class="filter__select --text">
+                  <span class="filter__method">{{ filter.method }}</span> {{ filter.filterLabel }}
+                </div>
+              </el-badge>
               <!-- select = 비어있는, 비어있지 않은 -->
-              <el-input v-else :placeholder="filter.filterLabel" v-model="filter.value" :disabled="true"
-                class="filter__select" />
+
             </el-form-item>
 
             <!-- [필터 추가 팝오버] 필터 추가 아이콘 버튼 선택시 -->
@@ -139,9 +150,9 @@
               <div class="kanban-filter__popover">
                 <div class="kanban-filter__popover__method">
                   <el-radio-group class="kanban-filter__popover__btns" v-model="selectedfilterMetnod">
-                    <el-radio-button type="primary" class="filter__btn" label="동일한" />
-                    <el-radio-button type="primary" class="filter__btn" label="포함한" />
-                    <el-radio-button type="primary" class="filter__btn" label="제외한 나머지" />
+                    <el-radio-button type="primary" class="filter__btn" label="일치" />
+                    <el-radio-button type="primary" class="filter__btn" label="포함" />
+                    <el-radio-button type="primary" class="filter__btn" label="제외" />
                     <el-radio-button type="primary" class="filter__btn" label="비어있는" />
                     <el-radio-button type="primary" class="filter__btn" label="비어있지 않은" />
                   </el-radio-group>
@@ -228,15 +239,22 @@
         <EmptyKanbanCard v-if="filterCards.filter(el => el.boardId === board.id).length === 0"
           @add="handleClickToAdd(board)" />
         <el-button v-else-if="filterCards.filter(el => el.boardId === board.id).length > 0" size="large" class="add-btn"
-          text @click="handleClickToAdd(board)">추가하기</el-button>
+          @click="handleClickToAdd(board)" type="text">
+          <el-icon>
+            <Plus />
+          </el-icon>
+          추가하기</el-button>
       </div>
     </div>
     <!-- 팝업 메뉴 -->
-    <el-drawer class="dark" width="800" :title="modalKanban.boardTitle" v-model="modalKanban.dialogVisible">
+    <el-drawer size="55%" :title="modalKanban.boardTitle" v-model="modalKanban.dialogVisible">
       <ModalKanbanCardCreate :isOpen="modalKanban.dialogVisible" :form="form" @enter.self="handleSave(selectedBoardId)"
         @update:form="updateForm" :type="modalKanban.openType" />
       <template #footer>
         <div class="dialog-footer">
+          <el-button size="large" type="default" @click="handleSave(selectedBoardId)">
+            <span class="save__text">다른 이름으로 저장</span>
+          </el-button>
           <el-button size="large" type="primary" @click="handleSave(selectedBoardId)">
             <span class="save__text">저장</span>
           </el-button>
@@ -266,6 +284,12 @@ import API from "@/apis";
 // Socket IO (실시간 통신)
 import { state, socket } from "@/socket";
 
+type FilterView = {
+  filterLabel: string;
+  _id: string;
+  filters: Filter[];
+};
+
 const users = computed(() => useUserStore().getMockUsers)
 const boards = computed(() => useBoardStore().getBoards)
 const selectedTeamId = computed(() => useCommonStore().getSbSelectedTeamId)
@@ -276,7 +300,7 @@ const selectedGroupName = computed(() => useUserStore().getGroupName)
 
 const selectedBoardId = ref('');
 const selectedWorker = ref(null);
-const selectedFilterView = ref(null); // 현재 선택된 필터뷰 [저장된 필터보기로 선택된]
+const selectedFilterView = ref<FilterView>(null); // 현재 선택된 필터뷰 [저장된 필터보기로 선택된]
 const selectedFilter: Filter = ref(null);  // 현재 선택된 필터 아이템 [필터 추가]
 const selectedFilters = ref<Filter[]>([]);  // 현재 선택된 필터 [필터 추가로 선택된 필터 아이템들]
 const selectedFilterLable = ref(''); // 현재 선택된 필터 이름
@@ -293,7 +317,7 @@ const kanbanInfo = computed(() => {
 const isOffFilter = ref(false);
 const isVisiblePop = ref(false);
 const filters = ref<Filter[]>([]);
-const selectedfilterMetnod = ref('동일한');
+const selectedfilterMetnod = ref('일치');
 
 
 const isOpenFilterView = ref(false);
@@ -301,30 +325,58 @@ const filterOtherViews = ref([]);
 const filterViewName = ref('');
 
 
+
+// 필터 추가 Select
+watch(selectedFilters, (val) => {
+  // 현재 일린 필터 인덱스
+  selectedFilters.value.forEach((el, idx) => {
+    //필터 라벨과 일치하는 필터를 찾아서 값을 비교합니다.
+    const sameLabelOption = filters.value.filter((filter) => filter.filterLabel === selectedFilters.value[idx].filterLabel)[0].option.map((el) => el.value);
+    if (selectedFilters.value[idx].value.length === 0) {
+      el.checkAll = false
+      el.indeterminate = false
+    } else if (sameLabelOption.length === selectedFilters.value[idx].value.length) {
+      el.checkAll = true
+      el.indeterminate = false
+    } else {
+      el.indeterminate = true
+    }
+  })
+}, { deep: true })
+
+
+const handleCheckAll = (e, filter) => {
+  filter.value = e ? filter.option.map((el) => el.value) : [];
+  filter.indeterminate = false;
+
+  console.log('filter', filter)
+};
+
+
 /** function 필터뷰 가져오기
  * @returns void
  */
-const getSelectedFilterViews = () => {
+const fetchFilterViews = () => {
   // API 호출
   // const result = await API.getFilterView();
   // filterOtherViews.value = result;
   filterOtherViews.value = [
     {
       filterLabel: '내가 만든 필터1', _id: '12asdfasd2334', filters: [
-        { filterLabel: '담당자', method: '동일한', value: '', option: [{ label: '이유준', value: '' }], active: false },
-        { filterLabel: '프리픽스', method: '동일한', value: '', option: [{ label: '전체 프리픽스', value: '전체 프리픽스' }], active: false },
+        { filterLabel: '담당자', method: '일치', value: '', option: [{ label: '이유준', value: '' }], active: false },
+        { filterLabel: '프리픽스', method: '일치', value: '', option: [{ label: '전체 프리픽스', value: '전체 프리픽스' }], active: false },
       ]
     },
     {
       filterLabel: '내가 만든 필터2', _id: '12asdfasd2334', filters: [
-        { filterLabel: '담당자', method: '동일한', value: '', option: [{ label: '전체 담당자', value: '전체 담당자' }], active: false },
-        { filterLabel: '프리픽스', method: '동일한', value: '', option: [{ label: '전체 프리픽스', value: '전체 프리픽스' }], active: false },
+        { filterLabel: '담당자', method: '일치', value: '', option: [{ label: '전체 담당자', value: '전체 담당자' }], active: false },
+        { filterLabel: '프리픽스', method: '일치', value: '', option: [{ label: '전체 프리픽스', value: '전체 프리픽스' }], active: false },
       ]
     },
     {
       filterLabel: '내가 만든 필터3', _id: '12asdfasd2334', filters: [
-        { filterLabel: '담당자', method: '동일한', value: '', option: [{ label: '전체 담당자', value: '전체 담당자' }], active: false },
-        { filterLabel: '프리픽스', method: '동일한', value: '', option: [{ label: '전체 프리픽스', value: '전체 프리픽스' }], active: false },
+        { filterLabel: '담당자', method: '일치', value: '', option: [{ label: '전체 담당자', value: '전체 담당자' }], active: false },
+        { filterLabel: '프리픽스', method: '일치', value: '', option: [{ label: '전체 프리픽스', value: '전체 프리픽스' }], active: false },
       ]
     },
   ];
@@ -332,7 +384,7 @@ const getSelectedFilterViews = () => {
   selectedFilterView.value = filterOtherViews.value[0];
 };
 
-getSelectedFilterViews();
+fetchFilterViews();
 
 const handleClickViewSave = () => {
   // 만약 내 필터 이름이 중복되면
@@ -361,25 +413,28 @@ const handleClickViewSelect = async () => {
   isOpenFilterView.value = false;
 };
 
-
 // 기본 필터 세팅
 filters.value.push({
   filterLabel: '담당자',
-  method: '동일한',
+  method: '일치',
   value: '',
   option: [
     { label: '전체 담당자', value: '전체 담당자' },
   ],
   active: false,
+  checkAll: false,
+  indeterminate: false,
 },
   {
     filterLabel: '프리픽스',
-    method: '동일한',
+    method: '일치',
     value: '',
     option: [
       { label: '전체 프리픽스', value: '전체 프리픽스' },
     ],
     active: false,
+    checkAll: false,
+    indeterminate: false,
   },
 );
 
@@ -388,7 +443,9 @@ type Filter = {
   filterLabel: string;
   option: FilterOption[];
   method: string;
-  active: boolean
+  active: boolean;
+  checkAll: boolean;
+  indeterminate: boolean;
 };
 type FilterOption = {
   label: string;
@@ -540,12 +597,6 @@ const getCards = async () => {
 watch(selectedTeamId, () => {
   getCards();
 }, { immediate: true })
-
-
-const handleClickNameActive = (name) => {
-  // activeName.value = name;
-  selectedWorker.value = name;
-}
 
 class CardActions {
   /** @function 카드 추가기능
@@ -838,40 +889,39 @@ const onDrop = async (e, boardId) => {
   // gap: 20px;
   width: 100%;
   height: 100%;
-  background-color: $dark-gray-500;
-  padding: 20px;
+  // background-color: $background-transparent-secondary;
+  padding-top: 10px;
 
   .kanban-header {
     display: flex;
     justify-content: space-between;
     width: 100%;
+    padding: 0px 20px;
 
     .kanban-header__title {
       display: flex;
       justify-content: center;
       align-items: center;
       font-size: 16px;
-      border-right: 2px solid $dark-gray-100;
-      margin-right: 20px;
-      padding-right: 20px;
+      // border-right: 2px solid $dark-gray-100;
+      padding-right: 10px;
       gap: 4px;
 
       span {
         white-space: nowrap;
         font-weight: 700;
-        color: $gray-200;
+        // color: $gray-200;
       }
 
       // 소켓
       .socket-icon {
-        font-size: 20px;
         width: 20px;
         height: 20px;
         padding: 4px;
-        border-radius: 50%;
-        background-color: $dark-gray-100;
-
         margin-left: 12px;
+        border-radius: 50%;
+        font-size: 20px;
+        background-color: $background-transparent;
 
         &.is-connect {
           color: $success;
@@ -879,12 +929,17 @@ const onDrop = async (e, boardId) => {
       }
     }
 
+    .kanban-header__divider {
+      display: flex;
+      height: 100%;
+    }
+
     .kanban-search {
       display: flex;
       width: 100%;
       height: 40px;
       // background-color: $dark-gray-100;
-      border-radius: 6px;
+      // border-radius: 6px;
       color: #ffffff;
     }
   }
@@ -894,23 +949,26 @@ const onDrop = async (e, boardId) => {
     display: flex;
     justify-content: flex-end;
     flex-direction: column;
-    padding: 10px;
+    // padding: 10px;
+
     border-radius: 10px;
     margin-right: 10px;
     width: 100%;
 
-    .kaban-fab-buttons--bottom {
+    .filter-divider--top {
+      margin: 10px 0;
+      margin-top: 0px;
+    }
+
+
+    .kanban-action-btns {
       display: flex;
-      // position: absolute;
-      justify-content: flex-end;
-      // background-color: $dark-gray-300;
-
+      justify-content: space-between;
+      align-items: center;
       width: 100%;
-      // right: 20px;
-      // bottom: 0px;
-      padding: 10px;
+      padding: 10px 24px;
 
-      .fab-button {
+      .kanban-action-btn__item {
         border: none;
       }
     }
@@ -920,6 +978,19 @@ const onDrop = async (e, boardId) => {
       display: flex;
       align-items: flex-end;
       width: 100%;
+      height: 100%;
+      // background-color: $dark-gray-100;
+      border-top: 1px solid $gray-100;
+      padding: 12px 20px;
+
+      .el-badge {
+
+        // 글씨는 천천히 보여지고, 크기는 빠르게
+        &::v-deep(sup) {
+          font-size: 12px;
+          color: $gray-100;
+        }
+      }
 
       .kanban-action-menu-bar__container {
         display: flex;
@@ -930,6 +1001,7 @@ const onDrop = async (e, boardId) => {
         .filter__item {
           display: flex;
           flex-direction: column;
+
 
           &::v-deep(.el-form-item__content) {
             display: flex;
@@ -942,47 +1014,35 @@ const onDrop = async (e, boardId) => {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 14px;
             height: 32px;
-            // color: $dark-gray-100;
             border-radius: 6px;
-            // border: 1px solid $dark-gray-100;
-            background-color: $dark-gray-100;
+            background-color: $background-transparent;
             padding-right: 10px;
             padding-left: 6px;
-            margin-right: -6px;
+            margin-right: 2px;
 
             .icon--method {
               display: flex;
-              // color: $gray-100;
               font-size: 16px;
             }
 
             .label--method {
               display: none;
-
             }
 
             &:hover .label--method {
               display: inline-block;
               font-size: 12px;
-              // color: $gray-100;
             }
           }
-
-
-
         }
-
 
         &::v-deep(.el-form-item__label) {
           display: flex;
           align-items: center;
           justify-content: flex-start;
         }
-
-
-
 
         &.--is-off {
           opacity: 0.2;
@@ -1033,36 +1093,71 @@ const onDrop = async (e, boardId) => {
       align-items: center;
       gap: 10px;
 
+      .el-select {
+        &::v-deep(.el-input__wrapper) {
+          border-radius: 6px;
+          background-color: $dark-gray-100;
+        }
+      }
+
+      .filter__method {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        font-weight: 700;
+        margin-left: 10px;
+        color: $primary;
+      }
+
       .filter__select {
         flex: 1;
-        border-radius: 12px;
-        margin-right: 10px;
         min-width: 140px;
+
+
+        &.--text {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          height: 32px;
+          border-radius: 6px;
+          margin-right: 10px;
+          box-sizing: border-box;
+          display: flex;
+          gap: 4px;
+          border: 2px dashed $gray-300;
+          color: $primary;
+        }
       }
+
+
     }
   }
-
-
 
   .kanban-container-boards {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
     justify-content: flex-start;
-    gap: 10px;
+    gap: 20px;
     width: 100%;
+    padding-left: 20px;
     height: 100%;
     overflow-x: scroll;
+    margin-top: 20px;
     margin-bottom: 20px;
 
     .add-btn {
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       width: 100%;
-      height: 40px;
-      margin-top: 10px;
-      border: 1px dashed $gray-700; // color: #ffffff;
+      height: 36px;
+      opacity: 0.8;
+      padding: 0px 10px;
+
+      .el-icon {
+        margin-right: 4px;
+      }
     }
   }
 
@@ -1071,19 +1166,20 @@ const onDrop = async (e, boardId) => {
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    // background-color: $gray-600;
+    // margin-top: 20px;
     gap: 10px;
     width: 280px;
+    height: 100%;
+    background-color: $background-transparent;
 
 
 
     // 넓이 고정
     flex-shrink: 0;
     min-height: 60%;
-    // background-color: black;
     padding: 4px 10px;
     padding-bottom: 16px;
-    border-radius: 10px;
+    border-radius: 8px;
   }
 
   .kanban-container-boards__panel-header {
@@ -1096,11 +1192,11 @@ const onDrop = async (e, boardId) => {
     height: 50px;
     font-size: 16px;
     font-weight: 700;
-    padding: 0 10px;
+    padding: 0 6px;
   }
 
   .kanban-card {
-    transition: all 1s ease-in-out;
+    // transition: all 1s ease-in-out;
     box-sizing: border-box;
   }
 
@@ -1122,18 +1218,9 @@ const onDrop = async (e, boardId) => {
     border-radius: 10px;
   }
 
-  .el-form-item__content .el-input__inner {
-    background-color: #2b2b2b;
-  }
-
   // 첫번째 태그 마진 제거
   .el-form-item__content .el-tag:first-child {
     margin-left: 0;
-  }
-
-  .el-form-item__content .el-tag {
-    margin-left: 10px;
-    // color: #ffffff;
   }
 
   .tag-container {
@@ -1143,13 +1230,13 @@ const onDrop = async (e, boardId) => {
 
 .dialog-footer {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
   width: 100%;
-  height: 30px;
   font-size: 20px;
+  padding-top: 20px;
   font-weight: 700;
 
   .save__text {
@@ -1166,7 +1253,6 @@ const onDrop = async (e, boardId) => {
 .md-editor {
   width: 100%;
   height: 300px;
-  border: none;
   border-radius: 10px;
   padding: 10px;
 }
@@ -1330,5 +1416,21 @@ const onDrop = async (e, boardId) => {
 .--disabled {
   opacity: 0.2;
   pointer-events: none;
+}
+
+html.dark {
+  .kanban-container-boards__panel {
+    background-color: $dark-gray-300;
+  }
+
+  .kanban-filter {
+    border-top: 1px solid $dark-gray-100 !important;
+  }
+
+  .--text {
+    border: 2px dashed $dark-gray-100 !important;
+  }
+
+
 }
 </style>

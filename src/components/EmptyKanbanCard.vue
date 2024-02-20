@@ -27,7 +27,7 @@ const handleClickToAdd = () => {
 .emptyKanbanCard {
   width: 100%;
   height: 120px;
-  border: 1px dashed $gray-700;
+  // border: 1px dashed $gray-300;
   border-radius: 12px;
   display: flex;
   justify-content: center;
@@ -51,9 +51,17 @@ const handleClickToAdd = () => {
   }
 }
 
+html.dark {
+  border: 1px dashed $dark-gray-300;
+}
+
+
 /* -------------------------------- Hover 스타일 ------------------------------- */
 .emptyKanbanCard:hover {
-  border-color: $primary;
+  // background-color: $background-transparent-secondary;
+  border: 1px dashed $primary;
   cursor: pointer;
 }
+
+// 다크모드
 </style>

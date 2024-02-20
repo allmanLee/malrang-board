@@ -9,6 +9,7 @@ interface CommonStore {
   sbSelectedProjectName: string
   sbSelectedTeamId: string
   sbSelectedTeamName: string
+  isDarkMode: boolean
 }
 
 export const useCommonStore = defineStore('common', {
@@ -17,6 +18,7 @@ export const useCommonStore = defineStore('common', {
     sbSelectedProjectName: '',
     sbSelectedTeamId: '',
     sbSelectedTeamName: '',
+    isDarkMode: false
   }),
   getters: {
     getSbSelectedProjectId: (state) => {
@@ -30,6 +32,9 @@ export const useCommonStore = defineStore('common', {
     },
     getSbSelectedTeamName: (state) => {
       return state.sbSelectedTeamName
+    },
+    getIsDarkMode: (state) => {
+      return state.isDarkMode
     }
   },
   actions: {

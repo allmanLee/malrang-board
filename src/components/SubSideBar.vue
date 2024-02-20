@@ -109,28 +109,57 @@ const userName = computed(() => {
   display: flex;
   height: 100%;
   width: 100%;
+  background-color: $background-transparent;
 
   .subsidebar__menu {
     padding-top: 10px;
     width: 100%;
     height: 100%;
+    background-color: $background-transparent;
 
     .subsideber__menu__item {
       margin-bottom: 20px;
     }
 
-    // 액티브 메뉴 아이콘에 배경
-    .el-menu-item.is-active {
+    .el-menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 60px;
+      border-radius: 8px;
+      transition: all 0.2s ease-in-out;
+      cursor: pointer;
+
       .menu-icon {
-        background-color: $gray-700;
-        color: white;
+        font-size: 24px;
+        padding: 4px;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        // background-color: $background-transparent;
+        transition: all 0.1s ease-in-out;
       }
 
-      span {
-        color: $gray-100;
+      &:hover {
+        background-color: none !important
       }
     }
 
+    // 액티브 메뉴 아이콘에 배경
+    .el-menu-item.is-active {
+      // background-color: $background-transparent;
+
+      .menu-icon {
+        transform: scale(1.2);
+      }
+
+      span {}
+
+
+      &:hover {
+        background-color: none !important;
+      }
+    }
   }
 
   .menu-content {
@@ -138,8 +167,9 @@ const userName = computed(() => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 100%;
+    width: 60px;
     height: 60px;
+    background-color: none;
 
     .menu-icon {
       font-size: 40px;
@@ -155,7 +185,7 @@ const userName = computed(() => {
       align-items: center;
       height: 20px;
       font-size: 14px;
-      font-weight: 900;
+      font-weight: 600;
 
     }
   }
@@ -177,9 +207,25 @@ const userName = computed(() => {
       width: 0px;
       padding: 6px;
       color: $gray-700;
-      border: 2px solid black;
+      // border: 2px solid black;
       font-size: 14px;
       font-weight: 700;
+    }
+  }
+}
+</style>
+
+<style lang="scss">
+// 다크모드
+html.dark {
+  .subsidebar {
+    .subsidebar__menu {
+      .menu-content {
+
+        .menu-icon {
+          background-color: $dark-gray-700;
+        }
+      }
     }
   }
 }
