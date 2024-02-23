@@ -216,40 +216,42 @@
           </el-tooltip>
           <!-- 추가기능 아이콘 (추가하기) -->
         </header>
-        <KanbanBoardCard @click="handleClickToUpdate(card, board.title)" ref="kanbanBoardCard" :id="card._id"
-          v-for="card in filterCards.filter(el => el.boardId === board.id).sort((a, b) => a.order - b.order)"
-          @delete="handleDeleteCard(card._id)" class="kanban-card" @dragleave.prevent="onDragLeave($event, card._id)"
-          @dragstart="handleDragStart($event, card)" draggable="true" :key="card._id" :card="card">
+        <section class="kanban-container-boards__panel-body" @dragenter.prevent @dragover.prevent>
+          <KanbanBoardCard @click="handleClickToUpdate(card, board.title)" ref="kanbanBoardCard" :id="card._id"
+            v-for="card in filterCards.filter(el => el.boardId === board.id).sort((a, b) => a.order - b.order)"
+            @delete="handleDeleteCard(card._id)" class="kanban-card" @dragleave.prevent="onDragLeave($event, card._id)"
+            @dragstart="handleDragStart($event, card)" draggable="true" :key="card._id" :card="card">
 
 
-          <!-- 드래그엔 드롭 -->
-          <div class="card-drag-wrap">
-            <!-- 위 -->
-            <div class="card-drag-wrap__top" @drop.prevent.stop="onDropOrder($event, card.boardId, card.order - 1)"
-              @dragover.prevent="onDragOver($event, card._id, 'top')">
-              <div class="card-drag-wrap__top__inner"></div>
+            <!-- 드래그엔 드롭 -->
+            <div class="card-drag-wrap">
+              <!-- 위 -->
+              <div class="card-drag-wrap__top" @drop.prevent.stop="onDropOrder($event, card.boardId, card.order - 1)"
+                @dragover.prevent="onDragOver($event, card._id, 'top')">
+                <div class="card-drag-wrap__top__inner"></div>
+              </div>
+              <!-- 아래 -->
+              <div class="card-drag-wrap__bottom" @drop.prevent.stop="onDropOrder($event, card.boardId, card.order + 1)"
+                @dragover.prevent="onDragOver($event, card._id, 'bottom')">
+                <div class="card-drag-wrap__bottom__inner"></div>
+              </div>
             </div>
-            <!-- 아래 -->
-            <div class="card-drag-wrap__bottom" @drop.prevent.stop="onDropOrder($event, card.boardId, card.order + 1)"
-              @dragover.prevent="onDragOver($event, card._id, 'bottom')">
-              <div class="card-drag-wrap__bottom__inner"></div>
-            </div>
-          </div>
-        </KanbanBoardCard>
-        <EmptyKanbanCard v-if="filterCards.filter(el => el.boardId === board.id).length === 0"
-          @add="handleClickToAdd(board)" />
-        <el-button v-else-if="filterCards.filter(el => el.boardId === board.id).length > 0" size="large" class="add-btn"
-          @click="handleClickToAdd(board)" text>
-          <el-icon>
-            <Plus />
-          </el-icon>
-          추가하기</el-button>
+          </KanbanBoardCard>
+          <EmptyKanbanCard v-if="filterCards.filter(el => el.boardId === board.id).length === 0"
+            @add="handleClickToAdd(board)" />
+          <el-button v-else-if="filterCards.filter(el => el.boardId === board.id).length > 0" size="large" class="add-btn"
+            @click="handleClickToAdd(board)" text>
+            <el-icon>
+              <Plus />
+            </el-icon>
+            추가하기</el-button>
+        </section>
       </div>
     </div>
     <!-- 팝업 메뉴 -->
-    <el-drawer size="55%" :title="modalKanban.boardTitle" v-model="modalKanban.dialogVisible">
+    <el-drawer size="55%" :title="modalKanban.boardTitle" v-model="modalKanban.dialogVisible" destroy-on-close>
       <ModalKanbanCardCreate :isOpen="modalKanban.dialogVisible" :form="form" @enter.self="handleSave(selectedBoardId)"
-        :template="getTemple" @update:form="updateForm" :type="modalKanban.openType" />
+        :optinalField="getTemple" @update:form="updateForm" :type="modalKanban.openType" />
       <template #footer>
         <div class="dialog-footer">
           <el-button size="large" type="default" @click="handleSave(selectedBoardId)">
@@ -279,7 +281,7 @@ import { cloneDeep, orderBy } from "lodash";
 import { useUserStore } from "@/stores/user";
 import { useBoardStore } from "@/stores/board";
 import { useCommonStore } from "@/stores/common";
-import { ElMessageBox } from "element-plus"; // 메세지 박스
+import { ElMessageBox, ElNotification } from "element-plus"; // 메세지 박스
 
 import "md-editor-v3/lib/style.css";
 import API from "@/apis";
@@ -430,8 +432,6 @@ const fetchFilterViews = () => {
       ]
     },
   ];
-
-  // selectedFilterView.value = filterOtherViews.value[0];
 };
 
 
@@ -489,14 +489,6 @@ const handleClickViewSelect = async () => {
   isOpenFilterView.value = false;
 };
 
-
-type InfoColumn = {
-  id: string;
-  title: string;
-  options: string[];
-  required: boolean;
-};
-
 type Filter = {
   value: string | string[];
   filterLabel: string;
@@ -512,7 +504,16 @@ type FilterOption = {
 };
 
 
-//TODO 팀에 옵셔널데이터 추가
+
+/* ---------------------------- TODO 팀에 옵셔널데이터 추가 --------------------------- */
+
+// type InfoColumn = {
+//   id: string;
+//   title: string;
+//   options: string[];
+//   required: boolean;
+// };
+
 // const InfoColumns = ref<InfoColumn[]>(null);
 // const params = {
 //   teamId: selectedTeamId.value,
@@ -522,6 +523,9 @@ type FilterOption = {
 //   InfoColumns.value = result;
 // };
 // getInfoColumns
+
+/* ------------------------------------ - ----------------------------------- */
+
 
 /** @function 필터 추가
  * @param filter 필터
@@ -693,6 +697,12 @@ class CardActions {
 
     } catch (error) {
       console.error(error);
+      ElNotification({
+        title: "카드 추가 실패",
+        message: "카드 추가에 실패했습니다.",
+        type: "error",
+      });
+      throw error;
     }
   }
 
@@ -1225,6 +1235,7 @@ const onDrop = async (e, boardId) => {
       display: flex;
       align-items: center;
       justify-content: flex-start;
+      flex-wrap: nowrap;
       width: 100%;
       height: 36px;
       opacity: 0.8;
@@ -1249,6 +1260,8 @@ const onDrop = async (e, boardId) => {
 
 
 
+
+
     // 넓이 고정
     flex-shrink: 0;
     min-height: 60%;
@@ -1268,6 +1281,19 @@ const onDrop = async (e, boardId) => {
     font-size: 16px;
     font-weight: 700;
     padding: 0 6px;
+  }
+
+  .kanban-container-boards__panel-body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+    padding: 0 6px;
+
+    overflow-y: scroll;
   }
 
   .kanban-card {
@@ -1509,6 +1535,10 @@ html.dark {
 
   .--text {
     border: 2px dashed $dark-gray-100 !important;
+  }
+
+  .add-btn:hover {
+    background-color: $dark-gray-100;
   }
 
 

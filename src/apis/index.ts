@@ -3,7 +3,7 @@ import type { UserId, User } from '../types/users.type';
 import type { Project, ProjectId, Team, TeamId } from '../types/projects.type';
 import type { ProjectRequestDto, TeamRequestDto } from '../types/dto/project.dto.type';
 import type { UserRequestDto } from '../types/users.type';
-import type { Board } from '../types/kanban.type';
+import type { Board, Card } from '../types/kanban.type';
 const API_URL = 'http://localhost:8000'; // Replace with your API URL
 
 // Define your API endpoints here
@@ -139,7 +139,7 @@ const userApi = {
   getCards: (params: any) => get(`${apiEndpoints.cards}`, params),
   deleteCard: (cardId: string) => del(`${apiEndpoints.cards}/${cardId}`),
 
-  createCard: (cardData: any) => post(apiEndpoints.card(cardData.boardId), cardData),
+  createCard: (cardData: any): Promise<Card> => post(apiEndpoints.card(cardData.boardId), cardData),
   updateCard: (cardData: any) => put(apiEndpoints.cardMo(cardData.boardId, cardData.cardId), cardData),
   moveCard: (cardData: any) => patch(apiEndpoints.cardMo(cardData.boardId, cardData.cardId),{order: cardData.order}),
 

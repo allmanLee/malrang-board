@@ -15,8 +15,8 @@
       </span>
     </h1>
     <el-form-item label-width="0" size="large" v-if="isEditTitle">
-      <el-input v-model="customForm.title" @keypress.enter="handleEnterCard" ref="titleInput" @blur="isEditTitle = false"
-        class="title-input" placeholder="제목을 입력하세요"></el-input>
+      <el-input v-model="customForm.title" ref="titleInput" @blur="isEditTitle = false" class="title-input"
+        placeholder="제목을 입력하세요"></el-input>
     </el-form-item>
 
 
@@ -34,8 +34,8 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item v-for="field in template?.cols || []" :key="field.id" :label="field.label" size="large">
-        <el-input v-if="field.type === 'text'" v-model="customForm.customForm[field.id]" placeholder="입력하세요"></el-input>
+      <el-form-item v-for="field in optinalField?.cols || []" :key="field.id" :label="field.label" size="large">
+        <el-input v-if="field.type === 'text'" v-model="customForm.optionalData[field.id]" placeholder="입력하세요"></el-input>
         <el-select v-else-if="field.type === 'select'" v-model="customForm.optionalData[field.key]" placeholder="선택하세요"
           class="select-user">
           <el-option v-for="option in field.options" :key="option.id" :label="option.label"
@@ -66,18 +66,19 @@
     <section class="form-items__description">
       <el-form-item label-width="0">
         <!-- 에디이터 (다크모드)-->
-        <md-editor ref="editorRef" language="en-US" :scrollAuto="true" :disabled="false" :preview="true"
-          v-model="customForm.description" :theme="isDarkMode ? 'dark' : 'light'"></md-editor>
+        <KeepAlive include="MdEditor">
+          <md-editor ref="editorRef" language="en-US" :scrollAuto="true" :disabled="false" :preview="false"
+            v-model="customForm.description" :theme="isDarkMode ? 'dark' : 'light'"></md-editor>
+        </KeepAlive>
       </el-form-item>
     </section>
     <el-button v-show="false" type="primary">등록</el-button>
-    어라 ? {{ template }}
   </el-form>
 </template>
 
 <script setup lang="ts">
 import { defineProps, ref, toRef, watch, defineEmits, computed } from "vue";
-import { MdEditor } from 'md-editor-v3';
+// import { MdEditor } from 'md-editor-v3';
 import { cloneDeep } from "lodash";
 import { useUserStore } from "@/stores/user";
 // import { useCommonStore } from "@/stores/common";
@@ -109,7 +110,7 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
-  template: {
+  optinalField: {
     type: Object,
     required: true,
   },
@@ -129,9 +130,9 @@ let customForm = ref(cloneDeep(form.value));
 let titleInput = ref(null);
 let handleClickEditTitle = () => {
   isEditTitle.value = true;
-  setTimeout(() => {
-    titleInput.value.focus();
-  }, 100);
+  // setTimeout(() => {
+  //   titleInput.value.focus();
+  // }, 100);
 };
 
 // customForm 업데이트 될때 emit
@@ -140,16 +141,30 @@ watch(customForm, (newVal) => {
 }, { deep: true });
 
 // open 될 때 form 업데이트
-watch(() => props.isOpen, (newVal) => {
-  if (newVal) {
-    customForm.value = cloneDeep(form.value);
-  }
-});
+// watch(() => props.isOpen, (newVal) => {
+//   if (newVal) {
+//     customForm.value = cloneDeep(form.value);
+//   }
+// }, { immediate: true });
+console.log("props.isOpen", props.isOpen);
+console.log("props.form", props.form);
+console.log("optinalField", props.optinalField);
 
-const handleEnterCard = () => {
-  console.log("handleEnterCard");
-  emit("enter", customForm.value);
+// 만약 customForm에서 optinalField에 비어있는 키가 있다면 추가
+if (props.optinalField) {
+  const optionalData = customForm.value.optionalData;
+  for (const field of props.optinalField.cols) {
+    if (!optionalData[field.key]) {
+      optionalData[field.key] = null;
+    }
+  }
 }
+
+
+// const handleEnterCard = () => {
+//   console.log("handleEnterCard");
+//   emit("enter", customForm.value);
+// }
 
 // 제목 앞에 fix:, feat:, add:, chore 등 이 붙어있으면 태그로 인식 태그로 추가
 // watch(() => customForm.value.title, (newVal) => {
