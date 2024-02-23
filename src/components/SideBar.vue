@@ -61,7 +61,7 @@
             <el-menu-item v-for="(prj, i) in filteredProjects" :key="`p-${i}`" @click="handleClickPrj" :index="`sp-${i}`">
               <template #title>
                 <el-icon>
-                  <icon-menu />
+                  <!-- <icon-menu /> -->
                 </el-icon>
                 <span>{{ prj.name }}</span>
               </template>
@@ -87,7 +87,7 @@
             <el-sub-menu :index="prj?._id" v-for="(prj) in filteredProjects" :key="prj?._id">
               <template #title>
                 <el-icon>
-                  <icon-menu />
+                  <!-- <icon-menu /> -->
                 </el-icon>
                 <span class="ti">{{ prj.name }}</span>
               </template>

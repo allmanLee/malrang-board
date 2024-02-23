@@ -16,6 +16,9 @@ import "element-plus/theme-chalk/src/message.scss";
 // messagebox
 import "element-plus/theme-chalk/src/message-box.scss";
 
+// notification
+import "element-plus/theme-chalk/src/notification.scss";
+
 // import './styles/element/index.scss' // custom Element Plus css
 
 // import 'element-plus/dist/index.css' // global Element Plus css

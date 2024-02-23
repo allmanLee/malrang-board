@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import MainView from '../views/MainView.vue'
-import { ElMessage } from 'element-plus'
+import {ElNotification } from 'element-plus'
 
 
 
@@ -67,7 +67,7 @@ router.beforeEach((to:any, from:any, next:any) => {
 
     if(to.name !== 'login') {
       next('/login');
-      ElMessage({
+      ElNotification({
         showClose: true,
         message: '로그인이 필요합니다.',
         type: 'warning'

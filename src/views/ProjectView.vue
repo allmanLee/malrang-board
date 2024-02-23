@@ -25,6 +25,7 @@
 
 
           <el-card v-for="(project, index) in projects" :key="project._id" class="card"
+            :shadow="project._id === selectedPrjId ? 'always' : 'never'"
             :class="{ 'highlighted': project._id === selectedPrjId }" @click="selectProject(project._id)">
             <div class="card-header">
               <section class="project-card-column">
@@ -35,7 +36,7 @@
               </section>
               <count-user :member="project?.teams?.reduce((acc, cur) => acc + cur?.members?.length, 0, 0)"
                 :team="project?.teams?.length" class="count-user"></count-user>
-              <el-button @click="deleteProject(project._id)" class="delete-button">
+              <el-button @click="deleteProject(project._id)" type="default" class="delete-button">
                 <el-icon>
                   <Delete />
                 </el-icon>
@@ -43,7 +44,7 @@
             </div>
             <div v-if="index === projects.length - 1" class="new-badge" />
           </el-card>
-          <el-card v-if="!showTeamFormFlag" class="card project-form-add">
+          <el-card v-if="!showTeamFormFlag" class="card project-form-add highlighted">
             <el-form @submit.prevent="addProject" class="form">
               <el-input v-model="newProjectName" placeholder="Project Name" required></el-input>
               <el-button type="primary" native-type="submit" class="add-button">Add Project</el-button>
@@ -55,6 +56,7 @@
         <div class="column">
           <h2 class="column-title">팀</h2>
           <el-card v-for="(team, index) in filteredTeams" :key="team._id" class="card"
+            :shadow="team._id === selectedTeamId ? 'always' : 'never'"
             :class="{ 'highlighted': team._id === selectedTeamId }" @click="selectTeam(team._id)">
             <div class="team-list">
               <div class="card-header">
@@ -76,7 +78,7 @@
             <div v-if="index === filteredTeams.length - 1" class="new-badge"></div>
           </el-card>
 
-          <el-card v-if="showTeamFormFlag" class="card">
+          <el-card v-if="showTeamFormFlag" class="card highlighted">
             <el-form @submit.prevent="addTeam" class="form">
               <el-input v-model="newTeamName" placeholder="Team Name" required></el-input>
               <el-button type="primary" native-type="submit" class="add-button">Add Team</el-button>
@@ -97,7 +99,8 @@
         <!-- Member Column -->
         <div class="column">
           <h2 class="column-title">팀원</h2>
-          <el-card v-for=" member  in  filteredMembers " :key="member.id" class="card">
+          <el-card v-for=" member  in  filteredMembers " :key="member.id" class="card"
+            :shadow="member.id === selectedTeamId ? 'always' : 'never'">
             <div class="member-list">
               <p class="member-profile">
                 <el-avatar icon="el-icon-user-solid" size="small" shape="circle" :src="member.avatar"
@@ -112,7 +115,7 @@
 
           </el-card>
           <!-- 선택 -->
-          <el-card v-if="showMemberFormFlag" class="avator">
+          <el-card v-if="showMemberFormFlag" class="avator ">
             <el-form @submit.prevent="addMember(selectedPrjId, selectedTeamId, newMember.id)" class="form">
               <!-- <el-input v-model="newMember" placeholder="Member Name" required></el-input> -->
               <!-- 팀원을 선택할 수 있음 -->
@@ -433,7 +436,7 @@ const selectTeam = (teamId) => {
 
 .column {
   flex: 1;
-  // background-color: black;
+  padding: 8px;
   border-radius: 10px;
   width: 400px;
   height: 600px;
@@ -479,6 +482,8 @@ const selectTeam = (teamId) => {
   align-items: flex-start !important;
   margin-bottom: 10px;
   text-align: left;
+  opacity: 0.7;
+  background-color: $gray-100;
 }
 
 
@@ -490,20 +495,20 @@ const selectTeam = (teamId) => {
   background-color: none !important;
 
   // 버튼 색상
-  --el-button-border-color: #616161;
-  --el-button-hover-bg-color: #eaeaea;
-  --el-button-hover-border-color: #2c2c2c;
+  // --el-button-border-color: #616161;
+  // --el-button-hover-bg-color: #eaeaea;
+  // --el-button-hover-border-color: #2c2c2c;
 
   &::v-deep(button) {
     border: 1px solid red;
   }
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.4);
-    border-color: #2c2c2c !important;
+    // background-color: rgba(0, 0, 0, 0.4);
+    // border-color: #2c2c2c !important;
 
     .el-icon {
-      color: #fff !important;
+      // color: #fff !important;
     }
   }
 }
@@ -547,7 +552,8 @@ const selectTeam = (teamId) => {
 }
 
 .highlighted {
-  background-color: $dark-gray-100;
+  background-color: white;
+  opacity: 1;
   // color: black;
 }
 
@@ -613,5 +619,16 @@ const selectTeam = (teamId) => {
   font-size: 12px;
   width: 100px;
   padding: 10px;
+}
+
+html.dark {
+
+  .card {
+    background-color: $dark-gray-100;
+  }
+
+  .highlighted {
+    background-color: black;
+  }
 }
 </style>

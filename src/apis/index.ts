@@ -24,6 +24,7 @@ const apiEndpoints = {
   cards: '/kanban/cards',
   card: (boardId: string) => `/kanban/boards/${boardId}/card`,
   cardMo: (boardId: string, cardId: string) => `/kanban/boards/${boardId}/card/${cardId}`,
+
 };
 
 // Create an instance of Axios with the base URL
@@ -141,6 +142,12 @@ const userApi = {
   createCard: (cardData: any) => post(apiEndpoints.card(cardData.boardId), cardData),
   updateCard: (cardData: any) => put(apiEndpoints.cardMo(cardData.boardId, cardData.cardId), cardData),
   moveCard: (cardData: any) => patch(apiEndpoints.cardMo(cardData.boardId, cardData.cardId),{order: cardData.order}),
+
+  // 정보 컬럼 (CRUD)
+  // getInfoColumns: (params: any): Promise<any> => get(`${apiEndpoints.infomationColumns}`, params),
+  // createInfoColumn: (columnData: any) => post(apiEndpoints.infomationColumns, columnData),
+  // updateInfoColumn: (columnData: any) => put(`${apiEndpoints.infomationColumns}/${columnData.id}`, columnData),
+  // deleteInfoColumn: (columnId: string) => del(`${apiEndpoints.infomationColumns}/${columnId}`),
 };
 
 // 모듈 

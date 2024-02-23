@@ -97,7 +97,7 @@
             </el-button>
             <el-button size="large" type="default" @click="handleClickViewSelect" v-if="!filterViewName.length"
               @keypress.enter="handleClickViewSelect">
-              <span class="save__text">'{{ selectedFilterView.filterLabel }}' 선택</span>
+              <span class="save__text">'{{ selectedFilterView?.filterLabel }}' 선택</span>
             </el-button>
           </template>
         </el-dialog>
@@ -107,13 +107,13 @@
 
       <section class="kanban-filter">
         <section class="kanban-action-menu-bar__container" :class="{ '--is-off': isOffFilter }">
-          <el-form label-position="top" label-width="100px" :model="test"
+          <el-form label-position="top" label-width="100px"
             style="display: flex; width: 100%; flex-wrap: wrap; align-items:flex-end; gap: 10px;">
             <el-form-item v-for="(filter, index) in selectedFilters" :key="filter.filterLabel" class="filter__item">
               <!-- <p class="filter__method-icon">
                 담당자
               </p> -->
-              <el-badge :is-dot="!isHoverFilter" :value="filter.filterLabel + ': ' + filter.method"
+              <el-badge :is-dot="true" :value="filter.filterLabel + ': ' + filter.method"
                 :type="filter.method === '일치' ? 'success' : filter.method === '포함' ? 'warning' : filter.method === '제외' ? 'danger' : 'info'">
                 <el-select v-if="filter.method !== '비어있는' && filter.method !== '비어있지 않은'"
                   :placeholder="filter.filterLabel + ' 선택'" v-model="filter.value" multiple :disabled="isOffFilter"
@@ -171,7 +171,7 @@
 
                 <div class="popover__footer">
                   <!-- 닫기 -->
-                  <el-button type="text" @click="isVisiblePop = false" class="popover__confirm-btn">취소</el-button>
+                  <el-button @click="isVisiblePop = false" class="popover__confirm-btn">취소</el-button>
                   <el-button type="primary" class="popover__confirm-btn"
                     @click="handleClickFilterAdd(selectedFilter, selectedfilterMetnod)"
                     :disabled="!selectedFilter">확인</el-button>
@@ -239,7 +239,7 @@
         <EmptyKanbanCard v-if="filterCards.filter(el => el.boardId === board.id).length === 0"
           @add="handleClickToAdd(board)" />
         <el-button v-else-if="filterCards.filter(el => el.boardId === board.id).length > 0" size="large" class="add-btn"
-          @click="handleClickToAdd(board)" type="text">
+          @click="handleClickToAdd(board)" text>
           <el-icon>
             <Plus />
           </el-icon>
@@ -249,11 +249,14 @@
     <!-- 팝업 메뉴 -->
     <el-drawer size="55%" :title="modalKanban.boardTitle" v-model="modalKanban.dialogVisible">
       <ModalKanbanCardCreate :isOpen="modalKanban.dialogVisible" :form="form" @enter.self="handleSave(selectedBoardId)"
-        @update:form="updateForm" :type="modalKanban.openType" />
+        :template="getTemple" @update:form="updateForm" :type="modalKanban.openType" />
       <template #footer>
         <div class="dialog-footer">
           <el-button size="large" type="default" @click="handleSave(selectedBoardId)">
-            <span class="save__text">다른 이름으로 저장</span>
+            <span class="save__text">저장 후 계속하기</span>
+            <el-icon>
+              <DArrowRight />
+            </el-icon>
           </el-button>
           <el-button size="large" type="primary" @click="handleSave(selectedBoardId)">
             <span class="save__text">저장</span>
@@ -283,6 +286,7 @@ import API from "@/apis";
 
 // Socket IO (실시간 통신)
 import { state, socket } from "@/socket";
+import { FormTemplate } from "@/types/projects.type";
 
 type FilterView = {
   filterLabel: string;
@@ -305,6 +309,55 @@ const selectedFilter: Filter = ref(null);  // 현재 선택된 필터 아이템 
 const selectedFilters = ref<Filter[]>([]);  // 현재 선택된 필터 [필터 추가로 선택된 필터 아이템들]
 const selectedFilterLable = ref(''); // 현재 선택된 필터 이름
 const searchValue = ref("");
+const selectedForm: FormTemplate = ref(null);
+
+const cards = ref<Card[]>([]);
+const initForm = ref<Card>({
+  _id: '',
+  title: "",
+  description: "",
+  created_date: "",
+  userId: "",
+  userName: '',
+  teamId: selectedTeamId.value,
+  boardId: '',
+  projectId: '',
+  order: 0,
+  tags: [],
+  commit: [],
+  optionalData: {},
+});
+// const initForm = computed(() => {
+//   // const templateCols = getTemple.value.cols;
+
+//   const default3: Card = {
+//     _id: '',
+//     title: "",
+//     description: "",
+//     created_date: "",
+//     userId: "",
+//     userName: '',
+//     teamId: selectedTeamId.value,
+//     boardId: '',
+//     projectId: '',
+//     order: 0,
+//     tags: [],
+//     commit: [],
+//   }
+//   const templateField = {}
+
+//   // templateCols.forEach((el) => {
+//   //   templateField[el.id] = null;
+//   // });
+
+//   return {
+//     ...default3,
+//     ...templateField,
+//   }
+// });
+// team에 formTemplate가 있음
+const selectedTemplate = ref({});
+//선택한 팀에 따라서 폼이 달라짐
 
 const kanbanInfo = computed(() => {
   return {
@@ -328,7 +381,6 @@ const filterViewName = ref('');
 
 // 필터 추가 Select
 watch(selectedFilters, (val) => {
-  // 현재 일린 필터 인덱스
   selectedFilters.value.forEach((el, idx) => {
     //필터 라벨과 일치하는 필터를 찾아서 값을 비교합니다.
     const sameLabelOption = filters.value.filter((filter) => filter.filterLabel === selectedFilters.value[idx].filterLabel)[0].option.map((el) => el.value);
@@ -348,8 +400,6 @@ watch(selectedFilters, (val) => {
 const handleCheckAll = (e, filter) => {
   filter.value = e ? filter.option.map((el) => el.value) : [];
   filter.indeterminate = false;
-
-  console.log('filter', filter)
 };
 
 
@@ -363,7 +413,7 @@ const fetchFilterViews = () => {
   filterOtherViews.value = [
     {
       filterLabel: '내가 만든 필터1', _id: '12asdfasd2334', filters: [
-        { filterLabel: '담당자', method: '일치', value: '', option: [{ label: '이유준', value: '' }], active: false },
+        { filterLabel: '담당자', method: '일치', value: '', option: [{ label: '이유준', value: '이유준' }], active: false },
         { filterLabel: '프리픽스', method: '일치', value: '', option: [{ label: '전체 프리픽스', value: '전체 프리픽스' }], active: false },
       ]
     },
@@ -381,7 +431,33 @@ const fetchFilterViews = () => {
     },
   ];
 
-  selectedFilterView.value = filterOtherViews.value[0];
+  // selectedFilterView.value = filterOtherViews.value[0];
+};
+
+
+/** @function 카드필터링
+ * @param val filters
+ * @param cards cards
+ * @description 
+ */
+const filterCardsByAction = (val, cards) => {
+  const filterCards = cards.filter((card) => {
+    return val.every((el) => {
+      if (el.method === '일치') {
+        return el.value.includes(card[el.filterLabel]);
+      } else if (el.method === '포함') {
+        return el.value.some((value) => card[el.filterLabel].includes(value));
+      } else if (el.method === '제외') {
+        return !el.value.includes(card[el.filterLabel]);
+      } else if (el.method === '비어있는') {
+        return card[el.filterLabel] === '';
+      } else if (el.method === '비어있지 않은') {
+        return card[el.filterLabel] !== '';
+      }
+    });
+  });
+
+  return filterCards;
 };
 
 fetchFilterViews();
@@ -413,30 +489,13 @@ const handleClickViewSelect = async () => {
   isOpenFilterView.value = false;
 };
 
-// 기본 필터 세팅
-filters.value.push({
-  filterLabel: '담당자',
-  method: '일치',
-  value: '',
-  option: [
-    { label: '전체 담당자', value: '전체 담당자' },
-  ],
-  active: false,
-  checkAll: false,
-  indeterminate: false,
-},
-  {
-    filterLabel: '프리픽스',
-    method: '일치',
-    value: '',
-    option: [
-      { label: '전체 프리픽스', value: '전체 프리픽스' },
-    ],
-    active: false,
-    checkAll: false,
-    indeterminate: false,
-  },
-);
+
+type InfoColumn = {
+  id: string;
+  title: string;
+  options: string[];
+  required: boolean;
+};
 
 type Filter = {
   value: string | string[];
@@ -451,6 +510,18 @@ type FilterOption = {
   label: string;
   value: string;
 };
+
+
+//TODO 팀에 옵셔널데이터 추가
+// const InfoColumns = ref<InfoColumn[]>(null);
+// const params = {
+//   teamId: selectedTeamId.value,
+// }
+// const getInfoColumns = async () => {
+//   const result = await API.getInfoColumns(params);
+//   InfoColumns.value = result;
+// };
+// getInfoColumns
 
 /** @function 필터 추가
  * @param filter 필터
@@ -483,25 +554,6 @@ const handleClickFilterReset = () => {
   });
   isOffFilter.value = false;
 };
-
-
-
-// const boards = ref<Board[]>(props.boards);
-const cards = ref<Card[]>([]);
-const initForm = (): Card => ({
-  _id: '',
-  title: "",
-  description: "",
-  created_date: "",
-  userId: "",
-  userName: '',
-  teamId: selectedTeamId.value,
-  boardId: '',
-  projectId: '',
-  order: 0,
-  tags: [],
-  commit: [],
-});
 
 // Socket IO (실시간 통신)
 // const boardStore = useBoardStore();
@@ -597,6 +649,12 @@ const getCards = async () => {
 watch(selectedTeamId, () => {
   getCards();
 }, { immediate: true })
+
+const getTemple = computed(() => {
+  const selectedTeamId2 = selectedTeamId.value
+  return selectedTemplate.value = useUserStore().fetchTemplate(selectedTeamId2)
+})
+
 
 class CardActions {
   /** @function 카드 추가기능
@@ -705,8 +763,13 @@ class CardActions {
   }
 }
 
+watch(selectedTeamId, () => {
+  console.log('selectedTeamId 가 변경', selectedTeamId.value)
+  form.value = cloneDeep(initForm.value);
+})
+
 const updateForm = (newForm) => {
-  form.value = newForm;
+  form.value = cloneDeep(newForm);
 };
 
 
@@ -745,14 +808,21 @@ class ModalKanban {
 let cardActions = new CardActions();
 const modalKanban = reactive(new ModalKanban());
 
-let form = ref<Card>(initForm());
+let form = ref<Card>(null);
+
+
 
 // 검색한 카드를 필터링하여 보여줍니다.
 const filterCards: ComputedRef<Card[]>
   = computed(() => {
-    return cards.value.filter((card) => {
+
+    const searchedCards = cards.value.filter((card) => {
       return card.title.includes(searchValue.value);
     });
+
+    const filteredCards = filterCardsByAction(selectedFilters.value, searchedCards);
+
+    return filteredCards;
   });
 
 const handleClickToUpdate = (card: Card, boardTitle) => {
@@ -765,25 +835,29 @@ const handleClickToUpdate = (card: Card, boardTitle) => {
  * @returns void
  * @description 카드를 생성, 수정합니다.
  */
-const handleSave = (boardId) => {
-  const modalType = modalKanban.openType;
+const handleSave = async (boardId) => {
+  try {
+    const modalType = modalKanban.openType;
 
-  if (modalType === 'create') {
-    delete form.value._id;
-    const order = filterCards.value.filter(el => el.boardId === boardId).length
-    cardActions.create(order + 1, boardId, form);
-  } else if (modalType === 'update') {
-    cardActions.update(form.value._id, form);
+    if (modalType === 'create') {
+      delete form.value._id;
+      const order = filterCards.value.filter(el => el.boardId === boardId).length
+      await cardActions.create(order + 1, boardId, form);
+    } else if (modalType === 'update') {
+      await cardActions.update(form.value._id, form);
+    }
+    modalKanban.close();
+    form.value = cloneDeep(initForm.value);
+  } catch (error) {
+    console.error(error);
   }
-  modalKanban.close();
-  form.value = initForm();
 };
 
 
 const handleClickToAdd = (board) => {
   const boardTitle = board.title;
   selectedBoardId.value = board.id;
-  form.value = initForm();
+  form.value = cloneDeep(initForm.value);
   form.value.userId = selectedWorker.value;
   modalKanban.open("create", boardTitle)
 };
@@ -890,7 +964,7 @@ const onDrop = async (e, boardId) => {
   width: 100%;
   height: 100%;
   // background-color: $background-transparent-secondary;
-  padding-top: 10px;
+  // padding-top: 10px;
 
   .kanban-header {
     display: flex;
@@ -938,9 +1012,10 @@ const onDrop = async (e, boardId) => {
       display: flex;
       width: 100%;
       height: 40px;
+      margin: 10px;
       // background-color: $dark-gray-100;
       // border-radius: 6px;
-      color: #ffffff;
+      // color: #ffffff;
     }
   }
 
@@ -1421,6 +1496,11 @@ const onDrop = async (e, boardId) => {
 html.dark {
   .kanban-container-boards__panel {
     background-color: $dark-gray-300;
+  }
+
+  // border-top
+  .kanban-action-menu-bar {
+    border-top: 1px solid $dark-gray-100;
   }
 
   .kanban-filter {

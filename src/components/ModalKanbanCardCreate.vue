@@ -33,19 +33,21 @@
           <el-option v-for="user in users" :key="user.id" :label="user.name" :value="user.id"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item size="large" label="우선 순위">
-        <el-select v-model="customForm.userId" placeholder="담당자를 선택하세요" class="select-user">
-          <el-option v-for="user in users" :key="user.id" :label="user.name" :value="user.id"></el-option>
+
+      <el-form-item v-for="field in template?.cols || []" :key="field.id" :label="field.label" size="large">
+        <el-input v-if="field.type === 'text'" v-model="customForm.customForm[field.id]" placeholder="입력하세요"></el-input>
+        <el-select v-else-if="field.type === 'select'" v-model="customForm.optionalData[field.key]" placeholder="선택하세요"
+          class="select-user">
+          <el-option v-for="option in field.options" :key="option.id" :label="option.label"
+            :value="option.id"></el-option>
         </el-select>
-      </el-form-item>
-      <el-form-item size="large" label="테스트 서버">
-        <el-select v-model="customForm.userId" placeholder="담당자를 선택하세요" class="select-user">
-          <el-option v-for="user in users" :key="user.id" :label="user.name" :value="user.id"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item size="large" label="종료일">
-        <el-date-picker v-model="customForm.date" type="date" placeholder="종료일을 선택하세요" value-format="yyyy-MM-dd"
-          format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>
+        <el-date-picker v-if="field.type === 'date'" v-model="customForm.optionalData[field.key]" type="date"
+          placeholder="날짜를 선택하세요" value-format="YYYY-MM-DD" format="YYYY-MM-DD" style="width: 100%;"></el-date-picker>
+        <el-input v-if="field.type === 'number'" v-model="customForm.optionalData[field.key]" type="number"
+          placeholder="숫자를 입력하세요" style="width: 100%;"></el-input>
+        <el-input v-if="field.type === 'textarea'" v-model="customForm.optionalData[field.key]" type="textarea"
+          placeholder="내용을 입력하세요">
+        </el-input>
       </el-form-item>
 
       <el-form-item label="태그 (최대 10개)">
@@ -59,7 +61,6 @@
           <el-button v-if="customForm.tag" type="primary" @click="handleAddTag">
             <span class="icon-enter">↵</span></el-button>
         </div>
-
       </el-form-item>
     </section>
     <section class="form-items__description">
@@ -70,6 +71,7 @@
       </el-form-item>
     </section>
     <el-button v-show="false" type="primary">등록</el-button>
+    어라 ? {{ template }}
   </el-form>
 </template>
 
@@ -78,7 +80,6 @@ import { defineProps, ref, toRef, watch, defineEmits, computed } from "vue";
 import { MdEditor } from 'md-editor-v3';
 import { cloneDeep } from "lodash";
 import { useUserStore } from "@/stores/user";
-import { title } from "process";
 // import { useCommonStore } from "@/stores/common";
 
 // 다크모드 여부
@@ -108,6 +109,10 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  template: {
+    type: Object,
+    required: true,
+  },
   // openType : ['create','update'],
   type: {
     type: String,
@@ -131,7 +136,6 @@ let handleClickEditTitle = () => {
 
 // customForm 업데이트 될때 emit
 watch(customForm, (newVal) => {
-  console.log("watch customForm", newVal);
   emit("update:form", newVal);
 }, { deep: true });
 
@@ -323,13 +327,13 @@ const handleCloseTag = (tag: any) => {
     border: 1px solid #2b2b2b;
     border-radius: 10px;
     padding: 10px;
-    color: white;
+    // color: white;
 
     &__preview {
       border: 1px solid #2b2b2b;
       border-radius: 10px;
       padding: 10px;
-      color: white;
+      // color: white;
     }
   }
 }
@@ -375,6 +379,28 @@ html.dark {
 
     .md-editor {
       border: 1px solid #2b2b2b;
+    }
+  }
+}
+
+html.dark {
+
+  .form-items__description {
+    .md-editor {
+      width: 100%;
+      // min-height: 100px;
+      // background-color: black;
+      border: 1px solid #2b2b2b;
+      border-radius: 10px;
+      padding: 10px;
+      color: white;
+
+      &__preview {
+        border: 1px solid #2b2b2b;
+        border-radius: 10px;
+        padding: 10px;
+        color: white;
+      }
     }
   }
 }

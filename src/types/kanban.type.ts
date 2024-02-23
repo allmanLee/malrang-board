@@ -32,6 +32,7 @@ export interface Card {
   tags: Tag[];
   order: number;
   commit: Commit[];
+  optionalData: {};
 }
 
 // 태그 배열 타입

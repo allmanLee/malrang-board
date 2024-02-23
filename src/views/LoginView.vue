@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import API from '@/apis';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElNotification } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 const email = ref('');
@@ -42,7 +42,7 @@ const login = async () => {
       password: password.value
     });
 
-    ElMessage.success('로그인이 완료되었습니다.'); // 로그인 성공
+    ElNotification.success('로그인이 완료되었습니다.'); // 로그인 성공
     userStore.fetchUser(result); // Store userState 업데이트
     isLoginError.value = false;
     setTimeout(() => {

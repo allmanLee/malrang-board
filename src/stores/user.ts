@@ -46,6 +46,13 @@ export const useUserStore = defineStore('user', {
     },
     getProjects: (state) => {
       return state.userState?.projects
+    },
+    // sbSelectedTeam 의 아이디와 일치하는 팀의 FormTemplate 을 가져옵니다.
+    getSelectedFormTemplate : (state) => (teamId: string) => {
+      const team = state.userState?.teams.find((team) => {
+        console.log('team._id', team._id)
+        team._id === teamId})
+      return team?.formTemplate
     }
   },
   actions: {
@@ -104,7 +111,11 @@ export const useUserStore = defineStore('user', {
 
       localStorage.setItem('userState', JSON.stringify(this.userState))
       localStorage.setItem('users', JSON.stringify(this.users))
-
+    },
+    fetchTemplate(teamId: string) {
+      console.log('teamId', teamId)
+      const team = this.userState?.teams.find((team) => team._id === teamId)
+      return team?.formTemplate
     },
     async createProject(projectData: ProjectRequestDto) {
       const result = await API.createProject(projectData)
