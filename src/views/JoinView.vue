@@ -1,11 +1,17 @@
 <template>
   <div class="joinview">
+    <!-- 백그라운드 동영상 -->
+    <!-- <div class="background-video"> -->
+    <!-- <video autoplay muted loop>
+        <source src="@/assets/videos/background.mp4" type="video/mp4" />
+      </video>
+    </div> -->
     <section class="joinview__left">
       <h1><span class="--welcome">Welcome to </span>말랑보드</h1>
     </section>
     <section class="joinview__right">
       <header>
-        <h1>회원가입</h1>
+        <h2>회원가입</h2>
       </header>
 
       <el-form ref="joinForm" :model="form" :rules="rules" @submit.prevent="nextStep" class="form"
@@ -170,6 +176,8 @@ const submitForm = async () => {
   margin: 40px;
   margin-top: -100px;
 
+
+
   .el-form {
     width: 100%;
   }
@@ -206,19 +214,20 @@ const submitForm = async () => {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    justify-content: flex-start;
+    justify-content: center;
     width: 500px;
     padding: 20px;
+    height: 100%;
     margin-right: 120px;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.8);
     border-radius: 10px;
 
     header {
-      h1 {
+      h2 {
         margin-bottom: 20px;
         font-weight: 200;
         font-family: 'malang-board-bold';
-        font-size: 30px;
+        font-size: 21px;
       }
     }
 

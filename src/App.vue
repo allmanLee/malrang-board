@@ -12,6 +12,11 @@ const isShowSide = computed(() => {
   return router.currentRoute.value.path === '/main';
 });
 
+// 로그인, 회원가입 에서 미노출 (SubSideBar에서 노출)
+const isLogin = computed(() => {
+  return router.currentRoute.value.path === '/login' || router.currentRoute.value.path === '/signup';
+});
+
 </script>
 <template>
   <el-container class="app-container">
@@ -55,10 +60,10 @@ const isShowSide = computed(() => {
       </div>
     </el-header> -->
     <el-container>
-      <el-aside class="navigation-side__bar">
+      <el-aside v-if="!isLogin" class="navigation-side__bar">
         <sub-side-bar />
       </el-aside>
-      <el-aside v-if="isShowSide" class="navigation-side__bar">
+      <el-aside v-if="!isLogin" class="navigation-side__bar">
         <SideBar />
       </el-aside>
       <div class="main">

@@ -193,7 +193,7 @@ export const useUserStore = defineStore('user', {
     logout() {
       localStorage.removeItem('userState')
       this.userState = null
-      router.push({ name: 'Login' })
+      router.push({ name: 'login' })
     }
   }
 })

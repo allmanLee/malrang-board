@@ -14,6 +14,8 @@
         </el-icon>
         <span>{{ kanbanInfo.teamName }}</span>
 
+
+
         <!-- 소켓 연결 여부 -->
         <!-- <el-tooltip class="item" effect="dark" content="실시간 연결됨" placement="top">
           <el-icon class="kanban-menu" :class="state.connected ? 'success' : 'error'">
@@ -33,6 +35,31 @@
           </el-icon>
         </template>
       </el-input>
+
+      <!-- 프로필 -->
+      <article class="kanban-header__profiles">
+        <!-- 본인 -->
+        <el-tooltip class="item" effect="dark" content="내 프로필" placement="bottom">
+          <el-avatar class="kanban-header__avatar --me" :size="20"
+            :src="'https://avatars.dicebear.com/api/avataaars/' + 1 + '.svg'">
+            <i class="el-icon-user-solid"></i>
+          </el-avatar>
+        </el-tooltip>
+        <!-- 연결된 사용자 프로필 -->
+        <div v-for="user in connectedUsers" class="kanban-header__profiles__item" :key="user.userName">
+          <el-tooltip class="item" effect="dark" :content="user.userName" placement="bottom">
+            <el-avatar class="kanban-header__avatar" :size="20"
+              :src="'https://avatars.dicebear.com/api/avataaars/' + 1 + '.svg'">
+              <i class="el-icon-user-solid"></i>
+            </el-avatar>
+          </el-tooltip>
+        </div>
+
+        <!-- 나머지 +3 -->
+        <div v-if="connectedUsers.length > 3" class="kanban-header__profiles__item">
+          <span class="kanban-header__profiles__item__count">+3</span>
+        </div>
+      </article>
     </div>
     <!-- 검색 -->
     <section class="kanban-action-menu-bar" @click="handleClickFilter(false)">
@@ -296,8 +323,8 @@ type FilterView = {
   filters: Filter[];
 };
 
-const users = computed(() => useUserStore().getMockUsers)
 const boards = computed(() => useBoardStore().getBoards)
+const user = computed(() => useUserStore().getUserState)
 const selectedTeamId = computed(() => useCommonStore().getSbSelectedTeamId)
 const selectedTeamName = computed(() => useCommonStore().getSbSelectedTeamName)
 const selectedProjectName = computed(() => useCommonStore().getSbSelectedProjectName)
@@ -559,9 +586,28 @@ const handleClickFilterReset = () => {
   isOffFilter.value = false;
 };
 
+const connectedUsers = ref([]);
+
+// 유저 접속
+const handleUserConnected = (data) => {
+  const user = connectedUsers.value.find((el) => el.userId === data.userId);
+  if (!user) {
+    connectedUsers.value.push(data);
+  }
+};
+
 // Socket IO (실시간 통신)
 // const boardStore = useBoardStore();
 onMounted(() => {
+
+
+
+  // 접속 또는 접속 종료시 누가 접속했는지 누가 나갔는지 알 수 있음
+  socket.on("users:connected", (data) => {
+    handleUserConnected(data);
+  });
+
+
   // remove any existing listeners (after a hot module replacement)
   // boardStore.bindEvent();
   socket.on("cards:created", (data) => {
@@ -610,8 +656,16 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+
+  // 접속 또는 접속 종료시 누가 접속했는지 누가 나갔는지 알려줍니다.
+  // socket.emit("users:connected", { userId: useUserStore().getUserState.id, userName: useUserStore().getUserState.name }, (result: any) => {
+  //   console.log('users:connected', result)
+  // });
+
   socket.off();
   state.connected = false;
+
+
 })
 
 
@@ -661,6 +715,7 @@ const getCards = async () => {
 // selectedTeamId 변경시 카드 조회
 watch(selectedTeamId, () => {
   getCards();
+
 }, { immediate: true })
 
 const getTemple = computed(() => {
@@ -795,6 +850,14 @@ class CardActions {
 watch(selectedTeamId, () => {
   console.log('selectedTeamId 가 변경', selectedTeamId.value)
   form.value = cloneDeep(initForm.value);
+
+  setTimeout(() => {
+    socket.emit("users:connected", { userId: user.value.id, userName: user.value.name }, (result: any) => {
+      console.log('users:connected', result)
+    });
+  }, 1000);
+
+
 })
 
 const updateForm = (newForm) => {
@@ -1030,6 +1093,46 @@ const onDrop = async (e, boardId) => {
           color: $success;
         }
       }
+    }
+
+    .kanban-header__profiles {
+      display: flex;
+      align-items: center;
+      gap: 0px;
+
+      .kanban-header__avatar.--me {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: $background-transparent;
+        font-size: 14px;
+        border: 2.4px solid $primary;
+        box-sizing: content-box;
+        color: $gray-600;
+      }
+
+      .kanban-header__profiles__item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: $background-transparent;
+        font-size: 14px;
+        color: $gray-600;
+        transition: all 0.2s ease-in-out;
+
+        // 호버 했을경우
+        &:hover {
+          cursor: pointer;
+          transform: scale(1.2);
+        }
+      }
+
+
+
     }
 
     .kanban-header__divider {
