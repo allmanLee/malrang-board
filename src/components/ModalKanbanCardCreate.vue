@@ -64,11 +64,23 @@
       </el-form-item>
     </section>
     <section class="form-items__description">
+
       <el-form-item label-width="0">
         <!-- 에디이터 (다크모드)-->
+        <!-- el-toggle -->
+        <div class="btn--edit">
+          <el-radio-group v-model="previewOnly" size="small">
+            <el-radio-button :label="false">편집</el-radio-button>
+            <el-radio-button :label="true">미리보기</el-radio-button>
+          </el-radio-group>
+        </div>
         <KeepAlive include="MdEditor">
-          <md-editor ref="editorRef" language="en-US" :scrollAuto="true" :disabled="false" :preview="false"
-            v-model="customForm.description" :theme="isDarkMode ? 'dark' : 'light'"></md-editor>
+
+          <md-editor v-if="!previewOnly" ref="editorRef" language="en-US" :scrollAuto="true" :disabled="false"
+            :preview="false" v-model="customForm.description" :theme="isDarkMode ? 'dark' : 'light'"></md-editor>
+          <md-preview class="md-editor__preview" v-else :modelValue="customForm.description"
+            :theme="isDarkMode ? 'dark' : 'light'">
+          </md-preview>
         </KeepAlive>
       </el-form-item>
     </section>
@@ -94,6 +106,8 @@ const isEditTitle = ref(false);
 
 // editor
 const editorRef = ref(null);
+const previewOnly = ref(false);
+
 
 // Store
 const userStore = useUserStore();
@@ -122,6 +136,12 @@ const props = defineProps({
 });
 
 const form = toRef(props, "form");
+
+
+
+if (props.type === "update") {
+  previewOnly.value = true;
+}
 
 
 
@@ -229,9 +249,6 @@ const handleCloseTag = (tag: any) => {
       }
     }
 
-
-
-
     .icon-edit {
       display: flex;
       align-items: flex-end;
@@ -335,6 +352,33 @@ const handleCloseTag = (tag: any) => {
 
 
 .form-items__description {
+
+  // 토글 버튼 스타일
+  .btn--edit {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+
+    .el-button {
+      // color: #ffffff;
+      font-size: 14px;
+      font-weight: 700;
+      // background-color: #2b2b2b;
+      // border: 1px solid #2b2b2b;
+      // border-radius: 10px;
+      // padding: 10px;
+      // height: 40px;
+      // width: 100px;
+      // margin-left: 10px;
+      // margin-right: 10px;
+      // &:hover {
+      //   background-color: #2b2b2b;
+      //   border: 1px solid #2b2b2b;
+      //   color: #ffffff;
+      // }
+    }
+  }
+
   .md-editor {
     width: 100%;
     // min-height: 100px;
@@ -346,6 +390,7 @@ const handleCloseTag = (tag: any) => {
 
     &__preview {
       border: 1px solid #2b2b2b;
+      min-height: 800px;
       border-radius: 10px;
       padding: 10px;
       // color: white;
@@ -412,6 +457,7 @@ html.dark {
 
       &__preview {
         border: 1px solid #2b2b2b;
+        min-height: 800px;
         border-radius: 10px;
         padding: 10px;
         color: white;

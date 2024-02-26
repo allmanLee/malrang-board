@@ -40,6 +40,7 @@ declare module 'vue' {
     ElSelect: typeof import('element-plus/es')['ElSelect']
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
     ElTag: typeof import('element-plus/es')['ElTag']
+    ElToggle: typeof import('element-plus/es')['ElToggle']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     EmptyKanbanCard: typeof import('./components/EmptyKanbanCard.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
