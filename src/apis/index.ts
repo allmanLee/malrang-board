@@ -138,9 +138,8 @@ const userApi = {
   // 카드 (CRUD)
   getCards: (params: any) => get(`${apiEndpoints.cards}`, params),
   deleteCard: (cardId: string) => del(`${apiEndpoints.cards}/${cardId}`),
-
+  updateCard: (cardData: any) => put(`${apiEndpoints.cards}/${cardData._id}`, cardData),
   createCard: (cardData: any): Promise<Card> => post(apiEndpoints.card(cardData.boardId), cardData),
-  updateCard: (cardData: any) => put(apiEndpoints.cardMo(cardData.boardId, cardData.cardId), cardData),
   moveCard: (cardData: any) => patch(apiEndpoints.cardMo(cardData.boardId, cardData.cardId),{order: cardData.order}),
 
   // 정보 컬럼 (CRUD)

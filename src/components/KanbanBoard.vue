@@ -590,6 +590,15 @@ onMounted(() => {
     cards.value[cardIdx].order = card.order;
   });
 
+  // 수정
+  socket.on("cards:updated", (data) => {
+    const card = data?.card;
+    console.log('cards:updated', card)
+
+    const cardIdx = cards.value.findIndex((el) => el._id === card._id);
+    cards.value[cardIdx] = card;
+  });
+
   socket.on("cards:deleted", (data) => {
     const cardId = data?.cardId;
     console.log('cards:deleted', cardId)
@@ -708,13 +717,23 @@ class CardActions {
 
 
 
-  update(cardId, form) {
-    const cardIdx = cards.value.findIndex((card) => card._id === cardId);
-    cards.value.splice(cardIdx, 1, {
-      ...form.value,
-    });
-    // 만약 커밋에 #mb-1 이런식으로 카드 번호가 붙어있으면 해당 카드의 커밋에 추가
-    this.addCommit(cardId, form.value);
+  async update(cardId, form) {
+    try {
+      const cardIdx = cards.value.findIndex((card) => card._id === cardId);
+      cards.value[cardIdx] = form.value;
+
+      this.resetCommit(cards.value)
+      this.addCommit(cardId, cards.value)
+
+      // API 호출
+      await API.updateCard(form.value);
+
+      socket.emit("cards:updated", { card: form.value }, (result: any) => {
+        console.log('cards:updated', result)
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   async delete(cardId) {
