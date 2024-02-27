@@ -106,10 +106,9 @@
           <!-- <span>필터를 저장하거나 현재 선택된 필터를 등록할 수 있습니다.</span> -->
           <div class="filter-other-views">
 
-            <el-select v-model="selectedFilterView" placeholder="필터 선택" class="select-user" value-key="filterLabel"
+            <el-select v-model="selectedFilterView" placeholder="필터 선택" class="select-user" value-key="filterKey"
               :class="{ '--disabled': !!filterViewName }" :disabled="!filterOtherViews.length || !!filterViewName">
-              <el-option v-for="filter in filterOtherViews" :key="filter.filterLabel" :label="filter.filterLabel"
-                :value="filter">
+              <el-option v-for="filter in filterOtherViews" :key="filter.key" :label="filter.filterLabel" :value="filter">
               </el-option>
             </el-select>
           </div>
@@ -136,15 +135,14 @@
         <section class="kanban-action-menu-bar__container" :class="{ '--is-off': isOffFilter }">
           <el-form label-position="top" label-width="100px"
             style="display: flex; width: 100%; flex-wrap: wrap; align-items:flex-end; gap: 10px;">
-            <el-form-item v-for="(filter, index) in selectedFilters" :key="filter.filterLabel" class="filter__item">
+            <el-form-item v-for="(filter, index) in selectedFilters" :key="filter.key" class="filter__item">
               <!-- <p class="filter__method-icon">
                 담당자
               </p> -->
-              <el-badge :is-dot="true" :value="filter.filterLabel + ': ' + filter.method"
+              <el-badge :is-dot="true" :value="filter.key + ': ' + filter.method"
                 :type="filter.method === '일치' ? 'success' : filter.method === '포함' ? 'warning' : filter.method === '제외' ? 'danger' : 'info'">
-                <el-select v-if="filter.method !== '비어있는' && filter.method !== '비어있지 않은'"
-                  :placeholder="filter.filterLabel + ' 선택'" v-model="filter.value" multiple :disabled="isOffFilter"
-                  class="filter__select">
+                <el-select v-if="filter.type === 'select'" :placeholder="filter.filterLabel + ' 선택'"
+                  v-model="filter.value" multiple :disabled="isOffFilter" value-key="value" class="filter__select">
                   <template #header>
                     <el-checkbox v-model="filter.checkAll" :indeterminate="filter.indeterminate"
                       @change="(e) => handleCheckAll(e, filter)">
@@ -152,22 +150,45 @@
                     </el-checkbox>
                   </template>
                   <!-- <el-option-group :label="filter.method + ': ' + filter.filterLabel"> -->
-                  <el-option v-for="(op, index) in filter.option" :key="index" :label="op.label" :value="op.value">
+                  <el-option v-for="(op, index) in filter.option" :key="index" :label="op.label" :value="op">
                     {{ op.label }}
                   </el-option>
+                  <template #prefix>
+                    <span class="filter__method">{{ filter.method }}</span>
+                  </template>
                   <template #tag>
-                    <span class="filter__method" v-if="filter.value.length">
-                      {{ filter.method }}</span>
                     <el-tag v-for="(value, index) in filter.value" :key="index">
-                      {{ value }}
+                      {{ value.label }}
                     </el-tag>
                   </template>
                 </el-select>
+                <!-- <el-input v-else-if="filter.type === 'input' && (filter.method !== '비어있는' && filter.method !== '비어있지 않은')"
+                  v-model="filter.value" :placeholder="filter.filterLabel" :disabled="isOffFilter"
+                  class="filter__select --text">     -->
+                <el-input v-else-if="filter.type === 'input'" v-model="filter.value" :placeholder="filter.filterLabel"
+                  :disabled="isOffFilter" class="filter__select --text">
+                  <template #prepend>
+                    <span class="filter__method --input">{{ filter.method }}</span>
+                  </template>
+                </el-input>
                 <div v-else :placeholder="filter.filterLabel" :disabled="true" class="filter__select --text">
                   <span class="filter__method">{{ filter.method }}</span> {{ filter.filterLabel }}
                 </div>
               </el-badge>
-              <!-- select = 비어있는, 비어있지 않은 -->
+
+              <!-- AND 와 OR 중 선택 가능 -->
+              <el-popover placement="bottom" width="auto" trigger="hover" v-if="(index !== selectedFilters.length - 1)">
+                <el-radio-group v-model="selectedfilterMetnod" class="kanban-filter__popover__btns">
+                  <el-radio-button type="primary" class="filter__btn" label="AND" />
+                  <el-radio-button type="primary" class="filter__btn" label="OR" />
+                </el-radio-group>
+                <template #reference>
+                  <el-button class="filter__op-btn" text>
+                    {{ filterOperators[index] }}
+                  </el-button>
+                </template>
+              </el-popover>
+
 
             </el-form-item>
 
@@ -180,11 +201,9 @@
                     <el-radio-button type="primary" class="filter__btn" label="일치" />
                     <el-radio-button type="primary" class="filter__btn" label="포함" />
                     <el-radio-button type="primary" class="filter__btn" label="제외" />
-                    <el-radio-button type="primary" class="filter__btn" label="비어있는" />
-                    <el-radio-button type="primary" class="filter__btn" label="비어있지 않은" />
                   </el-radio-group>
                 </div>
-                <el-select v-model="selectedFilter" placeholder="필터 선택" class="select-filter" value-key="filterLabel">
+                <el-select v-model="selectedFilter" placeholder="필터 선택" class="select-filter" value-key="key">
                   <el-option v-for="filter in filters" :key="filter.filterLabel" :label="filter.filterLabel"
                     :value="filter">
                   </el-option>
@@ -195,6 +214,25 @@
                   </el-icon>
                   필터를 선택해주세요.
                 </p>
+
+                <!-- 바로 필터링 하기 -->
+                <div v-if="selectedFilter" class="kanban-filter__popover__select-value">
+                  <el-select v-if="selectedFilter && selectedFilter.type === 'select'" v-model="selectedFilter.value"
+                    placeholder="값 선택" multiple :disabled="!selectedFilter" value-key="value" class="filter__select">
+                    <template #header>
+                      <el-checkbox v-model="selectedFilter.checkAll" :indeterminate="selectedFilter.indeterminate"
+                        @change="(e) => handleCheckAll(e, selectedFilter)">
+                        전체 선택
+                      </el-checkbox>
+                    </template>
+                    <el-option v-for="(op, index) in selectedFilter.option" :key="index" :label="op.label" :value="op">
+                      {{ op.label }}
+                    </el-option>
+                  </el-select>
+                  <el-input v-else-if="selectedFilter.type === 'input'" v-model="selectedFilter.value"
+                    :placeholder="selectedFilter.filterLabel" class="filter__select --text">
+                  </el-input>
+                </div>
 
                 <div class="popover__footer">
                   <!-- 닫기 -->
@@ -308,7 +346,7 @@ import { cloneDeep, orderBy } from "lodash";
 import { useUserStore } from "@/stores/user";
 import { useBoardStore } from "@/stores/board";
 import { useCommonStore } from "@/stores/common";
-import { ElMessageBox, ElNotification } from "element-plus"; // 메세지 박스
+import { ElCard, ElMessageBox, ElNotification } from "element-plus"; // 메세지 박스
 
 import "md-editor-v3/lib/style.css";
 import API from "@/apis";
@@ -330,6 +368,7 @@ const selectedTeamName = computed(() => useCommonStore().getSbSelectedTeamName)
 const selectedProjectName = computed(() => useCommonStore().getSbSelectedProjectName)
 const selectedProjectId = computed(() => useCommonStore().getSbSelectedProjectId)
 const selectedGroupName = computed(() => useUserStore().getGroupName)
+const users = computed(() => useUserStore().getUsers)
 
 const selectedBoardId = ref('');
 const selectedWorker = ref(null);
@@ -356,34 +395,6 @@ const initForm = ref<Card>({
   commit: [],
   optionalData: {},
 });
-// const initForm = computed(() => {
-//   // const templateCols = getTemple.value.cols;
-
-//   const default3: Card = {
-//     _id: '',
-//     title: "",
-//     description: "",
-//     created_date: "",
-//     userId: "",
-//     userName: '',
-//     teamId: selectedTeamId.value,
-//     boardId: '',
-//     projectId: '',
-//     order: 0,
-//     tags: [],
-//     commit: [],
-//   }
-//   const templateField = {}
-
-//   // templateCols.forEach((el) => {
-//   //   templateField[el.id] = null;
-//   // });
-
-//   return {
-//     ...default3,
-//     ...templateField,
-//   }
-// });
 // team에 formTemplate가 있음
 const selectedTemplate = ref({});
 //선택한 팀에 따라서 폼이 달라짐
@@ -400,6 +411,7 @@ const isOffFilter = ref(false);
 const isVisiblePop = ref(false);
 const filters = ref<Filter[]>([]);
 const selectedfilterMetnod = ref('일치');
+const filterOperators = ref([]);
 
 
 const isOpenFilterView = ref(false);
@@ -407,12 +419,60 @@ const filterOtherViews = ref([]);
 const filterViewName = ref('');
 
 
+//필터 오포레이터 추가
+const setFilterOperator = (firstIndex, operator) => {
+  filterOperators.value.splice(firstIndex, 0, operator);
+};
+
+// user 필터를 세팅합니다.
+const setUserOptions = () => {
+  return users.value.map((user) => {
+    return {
+      label: user.name,
+      value: user.id,
+    };
+  });
+}
+
+// 필터 옵션을 추가합니다.
+const setFilters = () => {
+
+
+  filters.value = [
+    // 제목  
+    {
+      filterLabel: '제목', key: 'title',
+      option: [], method: '일치', value: '', type: 'input', active: false, checkAll: true, indeterminate: false
+    },
+    {
+      filterLabel: '담당자', key: 'userId', option: [...setUserOptions()],
+      method: '일치', value: [...setUserOptions()], active: false, type: 'select', checkAll: true, indeterminate: false
+    },
+    {
+      filterLabel: '태그', key: 'tags', option: [
+        { label: '태그1', value: '태그1' },
+        { label: '태그2', value: '태그2' },
+        { label: '태그3', value: '태그3' },
+      ],
+      method: '포함', value: [], active: false, type: 'select', checkAll: true, indeterminate: false
+    },
+
+
+    // custom
+  ];
+};
+setTimeout(() => {
+  setFilters();
+}, 1000)
 
 // 필터 추가 Select
 watch(selectedFilters, (val) => {
   selectedFilters.value.forEach((el, idx) => {
-    //필터 라벨과 일치하는 필터를 찾아서 값을 비교합니다.
-    const sameLabelOption = filters.value.filter((filter) => filter.filterLabel === selectedFilters.value[idx].filterLabel)[0].option.map((el) => el.value);
+    //필터 라벨과 일치하는 필터를 찾아서 값을 비교합니다. (select, input, date)
+    const sameLabelOption = filters.value.filter((filter) => filter.key === selectedFilters.value[idx].key)[0].option.map((el) => el.value);
+
+    //type 이 select 일때
+    // if (selectedFilters.value[idx].type === 'select') {
     if (selectedFilters.value[idx].value.length === 0) {
       el.checkAll = false
       el.indeterminate = false
@@ -423,11 +483,12 @@ watch(selectedFilters, (val) => {
       el.indeterminate = true
     }
   })
+
+
 }, { deep: true })
 
-
 const handleCheckAll = (e, filter) => {
-  filter.value = e ? filter.option.map((el) => el.value) : [];
+  filter.value = e ? filter.option.map((el) => el) : [];
   filter.indeterminate = false;
 };
 
@@ -439,23 +500,46 @@ const fetchFilterViews = () => {
   // API 호출
   // const result = await API.getFilterView();
   // filterOtherViews.value = result;
+  console.log('filterOtherViews', setUserOptions())
   filterOtherViews.value = [
     {
-      filterLabel: '내가 만든 필터1', _id: '12asdfasd2334', filters: [
-        { filterLabel: '담당자', method: '일치', value: '', option: [{ label: '이유준', value: '이유준' }], active: false },
-        { filterLabel: '프리픽스', method: '일치', value: '', option: [{ label: '전체 프리픽스', value: '전체 프리픽스' }], active: false },
+      filterLabel: '내가 만든 필터',
+      key: '내가 만든 필터',
+      filters: [
+        {
+          filterLabel: '제목', key: 'title',
+          option: [], method: '일치', value: '', type: 'input', active: false, checkAll: true, indeterminate: false
+        },
+        {
+          filterLabel: '담당자', key: 'userId', option: [...setUserOptions()],
+          method: '일치', value: [...setUserOptions()], active: false, type: 'select', checkAll: true, indeterminate: false
+        },
+        {
+          filterLabel: '태그', key: 'tags', option: [
+            { label: '태그1', value: '태그1' },
+            { label: '태그2', value: '태그2' },
+            { label: '태그3', value: '태그3' },
+          ],
+          method: '포함', value: [], active: false, type: 'select', checkAll: true, indeterminate: false
+        },
       ]
     },
     {
-      filterLabel: '내가 만든 필터2', _id: '12asdfasd2334', filters: [
-        { filterLabel: '담당자', method: '일치', value: '', option: [{ label: '전체 담당자', value: '전체 담당자' }], active: false },
-        { filterLabel: '프리픽스', method: '일치', value: '', option: [{ label: '전체 프리픽스', value: '전체 프리픽스' }], active: false },
-      ]
-    },
-    {
-      filterLabel: '내가 만든 필터3', _id: '12asdfasd2334', filters: [
-        { filterLabel: '담당자', method: '일치', value: '', option: [{ label: '전체 담당자', value: '전체 담당자' }], active: false },
-        { filterLabel: '프리픽스', method: '일치', value: '', option: [{ label: '전체 프리픽스', value: '전체 프리픽스' }], active: false },
+      filterLabel: '내가 만든 필터2',
+      key: '내가 만든 필터2',
+      filters: [
+        {
+          filterLabel: '제목', key: 'title',
+          option: [], method: '일치', value: '', type: 'input', active: false, checkAll: true, indeterminate: false
+        },
+        {
+          filterLabel: '태그', key: 'tags', option: [
+            { label: '태그1', value: '태그1' },
+            { label: '태그2', value: '태그2' },
+            { label: '태그3', value: '태그3' },
+          ],
+          method: '포함', value: [], active: false, type: 'select', checkAll: true, indeterminate: false
+        },
       ]
     },
   ];
@@ -467,27 +551,47 @@ const fetchFilterViews = () => {
  * @param cards cards
  * @description 
  */
-const filterCardsByAction = (val, cards) => {
-  const filterCards = cards.filter((card) => {
-    return val.every((el) => {
-      if (el.method === '일치') {
-        return el.value.includes(card[el.filterLabel]);
-      } else if (el.method === '포함') {
-        return el.value.some((value) => card[el.filterLabel].includes(value));
-      } else if (el.method === '제외') {
-        return !el.value.includes(card[el.filterLabel]);
-      } else if (el.method === '비어있는') {
-        return card[el.filterLabel] === '';
-      } else if (el.method === '비어있지 않은') {
-        return card[el.filterLabel] !== '';
+const filterCardsByAction = (filters, cards) => {
+
+  let filterCards = cloneDeep(cards);
+
+  filters.forEach((filter) => {
+    // if (filter.active) {
+    filterCards = filterCards.filter((card) => {
+      if (filter.type === 'select') {
+        // 값이 없으면 패스
+        // if (filter.value.length === 0) {
+        //   return true;
+        // }
+        if (filter.method === '일치') {
+
+          console.log('filter.value', filter.value)
+          return filter.value.some((el) => el.value === card[filter.key]);
+        } else if (filter.method === '포함') {
+          return filter.value.some((el) => el.value.includes(card[filter.key]));
+        } else if (filter.method === '제외') {
+          return !filter.value.some((el) => el.value.includes(card[filter.key]));
+        }
+      } else if (filter.type === 'input') {
+        // 값이 없으면 패스
+        if (filter.value === '') {
+          return true;
+        }
+        if (filter.method === '일치') {
+          return card[filter.key] === filter.value;
+        } else if (filter.method === '포함') {
+          return card[filter.key].includes(filter.value);
+        } else if (filter.method === '제외') {
+          return !card[filter.key].includes(filter.value);
+        }
       }
     });
+    // }
   });
 
+  console.log('filterCards', filterCards)
   return filterCards;
 };
-
-fetchFilterViews();
 
 const handleClickViewSave = () => {
   // 만약 내 필터 이름이 중복되면
@@ -519,9 +623,11 @@ const handleClickViewSelect = async () => {
 type Filter = {
   value: string | string[];
   filterLabel: string;
+  key: string;
   option: FilterOption[];
   method: string;
   active: boolean;
+  type: string; // input, select, date
   checkAll: boolean;
   indeterminate: boolean;
 };
@@ -565,6 +671,8 @@ const handleClickFilterAdd = (filter, method) => {
     method: method,
   });
 
+
+  setFilterOperator(selectedFilters.value.length - 1, 'AND');
   isVisiblePop.value = false;
 };
 
@@ -599,9 +707,6 @@ const handleUserConnected = (data) => {
 // Socket IO (실시간 통신)
 // const boardStore = useBoardStore();
 onMounted(() => {
-
-
-
   // 접속 또는 접속 종료시 누가 접속했는지 누가 나갔는지 알 수 있음
   socket.on("users:connected", (data) => {
     handleUserConnected(data);
@@ -609,7 +714,6 @@ onMounted(() => {
 
 
   // remove any existing listeners (after a hot module replacement)
-  // boardStore.bindEvent();
   socket.on("cards:created", (data) => {
     const card = data?.card
     console.log('cards:created', card)
@@ -669,7 +773,8 @@ onUnmounted(() => {
 })
 
 
-// 위에 있을떄 드래그오버 이벤트
+// [드래그 기능]위에 있을떄 드래그오버 이벤트
+// TODO 드래그 이후 마우스 커서 스타일 변경
 const onDragOver = (e, cardId, type) => {
   const dom = document.getElementById(cardId);
 
@@ -715,7 +820,6 @@ const getCards = async () => {
 // selectedTeamId 변경시 카드 조회
 watch(selectedTeamId, () => {
   getCards();
-
 }, { immediate: true })
 
 const getTemple = computed(() => {
@@ -856,6 +960,8 @@ watch(selectedTeamId, () => {
       console.log('users:connected', result)
     });
   }, 1000);
+
+  fetchFilterViews();
 
 
 })
@@ -1259,6 +1365,10 @@ const onDrop = async (e, boardId) => {
           margin: 0px;
         }
 
+        .filter__op-btn {
+          margin-left: 10px;
+        }
+
       }
 
     }
@@ -1312,8 +1422,22 @@ const onDrop = async (e, boardId) => {
         align-items: center;
         font-size: 14px;
         font-weight: 700;
-        margin-left: 10px;
         color: $primary;
+
+        &.--input {}
+      }
+
+      .filter__operator {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        font-weight: 700;
+        color: $gray-700;
+        margin-left: 10px;
+      }
+
+      .--text {
+        gap: 0px !important;
       }
 
       .filter__select {
@@ -1324,14 +1448,13 @@ const onDrop = async (e, boardId) => {
         &.--text {
           display: flex;
           align-items: center;
-          width: 100%;
           height: 32px;
           border-radius: 6px;
           margin-right: 10px;
           box-sizing: border-box;
           display: flex;
           gap: 4px;
-          border: 2px dashed $gray-300;
+          // border: 2px dashed $gray-300;
           color: $primary;
         }
       }
@@ -1566,6 +1689,20 @@ const onDrop = async (e, boardId) => {
     margin-top: 20px;
   }
 
+
+  //select-value
+  &__select-value {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 40px;
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 10px;
+  }
+
   .help-text {
     display: flex;
     gap: 6px;
@@ -1656,7 +1793,7 @@ html.dark {
   }
 
   .--text {
-    border: 2px dashed $dark-gray-100 !important;
+    // border: 2px dashed $dark-gray-100 !important;
   }
 
   .add-btn:hover {
