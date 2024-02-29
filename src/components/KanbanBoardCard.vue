@@ -75,7 +75,7 @@
       </section>
       <div class="kanban-board-card-tags" v-if="card.tags.length">
 
-        <el-tag size="small" type="info" effect="dark" class="tag-only" round>{{ card.tags[0].title }}</el-tag>
+        <el-tag size="small" class="tag-only" round>{{ card.tags[0].label }}</el-tag>
         <el-tag v-if="card.tags.length > 1" size="small" type="info" effect="dark" class="more-tag__count">
           +{{ card.tags.length - 1 }}
         </el-tag>
@@ -184,7 +184,7 @@ const handleClickNumCopy = (id) => {
 const handleClickCommitCreate = (card) => {
   const cardId = card.id;
   const cardTitle = card.title;
-  const cardTag = card.tags[0]?.title || 'chore';
+  const cardTag = card.tags[0]?.label || 'chore';
 
   const commitMessage =
     ` ${cardTag}: ${cardTitle} (#mb - ${cardId})`
@@ -217,6 +217,9 @@ const handleClickDelete = () => {
   flex-direction: column;
   width: 100%;
   min-height: 120px;
+  // 안짤리게
+  flex-shrink: 0;
+
   border-radius: 12px;
   // border: 1px solid rgba(186, 186, 186, 0.4);
   padding: 0;
@@ -433,6 +436,7 @@ const handleClickDelete = () => {
 .kanban-board-card-tags {
   display: flex;
   gap: 4px;
+  margin-right: 10px;
 
   .more-tag__count {
     font-size: 12px;

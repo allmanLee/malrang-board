@@ -38,7 +38,7 @@ export interface Card {
 // 태그 배열 타입
 export interface Tag {
   id: string;
-  title: string;
+  label: string;
   color: string;
 }
 

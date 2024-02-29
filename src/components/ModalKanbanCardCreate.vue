@@ -53,7 +53,7 @@
       <el-form-item label="태그 (최대 10개)">
         <div class="tag-container">
           <el-tag v-for="tag in customForm.tags" :key="tag.id" type="info" closable @close="handleCloseTag(tag)" round>
-            {{ tag.title }}
+            {{ tag.label }}
           </el-tag>
           <el-input class="tag__input" v-model="customForm.tag" placeholder="추가 태그를 입력"
             @keyup.enter="handleAddTag"></el-input>
@@ -150,9 +150,9 @@ let customForm = ref(cloneDeep(form.value));
 let titleInput = ref(null);
 let handleClickEditTitle = () => {
   isEditTitle.value = true;
-  // setTimeout(() => {
-  //   titleInput.value.focus();
-  // }, 100);
+  setTimeout(() => {
+    titleInput.value.focus();
+  }, 100);
 };
 
 // customForm 업데이트 될때 emit
@@ -207,7 +207,7 @@ const handleAddTag = () => {
   if (customForm.value.tag) {
     customForm.value.tags.push({
       id: customForm.value.tags.length + 1,
-      title: customForm.value.tag,
+      label: customForm.value.tag,
       color: "info",
     });
     customForm.value.tag = "";
@@ -263,7 +263,6 @@ const handleCloseTag = (tag: any) => {
         align-items: center;
         font-size: 14px;
         line-height: 14px;
-        // font-weight: 700;
       }
     }
   }
@@ -274,6 +273,7 @@ const handleCloseTag = (tag: any) => {
   border-bottom: 1px dashed $gray-300;
   padding: 0;
   margin: 0;
+  border-radius: 0 !important;
   width: 100%;
   height: 39px;
 
