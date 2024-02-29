@@ -127,10 +127,17 @@
                 <el-select v-if="filter.type === 'select'" :placeholder="filter.filterLabel + ' 선택'"
                   v-model="filter.value" multiple :disabled="isOffFilter" value-key="value" class="filter__select">
                   <template #header>
-                    <el-checkbox v-model="filter.checkAll" :indeterminate="filter.indeterminate"
-                      @change="(e) => handleCheckAll(e, filter)">
-                      전체 선택
-                    </el-checkbox>
+                    <div class="dropdown-header__container">
+                      <el-checkbox v-model="filter.checkAll" :indeterminate="filter.indeterminate"
+                        @change="(e) => handleCheckAll(e, filter)">
+                        전체 선택
+                      </el-checkbox>
+
+                      <!-- 필터 지우기 -->
+                      <el-button type="info" text @click="handleClickFilterRemove(index)" class="filter__remove-btn">
+                        제거
+                      </el-button>
+                    </div>
                   </template>
                   <el-option v-for="(op, index) in filter.option" :key="index" :label="op.label" :value="op">
                     {{ op.label }}
@@ -148,6 +155,13 @@
                   :disabled="isOffFilter" class="filter__select --text">
                   <template #prepend>
                     <span class="filter__method --input">{{ filter.method }}</span>
+                  </template>
+                  <template #append>
+                    <el-button @click="handleClickFilterRemove(index)" class="filter__remove-btn">
+                      <el-icon>
+                        <Close />
+                      </el-icon>
+                    </el-button>
                   </template>
                 </el-input>
                 <div v-else :placeholder="filter.filterLabel" :disabled="true" class="filter__select --text">
@@ -467,6 +481,11 @@ const setFilters = async () => {
 setTimeout(() => {
   setFilters();
 }, 1000)
+
+const handleClickFilterRemove = (index) => {
+  console.log('handleClickFilterRemove')
+  selectedFilters.value.splice(index, 1);
+}
 
 // 필터 추가 Select
 watch(selectedFilters, (val) => {
@@ -1419,7 +1438,6 @@ const onDrop = async (e, boardId) => {
         .filter__op-btn {
           margin-left: 10px;
         }
-
       }
 
     }
@@ -1880,6 +1898,19 @@ html.dark {
       opacity: 0.6;
     }
   }
+}
+
+.dropdown-header__container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+
+  .filter__remove-btn {
+    display: flex !important;
+    font-weight: 200;
+  }
+
+
 }
 </style>
 
