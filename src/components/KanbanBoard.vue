@@ -69,7 +69,8 @@
             <span class="filter__text">필터 초기화</span>
           </el-button>
           <!-- 필터 숨기기 -->
-          <el-button text type="default" round @click.prevent="handleClickFilter">
+          <el-button round @click.prevent="handleClickFilter" :color="'#8a2be2'" class="show-btn" :text="!isOffFilter"
+            :class="{ '--is-off': isOffFilter }">
             <el-icon>
               <MoonNight />
             </el-icon>
@@ -564,6 +565,8 @@ const filterCardsByAction = (filters, cards) => {
 
   let filterCards = cloneDeep(cards);
 
+  if (isOffFilter.value) return filterCards;
+
   filters.forEach((filter) => {
     // if (filter.active) {
     filterCards = filterCards.filter((card) => {
@@ -702,8 +705,7 @@ const handleClickFilterAdd = (filter, method) => {
   isVisiblePop.value = false;
 };
 
-// 필터 보기
-
+// [필터 보기/숨기기]
 const handleClickFilter = (isBtn) => {
   if (isBtn) {
     isOffFilter.value = !isOffFilter.value;
@@ -1909,8 +1911,12 @@ html.dark {
     display: flex !important;
     font-weight: 200;
   }
+}
 
-
+.show-btn {
+  &.--is-off {
+    background-color: #892be257;
+  }
 }
 </style>
 
