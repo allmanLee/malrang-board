@@ -25,6 +25,8 @@ const apiEndpoints = {
   card: (boardId: string) => `/kanban/boards/${boardId}/card`,
   cardMo: (boardId: string, cardId: string) => `/kanban/boards/${boardId}/card/${cardId}`,
 
+  filterViews: '/kanban/filterViews',
+
 };
 
 // Create an instance of Axios with the base URL
@@ -141,6 +143,10 @@ const userApi = {
   updateCard: (cardData: any) => put(`${apiEndpoints.cards}/${cardData._id}`, cardData),
   createCard: (cardData: any): Promise<Card> => post(apiEndpoints.card(cardData.boardId), cardData),
   moveCard: (cardData: any) => patch(apiEndpoints.cardMo(cardData.boardId, cardData.cardId),{order: cardData.order}),
+
+  // 필터 뷰
+  getFilterViews: (params: any) => get(`${apiEndpoints.filterViews}`, params),
+  createFilterView: (viewData: any) => post(apiEndpoints.filterViews, viewData),
 
   // 정보 컬럼 (CRUD)
   // getInfoColumns: (params: any): Promise<any> => get(`${apiEndpoints.infomationColumns}`, params),

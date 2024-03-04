@@ -48,19 +48,24 @@
     다른사람이 만들어둔 필터SET을 선택하거나, 현재 필터 세팅을 'filterName'을 받아 저장할 수 있다. -->
       <section class="kanban-action-btns">
         <div class="--left">
-          <el-button type="primary" class="kanban-action-btn__item --table-view" round @click="isOpenFilterView = true">
+          <el-button type="primary" class="kanban-action-btn__item --table-view" round @click="isOpenFilterView = true"
+            :text="!selectedFilterView">
             <el-icon>
               <Filter />
             </el-icon>
-            <span>저장된 필터 보기</span>
+            <span v-if="selectedFilterView">저장된 필터 보기: {{ selectedFilterView.label }}
+            </span>
+            <span v-else>저장된 필터 보기</span>
           </el-button>
           <!-- 고급필터 설정 -->
-          <el-button text type="default" class="kanban-action-btn__item" round @click="isVisiblePop = true">
-            <el-icon>
-              <Filter />
-            </el-icon>
-            <span>고급 필터 추가</span>
-          </el-button>
+          <el-tooltip class="item" effect="dark" content="준비중인 기능입니다." placement="bottom">
+            <el-button text type="default" class="kanban-action-btn__item" round @click="isVisiblePop = true" disabled>
+              <el-icon>
+                <Filter />
+              </el-icon>
+              <span>고급 필터 추가</span>
+            </el-button>
+          </el-tooltip>
           <el-button text type="default" class="kanban-action-btn__item" :disabled="isOffFilter"
             @click="handleClickFilterReset" round>
             <el-icon class="filter" :class="{ '--is-off': isOffFilter }">
@@ -76,7 +81,6 @@
             </el-icon>
             <span> {{ isOffFilter ? '필터 보이기' : '필터 숨기기' }}</span>
           </el-button>
-          <!-- {{ selectedFilterView ? selectedFilterView.filterLabel : '' }} -->
         </div>
 
         <div class="--right">
@@ -97,7 +101,7 @@
 
             <el-select v-model="selectedFilterView" placeholder="필터 선택" class="select-user" value-key="filterKey"
               :class="{ '--disabled': !!filterViewName }" :disabled="!filterOtherViews.length || !!filterViewName">
-              <el-option v-for="filter in filterOtherViews" :key="filter.key" :label="filter.filterLabel" :value="filter">
+              <el-option v-for="filter in filterOtherViews" :key="filter.key" :label="filter.label" :value="filter">
               </el-option>
             </el-select>
           </div>
@@ -107,12 +111,12 @@
             @keypress.enter="handleClickViewSave"></el-input>
           <!-- 푸터 -->
           <template #footer>
-            <el-button size="large" type="primary" @click="isOpenFilterView = false" :disabled="!filterViewName">
+            <el-button size="large" type="primary" @click="handleClickViewSave" :disabled="!filterViewName">
               <span class="save__text">내 필터 등록</span>
             </el-button>
             <el-button size="large" type="default" @click="handleClickViewSelect" v-if="!filterViewName.length"
               @keypress.enter="handleClickViewSelect">
-              <span class="save__text">'{{ selectedFilterView?.filterLabel }}' 선택</span>
+              <span class="save__text">'{{ selectedFilterView?.label }}' 선택</span>
             </el-button>
           </template>
         </el-dialog>
@@ -340,8 +344,7 @@ import API from "@/apis";
 import { state, socket } from "@/socket";
 import { FormTemplate } from "@/types/projects.type";
 import { MoonNight } from "@element-plus/icons-vue";
-import { is } from "cypress/types/bluebird";
-import { ta } from "element-plus/es/locale";
+import { al } from "vitest/dist/reporters-5f784f42";
 
 type FilterView = {
   filterLabel: string;
@@ -440,6 +443,19 @@ const setUserOptions = () => {
   });
 }
 
+// 필터 뷰 생성
+const handleClickViewSave = async () => {
+  try {
+    const result = await API.createFilterView({ teamId: selectedTeamId.value, label: filterViewName.value, filters: selectedFilters.value });
+    isOpenFilterView.value = false
+    ElMessageBox.alert("내 필터가 저장되었습니다.", "알림", {
+      confirmButtonText: "확인",
+    });
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 // 필터 옵션을 추가합니다.
 const setFilters = async () => {
   try {
@@ -448,10 +464,10 @@ const setFilters = async () => {
     // 만약 필터가 있고 선택한 필터뷰가 있다면 초기화 물어보기
     if (selectedFilters.value.length > 0 && selectedFilterView.value) {
 
-      isConfirm = await ElMessageBox.confirm("필터를 초기화 하시겠습니까?", "알림", {
-        confirmButtonText: "확인",
-        cancelButtonText: "취소",
-      });
+      // isConfirm = await ElMessageBox.confirm("필터를 초기화 하시겠습니까?", "알림", {
+      //   confirmButtonText: "확인",
+      //   cancelButtonText: "취소",
+      // });
     } else { isConfirm = true; }
 
 
@@ -517,42 +533,48 @@ const handleCheckAll = (e, filter) => {
 /** function 필터뷰 가져오기
  * @returns void
  */
-const fetchFilterViews = () => {
-  // API 호출
-  // const result = await API.getFilterView();
-  // filterOtherViews.value = result;
-  console.log('filterOtherViews', setUserOptions())
-  filterOtherViews.value = [
-    {
-      filterLabel: '내가 만든 필터',
-      key: '내가 만든 필터',
-      filters: [
-        {
-          filterLabel: '제목', key: 'title',
-          option: [], method: '일치', value: '', type: 'input', active: false, checkAll: true, indeterminate: false
-        },
-        {
-          filterLabel: '담당자', key: 'userId', option: [...setUserOptions()],
-          method: '일치', value: [...setUserOptions()], active: false, type: 'select', checkAll: true, indeterminate: false
-        },
-      ]
-    },
-    {
-      filterLabel: '내가 만든 필터2',
-      key: '내가 만든 필터2',
-      filters: [
-        {
-          filterLabel: '제목', key: 'title',
-          option: [], method: '일치', value: '', type: 'input', active: false, checkAll: true, indeterminate: false
-        },
-        {
-          filterLabel: '태그', key: 'tags', option: [...setTagsOptions(tags)
-          ],
-          method: '포함', value: [...setTagsOptions(tags)], active: false, type: 'select', checkAll: true, indeterminate: false
-        },
-      ]
-    },
-  ];
+const fetchFilterViews = async () => {
+  try {
+    // API 호출
+    const result = await API.getFilterViews({ teamId: selectedTeamId.value });
+    filterOtherViews.value = result;
+    console.log('filterOtherViews', filterOtherViews.value)
+    // console.log('filterOtherViews', setUserOptions())
+
+    // filterOtherViews.value = [
+    //   {
+    //     filterLabel: '내가 만든 필터',
+    //     key: '내가 만든 필터',
+    //     filters: [
+    //       {
+    //         filterLabel: '제목', key: 'title',
+    //         option: [], method: '일치', value: '', type: 'input', active: false, checkAll: true, indeterminate: false
+    //       },
+    //       {
+    //         filterLabel: '담당자', key: 'userId', option: [...setUserOptions()],
+    //         method: '일치', value: [...setUserOptions()], active: false, type: 'select', checkAll: true, indeterminate: false
+    //       },
+    //     ]
+    //   },
+    //   {
+    //     filterLabel: '내가 만든 필터2',
+    //     key: '내가 만든 필터2',
+    //     filters: [
+    //       {
+    //         filterLabel: '제목', key: 'title',
+    //         option: [], method: '일치', value: '', type: 'input', active: false, checkAll: true, indeterminate: false
+    //       },
+    //       {
+    //         filterLabel: '태그', key: 'tags', option: [...setTagsOptions(tags)
+    //         ],
+    //         method: '포함', value: [...setTagsOptions(tags)], active: false, type: 'select', checkAll: true, indeterminate: false
+    //       },
+    //     ]
+    //   },
+    // ];
+  } catch (error) {
+    console.log('error', error)
+  }
 };
 
 
@@ -584,9 +606,17 @@ const filterCardsByAction = (filters, cards) => {
             return filter.value.some((el) => el.value === card[filter.key]);
           }
         } else if (filter.method === '포함') {
-          return filter.value.some((el) => el.value.includes(card[filter.key]));
+          if (Array.isArray(card[filter.key])) {
+            return filter.value.some(objA => card[filter.key].some(objB => objB.label.includes(objA.value)));
+          } else {
+            return filter.value.some((el) => card[filter.key].includes(el.value));
+          }
         } else if (filter.method === '제외') {
-          return !filter.value.some((el) => el.value.includes(card[filter.key]));
+          if (Array.isArray(card[filter.key])) {
+            return filter.value.every(objA => card[filter.key].some(objB => !objB.label.includes(objA.value)));
+          } else {
+            return filter.value.every((el) => !card[filter.key].includes(el.value));
+          }
         }
 
 
@@ -619,16 +649,6 @@ const setTagsOptions = (tags) => {
       label: tag,
       value: tag,
     };
-  });
-};
-
-const handleClickViewSave = () => {
-  // 만약 내 필터 이름이 중복되면
-  // 중복된다는 문구 표시
-  // 중복되지 않으면
-  // 내가 설정한 필터가 저장됩니다. 문구 표시
-  ElMessageBox.alert("내 필터가 저장되었습니다.", "알림", {
-    confirmButtonText: "확인",
   });
 };
 
@@ -741,6 +761,8 @@ const handleUserConnected = (data) => {
 // 필터 로컬 스토리지에 저장
 const setFilterLocal = () => {
   localStorage.setItem('filters', JSON.stringify(selectedFilters.value));
+  // 필터뷰 저장
+  localStorage.setItem('selectedFilterView', JSON.stringify(selectedFilterView.value));
 };
 
 // 필터 로컬 스토리지에서 가져오기
@@ -748,6 +770,7 @@ const getFilterViewLocal = () => {
   const filter = localStorage.getItem('filters');
 
   selectedFilters.value = JSON.parse(filter);
+  selectedFilterView.value = JSON.parse(localStorage.getItem('selectedFilterView'));
 
 };
 
@@ -889,8 +912,9 @@ const getCards = async () => {
 
 
 // selectedTeamId 변경시 카드 조회
-watch(selectedTeamId, () => {
-  getCards();
+watch(selectedTeamId, async () => {
+  await getCards();
+  await fetchFilterViews();
 }, { immediate: true })
 
 const getTemple = computed(() => {
@@ -1033,7 +1057,6 @@ watch(selectedTeamId, () => {
   }, 1000);
 
   fetchFilterViews();
-
 
 })
 
