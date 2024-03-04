@@ -48,15 +48,23 @@
     다른사람이 만들어둔 필터SET을 선택하거나, 현재 필터 세팅을 'filterName'을 받아 저장할 수 있다. -->
       <section class="kanban-action-btns">
         <div class="--left">
-          <el-button type="primary" class="kanban-action-btn__item --table-view" round @click="isOpenFilterView = true"
-            :text="!selectedFilterView">
-            <el-icon>
-              <Filter />
-            </el-icon>
-            <span v-if="selectedFilterView">저장된 필터 보기: {{ selectedFilterView.label }}
-            </span>
-            <span v-else>저장된 필터 보기</span>
-          </el-button>
+          <el-button-group>
+            <el-button type="primary" class="kanban-action-btn__item --table-view" @click="isOpenFilterView = true"
+              :text="!selectedFilterView">
+              <el-icon>
+                <Filter />
+              </el-icon>
+              <span v-if="selectedFilterView">필터 뷰: {{ selectedFilterView.label }}
+              </span>
+              <span v-else>필터 뷰</span>
+            </el-button>
+            <el-button v-if="selectedFilterView" disabled type="primary" class="kanban-action-btn__item --table-view">
+              <el-icon>
+                <Warning />
+              </el-icon>
+              <span>View 업데이트</span>
+            </el-button>
+          </el-button-group>
           <!-- 고급필터 설정 -->
           <el-tooltip class="item" effect="dark" content="준비중인 기능입니다." placement="bottom">
             <el-button text type="default" class="kanban-action-btn__item" round @click="isVisiblePop = true" disabled>
@@ -99,7 +107,7 @@
           <!-- <span>필터를 저장하거나 현재 선택된 필터를 등록할 수 있습니다.</span> -->
           <div class="filter-other-views">
 
-            <el-select v-model="selectedFilterView" placeholder="필터 선택" class="select-user" value-key="filterKey"
+            <el-select v-model="selectedFilterView" placeholder="필터 선택" class="select-user" value-key="_id"
               :class="{ '--disabled': !!filterViewName }" :disabled="!filterOtherViews.length || !!filterViewName">
               <el-option v-for="filter in filterOtherViews" :key="filter.key" :label="filter.label" :value="filter">
               </el-option>
@@ -169,6 +177,20 @@
                     </el-button>
                   </template>
                 </el-input>
+                <div v-else-if="filter.type === 'date'" class="filter__select --date">
+                  <el-date-picker type="date" v-model="filter.value" :placeholder="filter.filterLabel"
+                    :disabled="isOffFilter" class="filter__select --text" :clearable="false">
+                    <template #prepend>
+                      <span class="filter__method --input">{{ filter.method }}</span>
+                    </template>
+                  </el-date-picker>
+                  <el-button class="filter__remove-btn date" @click="handleClickFilterRemove(index)" type="text" circle
+                    size="mini" style="position: absolute; right: 0; top: 0; z-index: 1;">
+                    <el-icon>
+                      <Close />
+                    </el-icon>
+                  </el-button>
+                </div>
                 <div v-else :placeholder="filter.filterLabel" :disabled="true" class="filter__select --text">
                   <span class="filter__method">{{ filter.method }}</span> {{ filter.filterLabel }}
                 </div>
@@ -222,6 +244,10 @@
                   <el-input v-else-if="selectedFilter.type === 'input'" v-model="selectedFilter.value"
                     :placeholder="selectedFilter.filterLabel" class="filter__select --text">
                   </el-input>
+                  <!-- date -->
+                  <el-date-picker v-else-if="selectedFilter.type === 'date'" type="date" v-model="selectedFilter.value"
+                    placeholder="날짜 선택" class="filter__select --text">
+                  </el-date-picker>
                 </div>
 
                 <div class="popover__footer">
@@ -368,12 +394,8 @@ const selectedFilter: Filter = ref(null);  // 현재 선택된 필터 아이템 
 const selectedFilters = ref<Filter[]>([]);  // 현재 선택된 필터 [필터 추가로 선택된 필터 아이템들]
 const selectedFilterLable = ref(''); // 현재 선택된 필터 이름
 const searchValue = ref("");
-const selectedForm: FormTemplate = ref(null);
-
-
 const popoverRef = ref()
 const onClickOutside = () => {
-
   // .el-select-dropdown__dropdown
   if (event.target.closest('.el-select-dropdown__dropdown') || event.target.closest('.el-select-dropdown')
     || event.target.closest('.el-select-dropdown__item') || event.target.closest('.el-select-dropdown__wrap')
@@ -383,10 +405,12 @@ const onClickOutside = () => {
   ) {
     return
   }
-
-
   isVisiblePop.value = false
 }
+
+// 필터가 변경되는 경우를 감지하여 '뷰 업데이트' 버튼이 활성화 됩니다.
+const isChangingView = ref(false);
+
 
 const cards = ref<Card[]>([]);
 const initForm = ref<Card>({
@@ -490,14 +514,23 @@ const setFilters = async () => {
       ];
     }
 
+    // formTemplate에 따라서 필터가 달라짐
+    console.log('오홀', getTemple.value)
+
+    const optionalField = getTemple.value.cols.map((el) => {
+      return {
+        filterLabel: el.label, key: el.key, option: [], method: '일치', value: '', type: el.type, active: false, checkAll: true, indeterminate: false
+      }
+    })
+
+    filters.value = filters.value.concat(optionalField)
+
+
 
   } catch (error) {
     console.log('error', error)
   }
 };
-setTimeout(() => {
-  setFilters();
-}, 1000)
 
 const handleClickFilterRemove = (index) => {
   console.log('handleClickFilterRemove')
@@ -506,20 +539,24 @@ const handleClickFilterRemove = (index) => {
 
 // 필터 추가 Select
 watch(selectedFilters, (val) => {
+  console.log('filters.value 허허', filters.value)
   selectedFilters.value.forEach((el, idx) => {
     //필터 라벨과 일치하는 필터를 찾아서 값을 비교합니다. (select, input, date)
+
     const sameLabelOption = filters.value.filter((filter) => filter.key === selectedFilters.value[idx].key)[0].option.map((el) => el.value);
 
     //type 이 select 일때
     // if (selectedFilters.value[idx].type === 'select') {
-    if (selectedFilters.value[idx].value.length === 0) {
-      el.checkAll = false
-      el.indeterminate = false
-    } else if (sameLabelOption.length === selectedFilters.value[idx].value.length) {
-      el.checkAll = true
-      el.indeterminate = false
-    } else {
-      el.indeterminate = true
+    if (selectedFilters.value[idx].type !== 'date') {
+      if (selectedFilters.value[idx].value.length === 0) {
+        el.checkAll = false
+        el.indeterminate = false
+      } else if (sameLabelOption.length === selectedFilters.value[idx].value.length) {
+        el.checkAll = true
+        el.indeterminate = false
+      } else {
+        el.indeterminate = true
+      }
     }
   })
 }, { deep: true })
@@ -539,39 +576,6 @@ const fetchFilterViews = async () => {
     const result = await API.getFilterViews({ teamId: selectedTeamId.value });
     filterOtherViews.value = result;
     console.log('filterOtherViews', filterOtherViews.value)
-    // console.log('filterOtherViews', setUserOptions())
-
-    // filterOtherViews.value = [
-    //   {
-    //     filterLabel: '내가 만든 필터',
-    //     key: '내가 만든 필터',
-    //     filters: [
-    //       {
-    //         filterLabel: '제목', key: 'title',
-    //         option: [], method: '일치', value: '', type: 'input', active: false, checkAll: true, indeterminate: false
-    //       },
-    //       {
-    //         filterLabel: '담당자', key: 'userId', option: [...setUserOptions()],
-    //         method: '일치', value: [...setUserOptions()], active: false, type: 'select', checkAll: true, indeterminate: false
-    //       },
-    //     ]
-    //   },
-    //   {
-    //     filterLabel: '내가 만든 필터2',
-    //     key: '내가 만든 필터2',
-    //     filters: [
-    //       {
-    //         filterLabel: '제목', key: 'title',
-    //         option: [], method: '일치', value: '', type: 'input', active: false, checkAll: true, indeterminate: false
-    //       },
-    //       {
-    //         filterLabel: '태그', key: 'tags', option: [...setTagsOptions(tags)
-    //         ],
-    //         method: '포함', value: [...setTagsOptions(tags)], active: false, type: 'select', checkAll: true, indeterminate: false
-    //       },
-    //     ]
-    //   },
-    // ];
   } catch (error) {
     console.log('error', error)
   }
@@ -599,10 +603,11 @@ const filterCardsByAction = (filters, cards) => {
         // }
         if (filter.method === '일치') {
           //card[filter.key]가 배열이 경우
-          if (Array.isArray(card[filter.key])) {
+          if (Array.isArray(card[filter.key]) && filter.type !== 'date') {
             console.log('card[filter.key]', card[filter.key], filter.value)
             return filter.value.every(objA => card[filter.key].some(objB => objB.label === objA.value));
-          } else {
+          }
+          else {
             return filter.value.some((el) => el.value === card[filter.key]);
           }
         } else if (filter.method === '포함') {
@@ -762,15 +767,32 @@ const handleUserConnected = (data) => {
 const setFilterLocal = () => {
   localStorage.setItem('filters', JSON.stringify(selectedFilters.value));
   // 필터뷰 저장
-  localStorage.setItem('selectedFilterView', JSON.stringify(selectedFilterView.value));
+  // localStorage.setItem('selectedFilterView', JSON.stringify(selectedFilterView.value));
+
+  //필터 _id 를 저장
+  localStorage.setItem('filterViewId', selectedFilterView.value._id);
 };
 
 // 필터 로컬 스토리지에서 가져오기
 const getFilterViewLocal = () => {
   const filter = localStorage.getItem('filters');
 
-  selectedFilters.value = JSON.parse(filter);
-  selectedFilterView.value = JSON.parse(localStorage.getItem('selectedFilterView'));
+
+  const viewId = localStorage.getItem('filterViewId');
+
+
+  if (viewId) {
+    selectedFilterView.value = filterOtherViews.value.find((el) => el._id === viewId);
+    if (selectedFilterView.value) {
+      selectedFilters.value = selectedFilterView.value.filters;
+    }
+    // selectedFilters.value = selectedFilterView.value.filters;
+    console.log('오 정말 대단한걸', viewId, selectedFilterView.value, filterOtherViews.value)
+  }
+  else {
+    console.log('selectedFilterView4', selectedFilterView.value)
+    selectedFilters.value = JSON.parse(filter);
+  }
 
 };
 
@@ -779,9 +801,6 @@ onMounted(() => {
   socket.on("users:connected", (data) => {
     handleUserConnected(data);
   });
-
-  // localStorage 에 존재하는 필터뷰 가져오기
-  getFilterViewLocal();
 
   // 브라우저의 탭이 닫히거나 새로고침할때
   window.addEventListener('beforeunload', setFilterLocal);
@@ -915,6 +934,10 @@ const getCards = async () => {
 watch(selectedTeamId, async () => {
   await getCards();
   await fetchFilterViews();
+  setFilters();
+
+  // localStorage 에 존재하는 필터뷰 가져오기
+  getFilterViewLocal();
 }, { immediate: true })
 
 const getTemple = computed(() => {
@@ -1027,10 +1050,6 @@ class CardActions {
           const afterMb = element.title.split(`#mb-`)[1].split(' ')[0].split(')')[0].split(']')[0];
           const cardIdx = cards.value.findIndex((card) => card._id === afterMb);
           const cardTitle = element.title;
-          // const cardTag = element?.tags[0]?.title || 'chore';
-
-          // const commitMessage =
-          //   ` ${cardTag}: ${cardTitle}`
 
           const commitMessage =
             `${cardTitle}`
@@ -1052,7 +1071,6 @@ watch(selectedTeamId, () => {
 
   setTimeout(() => {
     socket.emit("users:connected", { userId: user.value.id, userName: user.value.name }, (result: any) => {
-      console.log('users:connected', result)
     });
   }, 1000);
 
@@ -1391,6 +1409,10 @@ const onDrop = async (e, boardId) => {
       padding: 12px 20px;
 
       .el-badge {
+        width: 100%;
+        display: flex;
+
+
         &::v-deep(sup) {
           font-size: 12px;
           color: $gray-100;
@@ -1415,6 +1437,8 @@ const onDrop = async (e, boardId) => {
             display: flex;
             flex-direction: row;
             align-items: center;
+            width: auto;
+            flex-wrap: nowrap;
             justify-content: flex-start;
           }
 
@@ -1939,6 +1963,45 @@ html.dark {
 .show-btn {
   &.--is-off {
     background-color: #892be257;
+  }
+}
+
+.filter__select.--date {
+  display: flex;
+  border: 0px;
+  width: 200px;
+  flex: 1 0;
+
+
+  // .el-input {
+  //   border-radius: 8px 0 0 8px;
+  // }
+
+  .el-input__wrapper {
+    border: 0px;
+    // width: 200px;
+  }
+
+  .filter__remove-btn {
+
+    // 날짜
+    &.date {
+      width: 40px;
+      position: relative;
+      padding: 0px;
+      margin: 0px;
+      display: flex;
+      align-items: center;
+      text-align: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: $gray-500;
+      border: 1px solid #4C4D4F;
+      background-color: #262727;
+      // border-left: 0px;
+      border-radius: 0 8px 8px 0;
+    }
   }
 }
 </style>
