@@ -29,6 +29,7 @@ export interface Card {
   projectCardId?: number;
   projectId: string;
   boardId: string;
+  avatar: string;
   tags: Tag[];
   order: number;
   commit: Commit[];

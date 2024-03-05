@@ -58,7 +58,8 @@
               </span>
               <span v-else>필터 뷰</span>
             </el-button>
-            <el-button v-if="selectedFilterView" disabled type="primary" class="kanban-action-btn__item --table-view">
+            <el-button v-if="selectedFilterView" :disabled="!isChangingView" type="primary"
+              class="kanban-action-btn__item --table-view">
               <el-icon>
                 <Warning />
               </el-icon>
@@ -118,6 +119,7 @@
           <el-input v-model="filterViewName" placeholder="내 필터 이름" clearable class="filter__input"
             @keypress.enter="handleClickViewSave"></el-input>
           <!-- 푸터 -->
+
           <template #footer>
             <el-button size="large" type="primary" @click="handleClickViewSave" :disabled="!filterViewName">
               <span class="save__text">내 필터 등록</span>
@@ -139,6 +141,7 @@
                 :type="filter.method === '일치' ? 'success' : filter.method === '포함' ? 'warning' : filter.method === '제외' ? 'danger' : 'info'">
                 <el-select v-if="filter.type === 'select'" :placeholder="filter.filterLabel + ' 선택'"
                   v-model="filter.value" multiple :disabled="isOffFilter" value-key="value" class="filter__select">
+
                   <template #header>
                     <div class="dropdown-header__container">
                       <el-checkbox v-model="filter.checkAll" :indeterminate="filter.indeterminate"
@@ -155,9 +158,11 @@
                   <el-option v-for="(op, index) in filter.option" :key="index" :label="op.label" :value="op">
                     {{ op.label }}
                   </el-option>
+
                   <template #prefix>
                     <span class="filter__method">{{ filter.method }}</span>
                   </template>
+
                   <template #tag>
                     <el-tag v-for="(a, index) in filter.value" :key="index">
                       {{ a.label }}
@@ -166,9 +171,11 @@
                 </el-select>
                 <el-input v-else-if="filter.type === 'input'" v-model="filter.value" :placeholder="filter.filterLabel"
                   :disabled="isOffFilter" class="filter__select --text">
+
                   <template #prepend>
                     <span class="filter__method --input">{{ filter.method }}</span>
                   </template>
+
                   <template #append>
                     <el-button @click="handleClickFilterRemove(index)" class="filter__remove-btn">
                       <el-icon>
@@ -180,6 +187,7 @@
                 <div v-else-if="filter.type === 'date'" class="filter__select --date">
                   <el-date-picker type="date" v-model="filter.value" :placeholder="filter.filterLabel"
                     :disabled="isOffFilter" class="filter__select --text" :clearable="false">
+
                     <template #prepend>
                       <span class="filter__method --input">{{ filter.method }}</span>
                     </template>
@@ -197,6 +205,7 @@
               </el-badge>
               <!-- AND 와 OR 중 선택 가능 -->
               <el-button class="filter__op-btn" text>AND</el-button>
+
               <template #reference>
                 <el-button class="filter__op-btn" text>
                   {{ filterOperators[index] }}
@@ -231,6 +240,7 @@
                 <div v-if="selectedFilter" class="kanban-filter__popover__select-value">
                   <el-select v-if="selectedFilter && selectedFilter.type === 'select'" v-model="selectedFilter.value"
                     placeholder="값 선택" multiple :disabled="!selectedFilter" value-key="value" class="filter__select">
+
                     <template #header>
                       <el-checkbox v-model="selectedFilter.checkAll" :indeterminate="selectedFilter.indeterminate"
                         @change="(e) => handleCheckAll(e, selectedFilter)">
@@ -258,6 +268,7 @@
                     :disabled="!selectedFilter">확인</el-button>
                 </div>
               </div>
+
               <template #reference>
                 <!-- 검색필터 추가 아이콘 버튼 -->
                 <el-button @click="isVisiblePop = !isVisiblePop" class="filter__add-btn">
@@ -285,8 +296,8 @@
         <header class="kanban-container-boards__panel-header">
           <h1 class="kanban-class">{{ board.title }} <span
               v-if="filterCards.filter(el => el.boardId === board.id).length > 0" class="kanban-class__count">({{
-                filterCards.filter(el => el.boardId === board.id).length
-              }})</span></h1>
+          filterCards.filter(el => el.boardId === board.id).length
+        }})</span></h1>
           <el-tooltip class="item" effect="dark" content="노트 추가" placement="top">
             <i @click="handleClickToAdd(board)"> <el-icon class="kanban-menu">
                 <Edit />
@@ -318,8 +329,8 @@
           </KanbanBoardCard>
           <EmptyKanbanCard v-if="filterCards.filter(el => el.boardId === board.id).length === 0"
             @add="handleClickToAdd(board)" />
-          <el-button v-else-if="filterCards.filter(el => el.boardId === board.id).length > 0" size="large" class="add-btn"
-            @click="handleClickToAdd(board)" text>
+          <el-button v-else-if="filterCards.filter(el => el.boardId === board.id).length > 0" size="large"
+            class="add-btn" @click="handleClickToAdd(board)" text>
             <el-icon>
               <Plus />
             </el-icon>
@@ -331,6 +342,7 @@
     <el-drawer size="55%" :title="modalKanban.boardTitle" v-model="modalKanban.dialogVisible" destroy-on-close>
       <ModalKanbanCardCreate :isOpen="modalKanban.dialogVisible" :form="form" @enter.self="handleSave(selectedBoardId)"
         :optinalField="getTemple" @update:form="updateForm" :type="modalKanban.openType" />
+
       <template #footer>
         <div class="dialog-footer">
           <el-button size="large" type="default" @click="handleSave(selectedBoardId)">
@@ -348,6 +360,7 @@
 
   </div>
 </template>
+
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, watch, onUnmounted, unref } from "vue";
 // computed 타입
@@ -425,6 +438,7 @@ const initForm = ref<Card>({
   projectId: '',
   order: 0,
   tags: [],
+  avatar: '',
   commit: [],
   optionalData: {},
 });
@@ -538,12 +552,23 @@ const handleClickFilterRemove = (index) => {
 }
 
 // 필터 추가 Select
-watch(selectedFilters, (val) => {
+watch(selectedFilters, (val, oldVla) => {
   console.log('filters.value 허허', filters.value)
+  // 필터뷰가 변경되면 뷰 업데이트 버튼이 활성화 됩니다.
+
+  if (oldVla.length !== 0) {
+    isChangingView.value = true;
+  }
+
+  console.log('isChangingView', isChangingView.value)
+
+
   selectedFilters.value.forEach((el, idx) => {
     //필터 라벨과 일치하는 필터를 찾아서 값을 비교합니다. (select, input, date)
 
     const sameLabelOption = filters.value.filter((filter) => filter.key === selectedFilters.value[idx].key)[0].option.map((el) => el.value);
+
+
 
     //type 이 select 일때
     // if (selectedFilters.value[idx].type === 'select') {
@@ -1262,6 +1287,7 @@ const onDrop = async (e, boardId) => {
 
 
 </script>
+
 <style scoped lang="scss">
 .kanban-container {
   position: relative;
@@ -1393,9 +1419,9 @@ const onDrop = async (e, boardId) => {
       width: 100%;
       padding: 10px 24px;
 
-      .kanban-action-btn__item {
-        border: none;
-      }
+      // .kanban-action-btn__item {
+      //   border: none;
+      // }
     }
 
 
@@ -1911,10 +1937,6 @@ html.dark {
     border-top: 1px solid $dark-gray-100 !important;
   }
 
-  .--text {
-    // border: 2px dashed $dark-gray-100 !important;
-  }
-
   .add-btn:hover {
     background-color: $dark-gray-100;
   }
@@ -1922,6 +1944,7 @@ html.dark {
 
 }
 </style>
+
 <style lang="scss">
 .moon-notification {
   // 보라색
@@ -2005,4 +2028,3 @@ html.dark {
   }
 }
 </style>
-

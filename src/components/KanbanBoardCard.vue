@@ -1,5 +1,6 @@
 <template>
-  <el-card class="kanban-board-card" ref="cardRef" :class="{ 'kanban-board-card--linked': isLinked }" :id="linkedCardId">
+  <el-card class="kanban-board-card" ref="cardRef" :class="{ 'kanban-board-card--linked': isLinked }"
+    :id="linkedCardId">
     <slot></slot> <!-- 커스텀 슬롯 (드래그 드랍으로 사용합니다.) -->
     <div class="kanban-board-card-header">
       <div class="kanban-board-card-header__menu">
@@ -31,8 +32,8 @@
           <el-icon class="linked-icon__icon">
             <Link />
           </el-icon>
-          <span class="icon-link__text">{{ card.commit.length
-          }}</span>
+          <span class="icon-link__text">
+            {{ card.commit.length }}</span>
         </div>
       </div>
     </div>
@@ -42,14 +43,21 @@
     <section class="card__item--profile">
       <!-- <el-avatar shape="square" class="header__user-avatar" :size="20"
         src="https://avatars.githubusercontent.com/u/26598542?v=4" alt="avatar" /> -->
+      <span class="header__user-name">
+        <el-image shape="round" class="user-avatar" :size="20" :src="'https://i.pravatar.cc/150'" alt="avatar" />
+        <div class="header__user-name__text">
+          <div>{{ card.userName }}</div>
+          <div class="project-card-id">
+            #md-{{ card.projectCardId }}
+          </div>
+        </div>
+      </span>
       <div class="kanban-board-card-header-title">
         <span class="title-text">
           {{ card.title }}
         </span>
       </div>
-      <span class="header__user-name">
-        {{ card.userName }}
-      </span>
+
 
       <!-- <el-tooltip content=" 번호 복사" placement="top">
           <el-icon @click.stop="handleClickNumCopy(card.projectCardId)" class="kanban-copy">
@@ -68,11 +76,11 @@
 
     <div class="kanban-board-card--num">
 
-      <section class="kanban-board-copy-icons">
+      <!-- <section class="kanban-board-copy-icons">
         <span class="header__card-num">
           #mb-{{ card.projectCardId }}
-        </span> <!-- 복사 버튼 -->
-      </section>
+        </span>
+      </section> -->
       <div class="kanban-board-card-tags" v-if="card.tags.length">
 
         <el-tag size="small" class="tag-only" round>{{ card.tags[0].label }}</el-tag>
@@ -110,6 +118,7 @@
     </div>
   </el-card>
 </template>
+
 <script setup lang="ts">
 import { ref, defineProps, defineEmits, computed, onUnmounted } from "vue";
 import { ElIcon } from "element-plus";
@@ -207,6 +216,7 @@ const handleClickDelete = () => {
 };
 
 </script>
+
 <style scoped lang="scss">
 .kanban-board-card {
   position: relative;
@@ -281,8 +291,34 @@ const handleClickDelete = () => {
       font-size: 14px;
       font-weight: 500;
       width: 100%;
-      color: $gray-500;
+      // color: $gray-500;
       // margin-left: 10px;
+
+      .user-avatar {
+        margin-right: 6px;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        background-color: white;
+      }
+
+      .header__user-name__text {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        font-size: 14px;
+        font-weight: 500;
+        // color: $gray-700;
+
+      }
+
+      .project-card-id {
+        margin-left: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        color: $gray-700;
+
+      }
     }
   }
 
@@ -415,7 +451,7 @@ const handleClickDelete = () => {
 
     .title-text {
       margin-right: 10px;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       width: 220px;
 
