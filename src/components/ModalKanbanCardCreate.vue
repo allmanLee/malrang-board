@@ -35,7 +35,8 @@
       </el-form-item>
 
       <el-form-item v-for="field in optinalField?.cols || []" :key="field.id" :label="field.label" size="large">
-        <el-input v-if="field.type === 'text'" v-model="customForm.optionalData[field.id]" placeholder="입력하세요"></el-input>
+        <el-input v-if="field.type === 'text'" v-model="customForm.optionalData[field.id]"
+          placeholder="입력하세요"></el-input>
         <el-select v-else-if="field.type === 'select'" v-model="customForm.optionalData[field.key]" placeholder="선택하세요"
           class="select-user">
           <el-option v-for="option in field.options" :key="option.id" :label="option.label"
@@ -55,8 +56,9 @@
           <el-tag v-for="tag in customForm.tags" :key="tag.id" type="info" closable @close="handleCloseTag(tag)" round>
             {{ tag.label }}
           </el-tag>
-          <el-input class="tag__input" v-model="customForm.tag" placeholder="추가 태그를 입력"
-            @keyup.enter="handleAddTag"></el-input>
+          <el-autocomplete class="tag__input" v-model="customForm.tag" :fetch-suggestions="querySearch"
+            value-key="label" placeholder="추가 태그를 입력" @select="handleAddTag" @keyup.enter="handleAddTag"
+            trigger-on-focus></el-autocomplete>
           <!-- 태그에 입력된 값이 있으면 'Enter'표시 -->
           <el-button v-if="customForm.tag" type="primary" @click="handleAddTag">
             <span class="icon-enter">↵</span></el-button>
@@ -128,6 +130,10 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  tags: {
+    type: Array,
+    required: true,
+  },
   // openType : ['create','update'],
   type: {
     type: String,
@@ -141,6 +147,25 @@ const form = toRef(props, "form");
 
 if (props.type === "update") {
   previewOnly.value = true;
+}
+
+// 태그를 필터링하여 보여줍니다.
+const restaurants = ref(props.tags)
+
+const querySearch = (queryString: string, cb: any) => {
+  console.log("tags", props.tags, restaurants.value);
+  const results = queryString
+    ? restaurants.value.filter(createFilter(queryString))
+    : restaurants.value
+  // call callback function to return suggestions
+  cb(results)
+};
+const createFilter = (queryString: string) => {
+  return (restaurant: any) => {
+    return (
+      restaurant.label.indexOf(queryString) === 0
+    )
+  }
 }
 
 
@@ -220,6 +245,7 @@ const handleCloseTag = (tag: any) => {
   customForm.value.tags.splice(index, 1);
 };
 </script>
+
 <style scoped lang="scss">
 // 폼
 .form-wrap {

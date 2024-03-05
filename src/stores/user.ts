@@ -98,6 +98,7 @@ export const useUserStore = defineStore('user', {
         id: user.id,
         name: user.name,
         email: user.email,
+        avatar: user.avatar || null,
         groupName: user.groupName || null,
         groupId: user.groupId || null,
         teams: teams || [],

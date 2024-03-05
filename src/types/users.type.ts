@@ -32,6 +32,7 @@ export type TeamRequestDto = {
 export type UserState = {
   id?: string,
   name: string;
+  avatar: string;
   email: string;
   teams: Team[];
   projects: Project[];

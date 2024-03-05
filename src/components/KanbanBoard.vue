@@ -21,16 +21,16 @@
       <article class="kanban-header__profiles">
         <!-- 본인 -->
         <el-tooltip class="item" effect="dark" content="내 프로필" placement="bottom">
-          <el-avatar class="kanban-header__avatar --me" :size="20"
-            :src="'https://avatars.dicebear.com/api/avataaars/' + 1 + '.svg'">
-            <i class="el-icon-user-solid"></i>
-          </el-avatar>
+          <el-skeleton v-if="user?.avatar" :loading="true" :avatar="true" :title="true" :row="1">
+            <el-avatar class="kanban-header__avatar --me" :size="20" :src="user.avatar">
+              <i class="el-icon-user-solid"></i>
+            </el-avatar>
+          </el-skeleton>
         </el-tooltip>
         <!-- 연결된 사용자 프로필 -->
         <div v-for="user in connectedUsers" class="kanban-header__profiles__item" :key="user.userName">
           <el-tooltip class="item" effect="dark" :content="user.userName" placement="bottom">
-            <el-avatar class="kanban-header__avatar" :size="20"
-              :src="'https://avatars.dicebear.com/api/avataaars/' + 1 + '.svg'">
+            <el-avatar class="kanban-header__avatar" :size="20" :src="user.avatar">
               <i class="el-icon-user-solid"></i>
             </el-avatar>
           </el-tooltip>
@@ -341,7 +341,7 @@
     <!-- 팝업 메뉴 -->
     <el-drawer size="55%" :title="modalKanban.boardTitle" v-model="modalKanban.dialogVisible" destroy-on-close>
       <ModalKanbanCardCreate :isOpen="modalKanban.dialogVisible" :form="form" @enter.self="handleSave(selectedBoardId)"
-        :optinalField="getTemple" @update:form="updateForm" :type="modalKanban.openType" />
+        :optinalField="getTemple" @update:form="updateForm" :tags="tags" :type="modalKanban.openType" />
 
       <template #footer>
         <div class="dialog-footer">
@@ -373,7 +373,7 @@ import { cloneDeep, orderBy } from "lodash";
 import { useUserStore } from "@/stores/user";
 import { useBoardStore } from "@/stores/board";
 import { useCommonStore } from "@/stores/common";
-import { ElMessageBox, ElNotification } from "element-plus"; // 메세지 박스
+import { ElMessageBox, ElNotification, valueEquals } from "element-plus"; // 메세지 박스
 import { ClickOutside as vClickOutside } from 'element-plus'
 
 import "md-editor-v3/lib/style.css";
@@ -433,12 +433,12 @@ const initForm = ref<Card>({
   created_date: "",
   userId: "",
   userName: '',
+  userAvatar: '',
   teamId: selectedTeamId.value,
   boardId: '',
   projectId: '',
   order: 0,
   tags: [],
-  avatar: '',
   commit: [],
   optionalData: {},
 });
@@ -673,11 +673,12 @@ const filterCardsByAction = (filters, cards) => {
 };
 
 const setTagsOptions = (tags) => {
-  console.log(tags.value)
+  console.log('하핫', tags.value)
+  if (!tags.value) return []
   return tags.value.map((tag) => {
     return {
-      label: tag,
-      value: tag,
+      label: tag.label,
+      value: tag.label,
     };
   });
 };
@@ -928,17 +929,18 @@ const onDragLeave = (e, cardId) => {
 
 const tags = ref([]);
 const setTagsFromCards = (cards) => {
-  console.log('cards', cards)
-  // 태그에서 타이틀이 중복된 태그만 가져옵니다. (가져온 태그는 title, color 정보가 있습니다.)
-  const tagsSet = new Set(cards.flatMap((card) => card.tags).map((tag) => tag.label));
+  // 태그에서 타이틀이 중복된 태그만 가져옵니다. (가져온 태그는 title, color 정보가 있습니다.)\
+  const _tag = cards.map((card) => card.tags).flat()
+
+  // label이 중복된 값 제거
+  const uniqueTags = _tag.filter((tag, index, self) =>
+    index === self.findIndex((t) => (
+      t.label === tag.label
+    ))
+  )
 
   // 태그를 배열로 변경합니다.
-  tags.value = Array.from(tagsSet);
-
-
-
-
-  tags.value = Array.from(tagsSet);
+  tags.value = uniqueTags;
 };
 // 카드 조회 API 호출
 const getCards = async () => {
@@ -1022,15 +1024,17 @@ class CardActions {
   async update(cardId, form) {
     try {
       const cardIdx = cards.value.findIndex((card) => card._id === cardId);
-      cards.value[cardIdx] = form.value;
+
 
       this.resetCommit(cards.value)
       this.addCommit(cardId, cards.value)
 
       // API 호출
-      await API.updateCard(form.value);
+      const result = await API.updateCard(form.value);
+      console.log(result)
+      cards.value[cardIdx] = result;
 
-      socket.emit("cards:updated", { card: form.value }, (result: any) => {
+      socket.emit("cards:updated", { card: result }, (result: any) => {
         console.log('cards:updated', result)
       });
     } catch (error) {
@@ -1095,7 +1099,7 @@ watch(selectedTeamId, () => {
   form.value = cloneDeep(initForm.value);
 
   setTimeout(() => {
-    socket.emit("users:connected", { userId: user.value.id, userName: user.value.name }, (result: any) => {
+    socket.emit("users:connected", { userId: user.value.id, userName: user.value.name, avater: user.value.avatar }, (result: any) => {
     });
   }, 1000);
 

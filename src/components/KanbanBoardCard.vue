@@ -44,7 +44,7 @@
       <!-- <el-avatar shape="square" class="header__user-avatar" :size="20"
         src="https://avatars.githubusercontent.com/u/26598542?v=4" alt="avatar" /> -->
       <span class="header__user-name">
-        <el-image shape="round" class="user-avatar" :size="20" :src="'https://i.pravatar.cc/150'" alt="avatar" />
+        <el-avatar class="user-avatar" :size="20" :src="card.userAvatar" alt="avatar" />
         <div class="header__user-name__text">
           <div>{{ card.userName }}</div>
           <div class="project-card-id">
@@ -283,7 +283,6 @@ const handleClickDelete = () => {
 
     .header__user-avatar {
       // margin-right: 10px;
-      border: 1px solid;
     }
 
     .header__user-name {
