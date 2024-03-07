@@ -58,12 +58,20 @@
               </span>
               <span v-else>필터 뷰</span>
             </el-button>
-            <el-button v-if="selectedFilterView" :disabled="!isChangingView" type="primary"
-              class="kanban-action-btn__item --table-view">
-              <el-icon>
+            <el-button v-if="selectedFilterView" :disabled="!isChangingView" type="default"
+              @click="handleClickViewUpdate" class="kanban-action-btn__item --table-view">
+              <el-icon :color="isChangingView ? 'green' : ''">
                 <Warning />
               </el-icon>
-              <span>View 업데이트</span>
+              <span>저장</span>
+            </el-button>
+            <!-- 뷰 끄기 -->
+            <el-button v-if="selectedFilterView" type="default" class="kanban-action-btn__item --table-view"
+              @click="handleClickViewClose()">
+              <el-icon color="red">
+                <Close />
+              </el-icon>
+              <span>닫기</span>
             </el-button>
           </el-button-group>
           <!-- 고급필터 설정 -->
@@ -93,13 +101,20 @@
         </div>
 
         <div class="--right">
-
-          <el-button text type="default" class="kanban-action-btn__item" round @click="isOpenFilterView = true">
-            <el-icon>
-              <Grid />
-            </el-icon>
-            <span>표로 보기</span>
-          </el-button>
+          <section>
+            <el-button text type="default" class="kanban-action-btn__item" round @click="isOpenFilterView = true">
+              <el-icon>
+                <Grid />
+              </el-icon>
+              <span>표로 보기</span>
+            </el-button>
+          </section>
+          <!-- <section class="color-systems-icon">
+            <span></span>
+            <span class="color-systems-icon__item" v-for="(color, index) in ['#2faa3a', '#433277', '#9232ae']"
+              :key="index" :style="{ backgroundColor: color }">
+            </span>
+          </section> -->
 
 
         </div>
@@ -116,7 +131,7 @@
           </div>
 
           <!-- 내 필터 이름 -->
-          <el-input v-model="filterViewName" placeholder="내 필터 이름" clearable class="filter__input"
+          <el-input v-model="filterViewName" placeholder="다른 이름으로 저장" clearable class="filter__input"
             @keypress.enter="handleClickViewSave"></el-input>
           <!-- 푸터 -->
 
@@ -204,7 +219,7 @@
                 </div>
               </el-badge>
               <!-- AND 와 OR 중 선택 가능 -->
-              <el-button class="filter__op-btn" text>AND</el-button>
+              <!-- <el-button class="filter__op-btn" text>AND</el-button> -->
 
               <template #reference>
                 <el-button class="filter__op-btn" text>
@@ -464,6 +479,30 @@ const filterOperators = ref([]);
 const isOpenFilterView = ref(false);
 const filterOtherViews = ref([]);
 const filterViewName = ref('');
+const handleClickViewUpdate = async () => {
+  try {
+    const id = selectedFilterView.value._id;
+    const result = await API.updateFilterView(id, { filters: selectedFilters.value });
+    isOpenFilterView.value = false
+    ElMessageBox.alert("내 필터가 업데이트 되었습니다.", "알림", {
+      confirmButtonText: "확인",
+    });
+    //  TODO 동기화 되어 필터가 싱크 떠야함
+    isChangingView.value = false;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// 필터뷰 닫기
+const handleClickViewClose = () => {
+  isOpenFilterView.value = false
+  selectedFilterView.value = null;
+  selectedFilters.value = [];
+  filterViewName.value = '';
+  isChangingView.value = false;
+  localStorage.removeItem('filterViewId')
+}
 
 
 //필터 오포레이터 추가
@@ -489,6 +528,9 @@ const handleClickViewSave = async () => {
     ElMessageBox.alert("내 필터가 저장되었습니다.", "알림", {
       confirmButtonText: "확인",
     });
+
+    //저장한 필터뷰로 변경
+    selectedFilterView.value = result;
   } catch (error) {
     console.log(error)
   }
@@ -556,16 +598,15 @@ watch(selectedFilters, (val, oldVla) => {
   console.log('filters.value 허허', filters.value)
   // 필터뷰가 변경되면 뷰 업데이트 버튼이 활성화 됩니다.
 
-  if (oldVla.length !== 0) {
-    isChangingView.value = true;
+  if (oldVla.length === 0 || !val) {
+    return
   }
-
+  isChangingView.value = true;
   console.log('isChangingView', isChangingView.value)
 
 
   selectedFilters.value.forEach((el, idx) => {
     //필터 라벨과 일치하는 필터를 찾아서 값을 비교합니다. (select, input, date)
-
     const sameLabelOption = filters.value.filter((filter) => filter.key === selectedFilters.value[idx].key)[0].option.map((el) => el.value);
 
 
@@ -819,7 +860,6 @@ const getFilterViewLocal = () => {
     console.log('selectedFilterView4', selectedFilterView.value)
     selectedFilters.value = JSON.parse(filter);
   }
-
 };
 
 onMounted(() => {
@@ -1426,6 +1466,34 @@ const onDrop = async (e, boardId) => {
       // .kanban-action-btn__item {
       //   border: none;
       // }
+
+      .--right {
+        display: flex;
+
+        .color-systems-icon {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+
+          .color-systems-icon__item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: $background-transparent;
+            font-size: 14px;
+            color: $gray-600;
+            transition: all 0.2s ease-in-out;
+
+            &:hover {
+              cursor: pointer;
+              transform: scale(1.2);
+            }
+          }
+        }
+      }
     }
 
 

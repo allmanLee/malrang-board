@@ -147,6 +147,7 @@ const userApi = {
   // 필터 뷰
   getFilterViews: (params: any) => get(`${apiEndpoints.filterViews}`, params),
   createFilterView: (viewData: any) => post(apiEndpoints.filterViews, viewData),
+  updateFilterView: (id: string,viewData: any) => patch(`${apiEndpoints.filterViews}/${id}`, viewData),
 
   // 정보 컬럼 (CRUD)
   // getInfoColumns: (params: any): Promise<any> => get(`${apiEndpoints.infomationColumns}`, params),
