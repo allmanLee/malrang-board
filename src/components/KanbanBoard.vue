@@ -1,5 +1,4 @@
 <template>
-  <!-- 드래그엔 드랍이 가능한 칸반보드 (한일, 보류, 할일) -->
   <div class="kanban-container">
     <div class="kanban-header">
       <h2 class="kanban-header__title">
@@ -44,8 +43,6 @@
     </div>
     <!-- 검색 -->
     <section class="kanban-action-menu-bar" @click="handleClickFilter(false)">
-      <!-- filter setting (Flot Button) 필터 선택기능
-    다른사람이 만들어둔 필터SET을 선택하거나, 현재 필터 세팅을 'filterName'을 받아 저장할 수 있다. -->
       <section class="kanban-action-btns">
         <div class="--left">
           <el-button-group>
@@ -106,16 +103,16 @@
               <el-icon>
                 <Grid />
               </el-icon>
-              <span>표로 보기</span>
+              <span>리스트 보기</span>
+            </el-button>
+            <!-- 설정 -->
+            <el-button text type="default" class="kanban-action-btn__item" round @click="handleClickFilter">
+              <el-icon>
+                <Setting />
+              </el-icon>
+              <span>설정</span>
             </el-button>
           </section>
-          <!-- <section class="color-systems-icon">
-            <span></span>
-            <span class="color-systems-icon__item" v-for="(color, index) in ['#2faa3a', '#433277', '#9232ae']"
-              :key="index" :style="{ backgroundColor: color }">
-            </span>
-          </section> -->
-
 
         </div>
         <el-dialog title="저장된 필터 보기" v-model="isOpenFilterView" width="auto">
@@ -179,8 +176,8 @@
                   </template>
 
                   <template #tag>
-                    <el-tag v-for="(a, index) in filter.value" :key="index">
-                      {{ a.label }}
+                    <el-tag v-for="(item, index) in filter.value" :key="index">
+                      {{ item.label }}
                     </el-tag>
                   </template>
                 </el-select>
@@ -294,9 +291,20 @@
                     <Plus />
                   </el-icon>
                 </el-button>
-
               </template>
             </el-popover>
+            <div class="color-picker-container">
+              <!-- 컬러 선택 -->
+              <el-color-picker v-model="color" popper-class="color-picker" class="color-picker__btn"
+                @active-change="handleChangeColor" ref="colorPicker" color-format="hex"
+                :predefine="['#ff4500', '#ff8c00', '#ffd700', '#90ee90', '#00ced1', '#1e90ff', '#c71585']"></el-color-picker>
+              <!-- 끄기 버튼 -->
+              <el-button text v-if="color" @click="color = null" class="color-picker__btn --close" size="small">
+                <el-icon>
+                  <Close />
+                </el-icon>
+              </el-button>
+            </div>
           </el-form>
         </section>
       </section>
@@ -372,7 +380,6 @@
         </div>
       </template>
     </el-drawer>
-
   </div>
 </template>
 
@@ -570,8 +577,6 @@ const setFilters = async () => {
       ];
     }
 
-    // formTemplate에 따라서 필터가 달라짐
-    console.log('오홀', getTemple.value)
 
     const optionalField = getTemple.value.cols.map((el) => {
       return {
@@ -595,14 +600,12 @@ const handleClickFilterRemove = (index) => {
 
 // 필터 추가 Select
 watch(selectedFilters, (val, oldVla) => {
-  console.log('filters.value 허허', filters.value)
   // 필터뷰가 변경되면 뷰 업데이트 버튼이 활성화 됩니다.
 
   if (oldVla.length === 0 || !val) {
     return
   }
   isChangingView.value = true;
-  console.log('isChangingView', isChangingView.value)
 
 
   selectedFilters.value.forEach((el, idx) => {
@@ -706,7 +709,6 @@ const filterCardsByAction = (filters, cards) => {
         }
       }
     });
-    // }
   });
 
   console.log('filterCards', filterCards)
@@ -757,6 +759,31 @@ type FilterOption = {
   value: string;
 };
 
+
+/* ---------------------------------- 컬러 필터 --------------------------------- */
+const color = ref(null);
+const colorPicker = ref(null);
+const handleChangeColor = (color22) => {
+  color.value = color22
+  console.log(color)
+  console.log(color.value)
+  // 닫기
+  colorPicker.value.hide();
+}
+
+// 버튼에 호버했을 경우
+const isHoverColor = ref(false);
+const handleHoverColor = () => {
+  isHoverColor.value = !isHoverColor.value;
+}
+
+document.addEventListener('mouseup', (e) => {
+  if (colorPicker.value && !colorPicker.value.$el.contains(e.target)) {
+    handleHoverColor()
+  }
+});
+
+/* ------------------------------------ - ----------------------------------- */
 
 
 /* ---------------------------- TODO 팀에 옵셔널데이터 추가 --------------------------- */
@@ -2097,6 +2124,81 @@ html.dark {
       // border-left: 0px;
       border-radius: 0 8px 8px 0;
     }
+  }
+}
+
+//  Color Picker
+.color-picker {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: auto;
+  height: 40px;
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 10px;
+
+
+  // 컬리 픽커 팔레트 안보이게
+  .el-color-dropdown__main-wrapper {
+    display: none;
+  }
+
+  .el-color-alpha-slider {
+    display: none;
+  }
+
+  .el-color-dropdown__btns {
+    display: none;
+  }
+
+  .color-picker__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: $background-transparent;
+    font-size: 14px;
+    color: $gray-600;
+    transition: all 0.2s ease-in-out;
+
+
+
+    &:hover {
+      cursor: pointer;
+      transform: scale(1.2);
+    }
+  }
+}
+
+.color-picker-container {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: auto;
+  font-size: 20px;
+  font-weight: 700;
+
+  .el-color-picker__trigger {
+    padding: 0px;
+  }
+
+  .el-color-picker__color {
+    border: none;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  // 닫기 버튼
+  .el-color-picker__close {
+    display: none;
   }
 }
 </style>

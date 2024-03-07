@@ -1,6 +1,10 @@
 <template>
-  <el-card class="kanban-board-card" ref="cardRef" :class="{ 'kanban-board-card--linked': isLinked }"
-    :id="linkedCardId">
+  <!-- 점 뱃지 -->
+  <!-- <el-badge :value="card.commit.length" :max="99"> -->
+  <el-card class="kanban-board-card" ref="cardRef" :class="{ 'kanban-board-card--linked': isLinked }" :style="{
+    'border-color': cardBorder
+  }" :id="linkedCardId">
+
     <slot></slot> <!-- 커스텀 슬롯 (드래그 드랍으로 사용합니다.) -->
     <div class="kanban-board-card-header">
       <div class="kanban-board-card-header__menu">
@@ -21,11 +25,6 @@
             </el-icon>
           </el-icon>
         </el-tooltip>
-        <!-- 메뉴 아이콘 버튼 -->
-        <!-- <el-icon class="kanban-menu menu-icon">
-          <MoreFilled />
-        </el-icon> -->
-
         <!-- 링크 아이콘 -->
         <div v-if="isLinked || card.commit.length" class="linked-icon" :class="{ 'linked-icon--linked': isLinked }">
 
@@ -37,12 +36,7 @@
         </div>
       </div>
     </div>
-
-
-
     <section class="card__item--profile">
-      <!-- <el-avatar shape="square" class="header__user-avatar" :size="20"
-        src="https://avatars.githubusercontent.com/u/26598542?v=4" alt="avatar" /> -->
       <span class="header__user-name">
         <el-avatar class="user-avatar" :size="20" :src="card.userAvatar" alt="avatar" />
         <div class="header__user-name__text">
@@ -57,56 +51,19 @@
           {{ card.title }}
         </span>
       </div>
-
-
-      <!-- <el-tooltip content=" 번호 복사" placement="top">
-          <el-icon @click.stop="handleClickNumCopy(card.projectCardId)" class="kanban-copy">
-            <CopyDocument />
-          </el-icon>
-        </el-tooltip>
-        <el-tooltip content="커밋 메시지 복사" placement="top">
-          <el-icon @click.stop="handleClickCommitCreate(card)" class="kanban-copy">
-            <el-icon>
-              <Ticket />
-            </el-icon>
-          </el-icon>
-
-        </el-tooltip> -->
     </section>
 
     <div class="kanban-board-card--num">
-
-      <!-- <section class="kanban-board-copy-icons">
-        <span class="header__card-num">
-          #mb-{{ card.projectCardId }}
-        </span>
-      </section> -->
       <div class="kanban-board-card-tags" v-if="card.tags.length">
 
-        <el-tag size="small" class="tag-only" round>{{ card.tags[0].label }}</el-tag>
-        <el-tag v-if="card.tags.length > 1" size="small" type="info" effect="dark" class="more-tag__count">
+        <el-tag v-for="(tag, index) in card.tags" :key="index" :color="tag.color" class="tag-only">
+          {{ tag.label }}
+        </el-tag>
+        <el-tag v-if="card.tags.length > 4" type="info" class="more-tag__count">
           +{{ card.tags.length - 1 }}
         </el-tag>
       </div>
     </div>
-
-
-    <!-- 전체 커밋 노출 -->
-    <!-- <div class="commit" v-if="card.commit[0]">
-      <div class="commit__item" v-for="( commit, index ) of  card.commit " :key="index">
-        <article :class="{ 'commit__item--hind': index > 3 }">
-
-          <a class="card-num__link" @click.stop="() => { }" :href="`#card__item-${commit.id}`">
-            <span class="card-num">
-              #mb-{{ commit.id }}
-            </span>
-            <span class="commit__body">
-              {{ commit.title }}
-            </span>
-          </a>
-        </article>
-      </div>
-    </div> -->
 
     <!-- [더보기 버튼] 만약 커밋이 3개 이상이면 노출 -->
     <div class="commit__more__btn" v-if="card.commit.length > 2">
@@ -125,6 +82,8 @@ import { ElIcon } from "element-plus";
 import { ElTag } from "element-plus";
 import { Card } from "@/types/Kanban.type";
 import { ElMessage } from "element-plus";
+import { reduce } from "lodash";
+import { s } from "vitest/dist/reporters-5f784f42";
 
 
 const emit = defineEmits(["delete"]);
@@ -136,10 +95,10 @@ const props = defineProps<{
 /* ------------------------------- URL 해시 관련 코드 ------------------------------- */
 const cardRef = ref(null);
 
-// const userName = computed(() => {
-//   const userIdx = props.card.userIdx;
-//   return users.value.find((user) => user.id === userIdx)?.name || "이름없음";
-// });
+// 카드 border 색 변경
+const cardBorder = computed(() => {
+  return props.card.tags[0]?.color || "";
+});
 
 // 카드 밖 클릭시 URL 해시 제거
 const handleClickOutside = () => {

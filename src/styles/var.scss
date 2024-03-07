@@ -44,6 +44,40 @@ $background-dark: #001420;
 $background-dark-secondary: rgb(2, 65, 74);
 
 
+//tag 13 background colors (전체적으로 더 밝은)
+$tag-red: #ff4d4f;
+$tag-volcano: #ff7a45;
+$tag-orange: #fa8c16;
+$tag-gold: #faad14;
+$tag-yellow: #fadb14;
+$tag-lime: #a0d911;
+$tag-green: #52c41a;
+$tag-cyan: #13c2c2;
+$tag-blue: #1890ff;
+$tag-geekblue: #2f54eb;
+$tag-purple: #722ed1;
+$tag-magenta: #eb2f96;
+$tag-grey: #8c8c8c;
+
+// dark mode
+$tag-red-dark: darken($tag-red, 4%);
+$tag-volcano-dark: darken($tag-volcano, 4%);
+$tag-orange-dark: darken($tag-orange, 4%);
+$tag-gold-dark: darken($tag-gold, 4%);
+$tag-yellow-dark: darken($tag-yellow, 4%);
+$tag-lime-dark: darken($tag-lime, 4%);
+$tag-green-dark: darken($tag-green, 4%);
+$tag-cyan-dark: darken($tag-cyan, 4%);
+$tag-blue-dark: darken($tag-blue, 4%);
+$tag-geekblue-dark: darken($tag-geekblue, 4%);
+$tag-purple-dark: darken($tag-purple, 4%);
+$tag-magenta-dark: darken($tag-magenta, 4%);
+$tag-grey-dark: darken($tag-grey, 4%);
+
+
+
+
+
 
 // system color (dark mode same as light mode)
 $success: #21ba45;

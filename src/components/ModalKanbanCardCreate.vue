@@ -53,7 +53,8 @@
 
       <el-form-item label="태그 (최대 10개)">
         <div class="tag-container">
-          <el-tag v-for="tag in customForm.tags" :key="tag.id" type="info" closable @close="handleCloseTag(tag)" round>
+          <el-tag v-for="tag in customForm.tags" :key="tag.id" closable @close="handleCloseTag(tag)" round
+            color="tag.color" effect="plain">
             {{ tag.label }}
           </el-tag>
           <el-autocomplete class="tag__input" v-model="customForm.tag" :fetch-suggestions="querySearch"
