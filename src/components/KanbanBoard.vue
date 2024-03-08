@@ -98,20 +98,20 @@
         </div>
 
         <div class="--right">
-          <section>
-            <el-button text type="default" class="kanban-action-btn__item" round @click="isOpenFilterView = true">
-              <el-icon>
-                <Grid />
-              </el-icon>
-              <span>리스트 보기</span>
-            </el-button>
+          <section class="right-btns__wrap">
+            <el-switch v-model="showTypeTable" active-color="" inactive-color="" active-text="표" inactive-text="칸반"
+              :active-icon="Expand" :inactive-icon="Postcard" class="kanban-action-btn__item" inline-prompt
+              size="large">
+            </el-switch>
             <!-- 설정 -->
-            <el-button text type="default" class="kanban-action-btn__item" round @click="handleClickFilter">
-              <el-icon>
-                <Setting />
-              </el-icon>
-              <span>설정</span>
-            </el-button>
+            <div class="right-btns__wrap__item">
+              <el-button text type="default" class="kanban-action-btn__item" round @click="handleClickFilter">
+                <el-icon>
+                  <Setting />
+                </el-icon>
+                <span>설정</span>
+              </el-button>
+            </div>
           </section>
 
         </div>
@@ -310,8 +310,10 @@
       </section>
     </section>
 
-
-    <div class="kanban-container-boards">
+    <div v-if="showTypeTable" class=" kanban-container-table">
+      <KanbanTable :cards="filterCards" :boards="boards" @select="handleSelectTable" :optionalField="getTemple" />
+    </div>
+    <div v-if="!showTypeTable" class="kanban-container-boards">
 
       <div class="kanban-container-boards__panel" v-for="board in boards" :key="board.id"
         @drop.prevent="onDrop($event, board.id)" @dragenter.prevent @dragover.prevent>
@@ -364,7 +366,7 @@
     <!-- 팝업 메뉴 -->
     <el-drawer size="55%" :title="modalKanban.boardTitle" v-model="modalKanban.dialogVisible" destroy-on-close>
       <ModalKanbanCardCreate :isOpen="modalKanban.dialogVisible" :form="form" @enter.self="handleSave(selectedBoardId)"
-        :optinalField="getTemple" @update:form="updateForm" :tags="tags" :type="modalKanban.openType" />
+        :optionalField="getTemple" @update:form="updateForm" :tags="tags" :type="modalKanban.openType" />
 
       <template #footer>
         <div class="dialog-footer">
@@ -390,6 +392,7 @@ import type { ComputedRef } from "vue";
 import { Board, Card } from "@/types/Kanban.type";
 import ModalKanbanCardCreate from "./ModalKanbanCardCreate.vue";
 import KanbanBoardCard from "@/components/KanbanBoardCard.vue";
+import KanbanTable from "@/components/KanbanTable.vue";
 import EmptyKanbanCard from "@/components/EmptyKanbanCard.vue";
 import { cloneDeep, orderBy } from "lodash";
 import { useUserStore } from "@/stores/user";
@@ -404,7 +407,9 @@ import API from "@/apis";
 // Socket IO (실시간 통신)
 import { state, socket } from "@/socket";
 import { FormTemplate } from "@/types/projects.type";
-import { MoonNight } from "@element-plus/icons-vue";
+import {
+  MoonNight, Close, Check, Postcard, Expand
+} from "@element-plus/icons-vue";
 import { al } from "vitest/dist/reporters-5f784f42";
 
 type FilterView = {
@@ -412,6 +417,9 @@ type FilterView = {
   _id: string;
   filters: Filter[];
 };
+
+
+const showTypeTable = ref(false);
 
 const boards = computed(() => useBoardStore().getBoards)
 const user = computed(() => useUserStore().getUserState)
@@ -467,6 +475,14 @@ const initForm = ref<Card>({
 // team에 formTemplate가 있음
 const selectedTemplate = ref({});
 //선택한 팀에 따라서 폼이 달라짐
+
+const handleSelectTable = (row) => {
+  console.log('row', row)
+
+  // 모달 열기 수정
+  handleClickToUpdate(row, row.boardTitle)
+
+}
 
 const kanbanInfo = computed(() => {
   return {
@@ -1497,6 +1513,16 @@ const onDrop = async (e, boardId) => {
       .--right {
         display: flex;
 
+        .right-btns__wrap {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+
+          .kanban-action-btn__item {
+            display: flex;
+          }
+        }
+
         .color-systems-icon {
           display: flex;
           align-items: center;
@@ -1706,6 +1732,18 @@ const onDrop = async (e, boardId) => {
     }
   }
 
+  // 표로보기
+  .kanban-container-table {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    overflow-y: scroll;
+  }
+
+
+  // 칸반으로 보기
   .kanban-container-boards {
     display: flex;
     flex-direction: row;

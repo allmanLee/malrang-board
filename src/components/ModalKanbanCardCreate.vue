@@ -34,7 +34,7 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item v-for="field in optinalField?.cols || []" :key="field.id" :label="field.label" size="large">
+      <el-form-item v-for="field in optionalField?.cols || []" :key="field.id" :label="field.label" size="large">
         <el-input v-if="field.type === 'text'" v-model="customForm.optionalData[field.id]"
           placeholder="입력하세요"></el-input>
         <el-select v-else-if="field.type === 'select'" v-model="customForm.optionalData[field.key]" placeholder="선택하세요"
@@ -127,7 +127,7 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
-  optinalField: {
+  optionalField: {
     type: Object,
     required: true,
   },
@@ -194,12 +194,12 @@ watch(customForm, (newVal) => {
 // }, { immediate: true });
 console.log("props.isOpen", props.isOpen);
 console.log("props.form", props.form);
-console.log("optinalField", props.optinalField);
+console.log("optionalField", props.optionalField);
 
-// 만약 customForm에서 optinalField에 비어있는 키가 있다면 추가
-if (props.optinalField) {
+// 만약 customForm에서 optionalField에 비어있는 키가 있다면 추가
+if (props.optionalField) {
   const optionalData = customForm.value.optionalData;
-  for (const field of props.optinalField.cols) {
+  for (const field of props.optionalField.cols) {
     if (!optionalData[field.key]) {
       optionalData[field.key] = null;
     }
