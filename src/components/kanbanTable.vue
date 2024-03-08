@@ -2,18 +2,31 @@
 <!-- element ui plus 사용 -->
 
 <template>
-  <el-table :data="cards" border table-layout="auto" @row-click="handleSelect">
+  <!-- 간트 차트로 보기 -->
+  <div class="kanban-table-header">
+    <h5>총 {{ cards.length }} 개</h5>
+    <div class="gantt-select">
+      <el-button text type="default" class="kanban-action-btn__item" round @click="handleClickGantt">
+        <el-icon>
+          <Postcard v-if="!isGantt" />
+          <Calendar v-else />
+        </el-icon>
+        <span> {{ isGantt ? '표 보기' : '간트 차트 보기' }}</span>
+      </el-button>
+
+      <el-select v-if="isGantt" v-model="ganttType" placeholder="간트 차트" style="width: 100px"
+        @change="handleSelectGantt">
+        <el-option v-for="item in ganttColsOptions" :key="item.value" :label="item.label" :value="item.value" />
+      </el-select>
+    </div>
+  </div>
+  <el-table :data="cards" table-layout="auto" @row-click="handleSelect" :border="!isGantt">
     <!-- 제목 -->
-    <el-table-column label="제목" prop="title">
+    <el-table-column fixed label="제목" prop="title" width="180">
     </el-table-column>
-    <!-- 내용 -->
-    <el-table-column label="내용" prop="description" width="180" sortable>
-      <template v-slot="{ row }">
-        <span>{{ row.description }}</span>
-      </template>
-    </el-table-column>
+
     <!-- 담당자 -->
-    <el-table-column label="담당자" prop="userName" width="180" sortable>
+    <el-table-column fixed label="담당자" prop="userName" width="180" sortable>
 
       <template v-slot="{ row }">
         <div class="profile-flex">
@@ -22,8 +35,16 @@
         </div>
       </template>
     </el-table-column>
+
+    <!-- 내용 -->
+    <el-table-column v-if="!isGantt" label="내용" prop="description" width="180" sortable>
+
+      <template v-slot="{ row }">
+        <span>{{ row.description }}</span>
+      </template>
+    </el-table-column>
     <!-- 상태 -->
-    <el-table-column label="보드" prop="boardId" width="180" sortable>
+    <el-table-column v-if="!isGantt" label="보드" prop="boardId" width="180" sortable>
 
       <template v-slot="{ row }">
         <!-- 보드 제목 -->
@@ -33,7 +54,7 @@
     </el-table-column>
 
     <!-- 태그 -->
-    <el-table-column label="태그" prop="tags" width="180" sortable>
+    <el-table-column v-if="!isGantt" label="태그" prop="tags" width="180" sortable>
 
       <template v-slot="{ row }">
         <div class="tags">
@@ -41,11 +62,20 @@
         </div>
       </template>
     </el-table-column>
-
-    <el-table-column v-for="col in optionalField.cols" :key="col.key" :label="col.label" width="180" sortable>
+    <el-table-column v-for="col in customField" :key="col.key" :label="col.label" width="180" sortable>
 
       <template v-slot="{ row }">
-        <span>{{ row.optionalData[col.key] }}</span>
+        <span v-if="col">{{ row.optionalData[col.key] }}</span>
+      </template>
+    </el-table-column>
+
+
+    <!-- 간트 차트 -->
+    <el-table-column v-for="col in ganttCols" :key="col.key" :label="col.label" width="180">
+
+      <template v-slot="{ row }">
+        <div class="test">
+        </div>
       </template>
     </el-table-column>
   </el-table>
@@ -72,10 +102,72 @@ const props = defineProps({
   },
 })
 
-console.log(props.optionalField)
+
+/* -------------------------------- 간트 차트 ------------------------------- */
+const isGantt = ref(false);
+const handleClickGantt = () => {
+  // ElNotification({
+  //   title: "준비중인 기능입니다.",
+  //   message: "간트 차트 기능은 준비중입니다.",
+  //   type: "warning",
+  // });
+
+  isGantt.value = !isGantt.value;
+}
+
+
+const customField = computed(() => {
+  return isGantt.value ?
+    [] :
+    props.optionalField.cols.map((col) => {
+      return {
+        label: col.label,
+        key: col.key,
+      }
+    })
+})
 const boardTitle = (row) => {
   const board = props.boards.find((board) => board.id === row.boardId)
   return board.title
+}
+
+const ganttCols = ref([])
+const ganttType = ref('Day')
+
+
+// 간트 차트 컬럼 변경
+
+// ganttCols 는 기본 'Day' 이며, week, month, year 등으로 변경 가능
+const ganttColsOptions = [{
+  label: 'Day',
+  value: 'Day',
+},
+{
+  label: 'Week',
+  value: 'Week',
+},
+{
+  label: 'Month',
+  value: 'Month',
+},
+{
+  label: 'Year',
+  value: 'Year',
+},
+]
+
+const handleSelectGantt = (val) => {
+  console.log(val)
+  ganttCols.value = []
+  if (val === 'Day') {
+    // 날짜만큼 생성합니다. (1년치)
+    for (let i = 0; i < 365; i++) {
+      ganttCols.value.push({
+        key: i,
+        label: i + 1,
+      })
+    }
+  }
 }
 
 const handleSelect = (selection: any[]) => {
@@ -85,6 +177,15 @@ const handleSelect = (selection: any[]) => {
 </script>
 
 <style scoped lagn="scss">
+.kanban-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+
+}
+
 .tags {
   display: flex;
   flex-wrap: wrap;
@@ -95,5 +196,12 @@ const handleSelect = (selection: any[]) => {
   display: flex;
   align-items: center;
   gap: 5px;
+}
+
+/* ---------------------------------- 간트 차트 --------------------------------- */
+.test {
+  width: 100%;
+  height: 100%;
+  background-color: red
 }
 </style>

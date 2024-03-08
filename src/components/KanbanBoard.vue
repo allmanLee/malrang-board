@@ -428,8 +428,6 @@ type FilterView = {
   _id: string;
   filters: Filter[];
 };
-
-
 const showTypeTable = ref(false);
 
 const boards = computed(() => useBoardStore().getBoards)
@@ -464,8 +462,6 @@ const onClickOutside = () => {
 
 // 필터가 변경되는 경우를 감지하여 '뷰 업데이트' 버튼이 활성화 됩니다.
 const isChangingView = ref(false);
-
-
 const cards = ref<Card[]>([]);
 const initForm = ref<Card>({
   _id: '',
@@ -508,8 +504,6 @@ const isVisiblePop = ref(false);
 const filters = ref<Filter[]>([]);
 const selectedfilterMetnod = ref('일치');
 const filterOperators = ref([]);
-
-
 const isOpenFilterView = ref(false);
 const filterOtherViews = ref([]);
 const filterViewName = ref('');
@@ -528,6 +522,8 @@ const handleClickViewUpdate = async () => {
   }
 }
 
+
+/* ---------------------------------- 설정 모달 --------------------------------- */
 const isOpenSetting = ref(false);
 const kanbanSettingSave = () => {
   isOpenSetting.value = false;
