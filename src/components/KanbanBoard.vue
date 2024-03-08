@@ -105,13 +105,22 @@
             </el-switch>
             <!-- 설정 -->
             <div class="right-btns__wrap__item">
-              <el-button text type="default" class="kanban-action-btn__item" round @click="handleClickFilter">
+              <el-button text type="default" class="kanban-action-btn__item" round @click="isOpenSetting = true">
                 <el-icon>
                   <Setting />
                 </el-icon>
                 <span>설정</span>
               </el-button>
             </div>
+            <el-dialog title="설정" v-model="isOpenSetting" width="auto">
+              <modal-board-setting />
+
+              <template #footer>
+                <el-button size="large" type="primary" @click="kanbanSettingSave">
+                  <span class="save__text">저장</span>
+                </el-button>
+              </template>
+            </el-dialog>
           </section>
 
         </div>
@@ -264,7 +273,8 @@
                     </el-option>
                   </el-select>
                   <el-input v-else-if="selectedFilter.type === 'input'" v-model="selectedFilter.value"
-                    :placeholder="selectedFilter.filterLabel" class="filter__select --text">
+                    :placeholder="selectedFilter.filterLabel" class="filter__select --text"
+                    @keydown="handleEnterFilter">
                   </el-input>
                   <!-- date -->
                   <el-date-picker v-else-if="selectedFilter.type === 'date'" type="date" v-model="selectedFilter.value"
@@ -359,7 +369,8 @@
             <el-icon>
               <Plus />
             </el-icon>
-            추가하기</el-button>
+            추가하기
+          </el-button>
         </section>
       </div>
     </div>
@@ -517,6 +528,12 @@ const handleClickViewUpdate = async () => {
   }
 }
 
+const isOpenSetting = ref(false);
+const kanbanSettingSave = () => {
+  isOpenSetting.value = false;
+}
+
+
 // 필터뷰 닫기
 const handleClickViewClose = () => {
   isOpenFilterView.value = false
@@ -541,6 +558,12 @@ const setUserOptions = () => {
       value: user.id,
     };
   });
+}
+
+const handleEnterFilter = (e) => {
+  if (e.key === 'Enter') {
+    handleClickFilterAdd(selectedFilter.value, selectedfilterMetnod.value)
+  }
 }
 
 // 필터 뷰 생성
