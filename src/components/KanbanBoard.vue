@@ -481,8 +481,8 @@ const initForm = ref<Card>({
 });
 // team에 formTemplate가 있음
 const selectedTemplate = ref({});
-//선택한 팀에 따라서 폼이 달라짐
 
+//선택한 팀에 따라서 폼이 달라짐
 const handleSelectTable = (row) => {
   console.log('row', row)
 

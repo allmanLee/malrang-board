@@ -23,6 +23,8 @@ export interface Card {
   title: string; 
   description: string;
   created_date: string;
+  endDate: string;
+  startDate: string;
   userId: string;
   userName: string;
   teamId: string;

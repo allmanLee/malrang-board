@@ -71,10 +71,12 @@
 
 
     <!-- 간트 차트 -->
-    <el-table-column v-for="col in ganttCols" :key="col.key" :label="col.label" width="180">
+    <el-table-column v-for="col in ganttCols" :key="col.key" :label="col.label" width="180" class-name="gantt-col">
 
       <template v-slot="{ row }">
         <div class="test">
+          <!-- 흐린 점 -->
+          .
         </div>
       </template>
     </el-table-column>
@@ -113,6 +115,9 @@ const handleClickGantt = () => {
   // });
 
   isGantt.value = !isGantt.value;
+  // 처음은 주단위로 설정
+  handleSelectGantt('Week')
+  ganttType.value = 'Week'
 }
 
 
@@ -138,30 +143,43 @@ const ganttType = ref('Day')
 // 간트 차트 컬럼 변경
 
 // ganttCols 는 기본 'Day' 이며, week, month, year 등으로 변경 가능
-const ganttColsOptions = [{
-  label: 'Day',
-  value: 'Day',
-},
-{
-  label: 'Week',
-  value: 'Week',
-},
-{
-  label: 'Month',
-  value: 'Month',
-},
-{
-  label: 'Year',
-  value: 'Year',
-},
+const ganttColsOptions = [
+  {
+    label: 'Week',
+    value: 'Week',
+  },
+  {
+    label: 'Month',
+    value: 'Month',
+  },
+  {
+    label: 'Year',
+    value: 'Year',
+  },
 ]
 
 const handleSelectGantt = (val) => {
   console.log(val)
   ganttCols.value = []
-  if (val === 'Day') {
-    // 날짜만큼 생성합니다. (1년치)
-    for (let i = 0; i < 365; i++) {
+  if (val === 'Week') {
+    // 주차만큼 생성합니다. (1년치)
+    for (let i = 0; i < 52; i++) {
+      ganttCols.value.push({
+        key: i,
+        label: i + 1,
+      })
+    }
+  } else if (val === 'Month') {
+    // 월만큼 생성합니다. (1년치)
+    for (let i = 0; i < 12; i++) {
+      ganttCols.value.push({
+        key: i,
+        label: i + 1,
+      })
+    }
+  } else if (val === 'Year') {
+    // 년만큼 생성합니다. (1년치)
+    for (let i = 0; i < 1; i++) {
       ganttCols.value.push({
         key: i,
         label: i + 1,
@@ -174,9 +192,10 @@ const handleSelect = (selection: any[]) => {
   console.log(selection)
   emit('select', selection)
 }
+
 </script>
 
-<style scoped lagn="scss">
+<style scoped lang="scss">
 .kanban-table-header {
   display: flex;
   justify-content: space-between;
@@ -200,8 +219,33 @@ const handleSelect = (selection: any[]) => {
 
 /* ---------------------------------- 간트 차트 --------------------------------- */
 .test {
+  display: flex;
+  align-items: center;
   width: 100%;
   height: 100%;
-  background-color: red
+  padding: 0px;
+  background-color: $primary;
+}
+</style>
+
+<style lang="scss">
+.el-table__row {
+  cursor: pointer;
+  border-radius: 50%;
+  background-color: red;
+}
+
+.gantt-col {
+  padding: 0px;
+
+
+  .cell {
+    display: flex;
+    align-items: center;
+    padding: 0px !important;
+
+    // border: 1px solid green;
+  }
+
 }
 </style>
