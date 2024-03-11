@@ -33,6 +33,16 @@
           <el-option v-for="user in users" :key="user.id" :label="user.name" :value="user.id"></el-option>
         </el-select>
       </el-form-item>
+      <!-- 시작일 -->
+      <el-form-item size="large" label="시작일" required>
+        <el-date-picker v-model="customForm.startDate" type="date" placeholder="날짜를 선택하세요" value-format="YYYY-MM-DD"
+          format="YYYY-MM-DD" style="width: 100%;"></el-date-picker>
+      </el-form-item>
+      <!-- 마감일 -->
+      <el-form-item size="large" label="마감일" required>
+        <el-date-picker v-model="customForm.endDate" type="date" placeholder="날짜를 선택하세요" value-format="YYYY-MM-DD"
+          format="YYYY-MM-DD" style="width: 100%;"></el-date-picker>
+      </el-form-item>
 
       <el-form-item v-for="field in optionalField?.cols || []" :key="field.id" :label="field.label" size="large">
         <el-input v-if="field.type === 'text'" v-model="customForm.optionalData[field.id]"

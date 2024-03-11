@@ -6,13 +6,13 @@
   <div class="kanban-table-header">
     <h5>총 {{ cards.length }} 개</h5>
     <div class="gantt-select">
-      <el-button text type="default" class="kanban-action-btn__item" round @click="handleClickGantt">
+      <!-- <el-button text type="default" class="kanban-action-btn__item" round @click="handleClickGantt">
         <el-icon>
           <Postcard v-if="!isGantt" />
           <Calendar v-else />
         </el-icon>
         <span> {{ isGantt ? '표 보기' : '간트 차트 보기' }}</span>
-      </el-button>
+      </el-button> -->
 
       <el-select v-if="isGantt" v-model="ganttType" placeholder="간트 차트" style="width: 100px"
         @change="handleSelectGantt">
@@ -22,7 +22,7 @@
   </div>
   <el-table :data="cards" table-layout="auto" @row-click="handleSelect" :border="!isGantt">
     <!-- 제목 -->
-    <el-table-column fixed label="제목" prop="title" width="180">
+    <el-table-column fixed label="제목" prop="title">
     </el-table-column>
 
     <!-- 담당자 -->
@@ -75,8 +75,7 @@
 
       <template v-slot="{ row }">
         <div class="test">
-          <!-- 흐린 점 -->
-          .
+          test
         </div>
       </template>
     </el-table-column>
@@ -202,7 +201,6 @@ const handleSelect = (selection: any[]) => {
   align-items: center;
   gap: 10px;
   margin-bottom: 10px;
-
 }
 
 .tags {
@@ -228,24 +226,4 @@ const handleSelect = (selection: any[]) => {
 }
 </style>
 
-<style lang="scss">
-.el-table__row {
-  cursor: pointer;
-  border-radius: 50%;
-  background-color: red;
-}
-
-.gantt-col {
-  padding: 0px;
-
-
-  .cell {
-    display: flex;
-    align-items: center;
-    padding: 0px !important;
-
-    // border: 1px solid green;
-  }
-
-}
-</style>
+<style lang="scss"></style>

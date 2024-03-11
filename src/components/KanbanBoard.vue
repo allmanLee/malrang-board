@@ -99,10 +99,27 @@
 
         <div class="--right">
           <section class="right-btns__wrap">
-            <el-switch v-model="showTypeTable" active-color="" inactive-color="" active-text="표" inactive-text="칸반"
-              :active-icon="Expand" :inactive-icon="Postcard" class="kanban-action-btn__item" inline-prompt
-              size="large">
-            </el-switch>
+
+            <el-radio-group v-model="showTypeTable" size="large" class="kanban-action-btn__item">
+              <el-radio-button label="table" class="kanban-action-btn__item">
+                <el-icon>
+                  <Postcard />
+                </el-icon>
+                <span>표</span>
+              </el-radio-button>
+              <el-radio-button label="kanban" class="kanban-action-btn__item">
+                <el-icon>
+                  <Expand />
+                </el-icon>
+                <span>칸반</span>
+              </el-radio-button>
+              <el-radio-button label="gantt" class="kanban-action-btn__item">
+                <el-icon>
+                  <Calendar />
+                </el-icon>
+                <span>캘린더</span>
+              </el-radio-button>
+            </el-radio-group>
             <!-- 설정 -->
             <div class="right-btns__wrap__item">
               <el-button text type="default" class="kanban-action-btn__item" round @click="isOpenSetting = true">
@@ -320,10 +337,13 @@
       </section>
     </section>
 
-    <div v-if="showTypeTable" class=" kanban-container-table">
+    <div v-if="showTypeTable === 'table'" class=" kanban-container-table">
       <KanbanTable :cards="filterCards" :boards="boards" @select="handleSelectTable" :optionalField="getTemple" />
     </div>
-    <div v-if="!showTypeTable" class="kanban-container-boards">
+    <div v-if="showTypeTable === 'gantt'" class="kanban-container-table">
+      <GanttChart :cards="filterCards" :boards="boards" />
+    </div>
+    <div v-if="showTypeTable === 'kanban'" class="kanban-container-boards">
 
       <div class="kanban-container-boards__panel" v-for="board in boards" :key="board.id"
         @drop.prevent="onDrop($event, board.id)" @dragenter.prevent @dragover.prevent>
@@ -419,7 +439,7 @@ import API from "@/apis";
 import { state, socket } from "@/socket";
 import { FormTemplate } from "@/types/projects.type";
 import {
-  MoonNight, Close, Check, Postcard, Expand
+  MoonNight, Close, Check, Postcard, Expand, Calendar
 } from "@element-plus/icons-vue";
 import { al } from "vitest/dist/reporters-5f784f42";
 
@@ -428,7 +448,7 @@ type FilterView = {
   _id: string;
   filters: Filter[];
 };
-const showTypeTable = ref(false);
+const showTypeTable = ref('kanban');
 
 const boards = computed(() => useBoardStore().getBoards)
 const user = computed(() => useUserStore().getUserState)
@@ -1280,6 +1300,16 @@ const handleSave = async (boardId) => {
   try {
     const modalType = modalKanban.openType;
 
+    // startDate가 endDate보다 늦을 수 없습니다.
+    if (form.value.startDate > form.value.endDate) {
+      ElNotification({
+        title: "날짜 오류",
+        message: "시작일은 종료일보다 늦을 수 없습니다.",
+        type: "error",
+      });
+      return;
+    }
+
     if (modalType === 'create') {
       delete form.value._id;
       const order = filterCards.value.filter(el => el.boardId === boardId).length
@@ -1293,7 +1323,6 @@ const handleSave = async (boardId) => {
     console.error(error);
   }
 };
-
 
 const handleClickToAdd = (board) => {
   const boardTitle = board.title;
@@ -1388,6 +1417,10 @@ const onDrop = async (e, boardId) => {
 
   // 만약 커밋에 #mb-1 이런식으로 카드 번호가 붙어있으면 해당 카드의 커밋에 추가
   cardActions.addCommit(cardId, cards.value);
+
+
+  // 간트 차트 보기
+  const isGanttChart = ref(false);
 };
 
 
@@ -1524,10 +1557,6 @@ const onDrop = async (e, boardId) => {
       align-items: center;
       width: 100%;
       padding: 10px 24px;
-
-      // .kanban-action-btn__item {
-      //   border: none;
-      // }
 
       .--right {
         display: flex;

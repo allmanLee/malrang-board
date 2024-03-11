@@ -57,6 +57,7 @@ declare module 'vue' {
     ElToggle: typeof import('element-plus/es')['ElToggle']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     EmptyKanbanCard: typeof import('./components/EmptyKanbanCard.vue')['default']
+    GanttChart: typeof import('./components/GanttChart.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     IconCommunity: typeof import('./components/icons/IconCommunity.vue')['default']
     IconDocumentation: typeof import('./components/icons/IconDocumentation.vue')['default']
