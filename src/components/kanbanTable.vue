@@ -75,7 +75,7 @@
 
       <template v-slot="{ row }">
         <div class="test">
-          test
+          <!-- 7일  -->
         </div>
       </template>
     </el-table-column>
@@ -118,6 +118,28 @@ const handleClickGantt = () => {
   handleSelectGantt('Week')
   ganttType.value = 'Week'
 }
+
+// 좌우 스크롤 시 일정이 있는데 보이지 않을 경우 왼쪽 또는 오른쪽에 고정하여 화살표로 표시
+window.addEventListener('scroll', () => {
+  const table = document.querySelector('.el-table__body-wrapper')
+  if (table) {
+    const scrollLeft = table.scrollLeft
+    const scrollWidth = table.scrollWidth
+    const clientWidth = table.clientWidth
+    if (scrollLeft > 0) {
+      // 왼쪽 화살표 표시
+      table.classList.add('scroll-left')
+    } else {
+      table.classList.remove('scroll-left')
+    }
+    if (scrollLeft + clientWidth < scrollWidth) {
+      // 오른쪽 화살표 표시
+      table.classList.add('scroll-right')
+    } else {
+      table.classList.remove('scroll-right')
+    }
+  }
+})
 
 
 const customField = computed(() => {
