@@ -717,7 +717,7 @@ const filterCardsByAction = (filters, cards) => {
 
   if (isOffFilter.value) return filterCards;
 
-  filters.forEach((filter) => {
+  filters?.forEach((filter) => {
     // if (filter.active) {
     filterCards = filterCards.filter((card) => {
       if (filter.type === 'select') {
@@ -1249,20 +1249,6 @@ class ModalKanban {
   close() {
     this.dialogVisible = false;
   }
-
-  // async beforeClose(done) { // TODO 사용성이 떨어짐 (노션도 물어보지 않습니다.)
-
-  //   const isClose = await ElMessageBox.confirm("작성중인 내용이 있습니다. 정말 닫으시겠습니까?"
-  //     , {
-  //       confirmButtonText: "닫기",
-  //       cancelButtonText: "취소",
-  //     });
-
-  //   if(isClose) {
-  //     this.dialogVisible = false;
-  //     done();
-  //   }
-
 }
 
 
