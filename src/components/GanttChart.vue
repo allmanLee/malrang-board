@@ -45,16 +45,18 @@
       <!-- 마감일 (endDate) 만큼만 표시 색칠 -->
       <template v-slot="{ row }">
         <div class="gantt-chart">
-          <div v-if="isDisplayGantt(row.startDate, row.endDate, col.date)" class="gantt-chart-content-item"
-            ref="ganttItem" :style="{ width: '100%', background: '#409EFF' }">
-            {{ row.title }}
-          </div>
 
           <!-- 일 단위 7칸 -->
-          <div v-if="ganttType === 'Week'
-          " v-for="text in 7" class="gantt-chart-content-item" ref="ganttItem"
-            :style="{ width: '14.28%', background: '#409EFF' }">
-            <!-- {{ row.title }} -->
+          <div v-for="text in 7" class="gantt-chart-content-item" ref="ganttItem" :style="{ width: '14.28%' }"
+            :key="text" />
+          <!-- {{ row.title }} -->
+
+          <!-- 간트 차트 표시 -->
+          <div v-if="isDisplayGantt(row.startDate, row.endDate, col.date)" class="gantt-chart-content-item" :style="{
+          position: 'absolute', width: calWidth(row.startDate, row.endDate, col.date) + '%', left: calLeft(row.startDate, col.date) + '%'
+          , background: '#409eff'
+        }">
+            {{ row.title }}
           </div>
         </div>
       </template>
@@ -82,7 +84,16 @@ const props = defineProps({
     required: true,
   },
 })
+const calLeft = (startDate, colDate) => {
+  const baseWidth = 14.28
+}
+const calWidth = (startDate, endDate, colDate) => {
+  const baseWidth = 14.28
 
+  const start = new Date(startDate)
+  const end = new Date(endDate)
+  const col = new Date(colDate)
+}
 // 날짜 포맷 (MM월 DD일(요일))
 const formatDate = (date: string) => {
   const newDate = new Date(date)
@@ -97,24 +108,24 @@ const formatDate = (date: string) => {
 const ganttCols = ref([])
 
 //간트 차트 스크롤해서 막대가 화면 밖으로 나가면 화살표 생성
-const ganttScroll = () => {
-  const ganttItem = document.getElementById('ganttItem')
-  if (ganttItem) {
-    const ganttItemWidth = ganttItem.offsetWidth
-    const ganttItemLeft = ganttItem.getBoundingClientRect().left
-    const ganttItemRight = ganttItem.getBoundingClientRect().right
-    const ganttChart = document.querySelector('.gantt-chart')
-    const ganttChartWidth = ganttChart.offsetWidth
-    const ganttChartLeft = ganttChart.getBoundingClientRect().left
-    const ganttChartRight = ganttChart.getBoundingClientRect().right
-    if (ganttItemLeft < ganttChartLeft) {
-      console.log('왼쪽 화살표 생성')
-    }
-    if (ganttItemRight > ganttChartRight) {
-      console.log('오른쪽 화살표 생성')
-    }
-  }
-}
+// const ganttScroll = () => {
+//   const ganttItem = document.getElementById('ganttItem')
+//   if (ganttItem) {
+//     const ganttItemWidth = ganttItem.offsetWidth
+//     const ganttItemLeft = ganttItem.getBoundingClientRect().left
+//     const ganttItemRight = ganttItem.getBoundingClientRect().right
+//     const ganttChart = document.querySelector('.gantt-chart')
+//     const ganttChartWidth = ganttChart.offsetWidth
+//     const ganttChartLeft = ganttChart.getBoundingClientRect().left
+//     const ganttChartRight = ganttChart.getBoundingClientRect().right
+//     if (ganttItemLeft < ganttChartLeft) {
+//       console.log('왼쪽 화살표 생성')
+//     }
+//     if (ganttItemRight > ganttChartRight) {
+//       console.log('오른쪽 화살표 생성')
+//     }
+//   }
+// }
 
 
 // 간트 차트에 바 표시 여부
@@ -140,9 +151,10 @@ const isDisplayGantt = (startDate, endDate, colDate) => {
     // class 추가 (7일로 나눈 나머지) 만큼 표시합니다.
     const result = (colDay - staratDay) % 7
     // const ref = document.getElementById('ganttItem')
-    return true
+    console.log(result)
+    return result
   }
-
+  console.log(result)
   return result
 }
 
@@ -228,6 +240,7 @@ const handleSelect = (selection: any[]) => {
 }
 
 .gantt-chart {
+  position: relative;
   display: flex;
   width: 100%;
   // padding: 20px;
@@ -255,7 +268,7 @@ const handleSelect = (selection: any[]) => {
       justify-content: center;
       height: 32px;
       padding: 0px;
-      background-color: #409eff;
+      // background-color: #409eff;
       color: white;
       // border-radius: 5px;
       margin: 0px;

@@ -113,12 +113,12 @@
                 </el-icon>
                 <span>칸반</span>
               </el-radio-button>
-              <el-radio-button label="gantt" class="kanban-action-btn__item">
+              <!-- <el-radio-button label="gantt" class="kanban-action-btn__item">
                 <el-icon>
                   <Calendar />
                 </el-icon>
                 <span>캘린더</span>
-              </el-radio-button>
+              </el-radio-button> -->
             </el-radio-group>
             <!-- 설정 -->
             <div class="right-btns__wrap__item">
