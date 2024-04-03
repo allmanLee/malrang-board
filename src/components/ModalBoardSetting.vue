@@ -190,7 +190,6 @@ const addTag = () => {
   tags.value.push({
     id: tags.value.length + 1,
     name: tagForm.value.label,
-    key: tagForm.value.key,
     color: tagForm.value.color,
   })
 
