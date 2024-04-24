@@ -444,7 +444,7 @@ import {
 import { al } from "vitest/dist/reporters-5f784f42";
 
 type FilterView = {
-  filterLabel: string;
+  label: string;
   _id: string;
   filters: Filter[];
 };
@@ -461,13 +461,12 @@ const users = computed(() => useUserStore().getUsers)
 
 const selectedBoardId = ref('');
 const selectedWorker = ref(null);
-const selectedFilterView = ref<FilterView>(null); // 현재 선택된 필터뷰 [저장된 필터보기로 선택된]
-const selectedFilter: Filter = ref(null);  // 현재 선택된 필터 아이템 [필터 추가]
+const selectedFilterView = ref<FilterView | null>(null); // 현재 선택된 필터뷰 [저장된 필터보기로 선택된]
+const selectedFilter = ref<Filter | null>(null);  // 현재 선택된 필터 아이템 [필터 추가]
 const selectedFilters = ref<Filter[]>([]);  // 현재 선택된 필터 [필터 추가로 선택된 필터 아이템들]
-const selectedFilterLable = ref(''); // 현재 선택된 필터 이름
 const searchValue = ref("");
 const popoverRef = ref()
-const onClickOutside = () => {
+const onClickOutside = (event: any) => {
   // .el-select-dropdown__dropdown
   if (event.target.closest('.el-select-dropdown__dropdown') || event.target.closest('.el-select-dropdown')
     || event.target.closest('.el-select-dropdown__item') || event.target.closest('.el-select-dropdown__wrap')
@@ -488,6 +487,8 @@ const initForm = ref<Card>({
   title: "",
   description: "",
   created_date: "",
+  startDate: "",
+  endDate: "",
   userId: "",
   userName: '',
   userAvatar: '',
@@ -503,7 +504,7 @@ const initForm = ref<Card>({
 const selectedTemplate = ref({});
 
 //선택한 팀에 따라서 폼이 달라짐
-const handleSelectTable = (row) => {
+const handleSelectTable = (row: Card) => {
   console.log('row', row)
 
   // 모달 열기 수정
@@ -697,8 +698,8 @@ const handleCheckAll = (e, filter) => {
 const fetchFilterViews = async () => {
   try {
     // API 호출
-    const result = await API.getFilterViews({ teamId: selectedTeamId.value });
-    filterOtherViews.value = result;
+    const result = await API.getFilterViews({ teamId: selectedTeamId.value })
+    filterOtherViews.value = result
     console.log('filterOtherViews', filterOtherViews.value)
   } catch (error) {
     console.log('error', error)
@@ -902,7 +903,7 @@ const handleClickFilterReset = () => {
   setFilters();
 };
 
-const connectedUsers = ref([]);
+const connectedUsers = ref<any[]>([]);
 
 // 유저 접속
 const handleUserConnected = (data) => {

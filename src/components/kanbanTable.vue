@@ -6,18 +6,6 @@
   <div class="kanban-table-header">
     <h5>총 {{ cards.length }} 개</h5>
     <div class="gantt-select">
-      <!-- <el-button text type="default" class="kanban-action-btn__item" round @click="handleClickGantt">
-        <el-icon>
-          <Postcard v-if="!isGantt" />
-          <Calendar v-else />
-        </el-icon>
-        <span> {{ isGantt ? '표 보기' : '간트 차트 보기' }}</span>
-      </el-button> -->
-
-      <el-select v-if="isGantt" v-model="ganttType" placeholder="간트 차트" style="width: 100px"
-        @change="handleSelectGantt">
-        <el-option v-for="item in ganttColsOptions" :key="item.value" :label="item.label" :value="item.value" />
-      </el-select>
     </div>
   </div>
   <el-table :data="cards" table-layout="auto" @row-click="handleSelect" :border="!isGantt">
@@ -106,18 +94,6 @@ const props = defineProps({
 
 /* -------------------------------- 간트 차트 ------------------------------- */
 const isGantt = ref(false);
-const handleClickGantt = () => {
-  // ElNotification({
-  //   title: "준비중인 기능입니다.",
-  //   message: "간트 차트 기능은 준비중입니다.",
-  //   type: "warning",
-  // });
-
-  isGantt.value = !isGantt.value;
-  // 처음은 주단위로 설정
-  handleSelectGantt('Week')
-  ganttType.value = 'Week'
-}
 
 // 좌우 스크롤 시 일정이 있는데 보이지 않을 경우 왼쪽 또는 오른쪽에 고정하여 화살표로 표시
 window.addEventListener('scroll', () => {
@@ -158,58 +134,8 @@ const boardTitle = (row) => {
 }
 
 const ganttCols = ref([])
-const ganttType = ref('Day')
 
-
-// 간트 차트 컬럼 변경
-
-// ganttCols 는 기본 'Day' 이며, week, month, year 등으로 변경 가능
-const ganttColsOptions = [
-  {
-    label: 'Week',
-    value: 'Week',
-  },
-  {
-    label: 'Month',
-    value: 'Month',
-  },
-  {
-    label: 'Year',
-    value: 'Year',
-  },
-]
-
-const handleSelectGantt = (val) => {
-  console.log(val)
-  ganttCols.value = []
-  if (val === 'Week') {
-    // 주차만큼 생성합니다. (1년치)
-    for (let i = 0; i < 52; i++) {
-      ganttCols.value.push({
-        key: i,
-        label: i + 1,
-      })
-    }
-  } else if (val === 'Month') {
-    // 월만큼 생성합니다. (1년치)
-    for (let i = 0; i < 12; i++) {
-      ganttCols.value.push({
-        key: i,
-        label: i + 1,
-      })
-    }
-  } else if (val === 'Year') {
-    // 년만큼 생성합니다. (1년치)
-    for (let i = 0; i < 1; i++) {
-      ganttCols.value.push({
-        key: i,
-        label: i + 1,
-      })
-    }
-  }
-}
-
-const handleSelect = (selection: any[]) => {
+const handleSelect = (selection) => {
   console.log(selection)
   emit('select', selection)
 }
