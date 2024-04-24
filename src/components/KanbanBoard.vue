@@ -351,8 +351,8 @@
         <header class="kanban-container-boards__panel-header">
           <h1 class="kanban-class">{{ board.title }} <span
               v-if="filterCards.filter(el => el.boardId === board.id).length > 0" class="kanban-class__count">({{
-          filterCards.filter(el => el.boardId === board.id).length
-        }})</span></h1>
+                filterCards.filter(el => el.boardId === board.id).length
+              }})</span></h1>
           <el-tooltip class="item" effect="dark" content="노트 추가" placement="top">
             <i @click="handleClickToAdd(board)"> <el-icon class="kanban-menu">
                 <Edit />
