@@ -200,9 +200,6 @@ watch(customForm, (newVal) => {
 //     customForm.value = cloneDeep(form.value);
 //   }
 // }, { immediate: true });
-console.log("props.isOpen", props.isOpen);
-console.log("props.form", props.form);
-console.log("optionalField", props.optionalField);
 
 // 만약 customForm에서 optionalField에 비어있는 키가 있다면 추가
 if (props.optionalField) {

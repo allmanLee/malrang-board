@@ -1246,6 +1246,12 @@ class ModalKanban {
     this.dialogVisible = true;
     this.openType = type;
     this.boardTitle = boardTitle;
+
+    if (type === "create") {
+      // 만약 생성 폼이라면 userId, userName을 사용자 정보로 초기화합니다.
+      form.value.userId = user.value.id;
+      form.value.userName = user.value.name
+    }
   }
   close() {
     this.dialogVisible = false;
