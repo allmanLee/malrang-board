@@ -1,4 +1,5 @@
 <template>
+  <!-- 드래그엔 드랍이 가능한 칸반보드 (한일, 보류, 할일) -->
   <div class="kanban-container">
     <div class="kanban-header">
       <h2 class="kanban-header__title">
@@ -20,16 +21,16 @@
       <article class="kanban-header__profiles">
         <!-- 본인 -->
         <el-tooltip class="item" effect="dark" content="내 프로필" placement="bottom">
-          <el-skeleton v-if="user?.avatar" :loading="true" :avatar="true" :title="true" :row="1">
-            <el-avatar class="kanban-header__avatar --me" :size="20" :src="user.avatar">
-              <i class="el-icon-user-solid"></i>
-            </el-avatar>
-          </el-skeleton>
+          <el-avatar class="kanban-header__avatar --me" :size="20"
+            :src="'https://avatars.dicebear.com/api/avataaars/' + 1 + '.svg'">
+            <i class="el-icon-user-solid"></i>
+          </el-avatar>
         </el-tooltip>
         <!-- 연결된 사용자 프로필 -->
         <div v-for="user in connectedUsers" class="kanban-header__profiles__item" :key="user.userName">
           <el-tooltip class="item" effect="dark" :content="user.userName" placement="bottom">
-            <el-avatar class="kanban-header__avatar" :size="20" :src="user.avatar">
+            <el-avatar class="kanban-header__avatar" :size="20"
+              :src="'https://avatars.dicebear.com/api/avataaars/' + 1 + '.svg'">
               <i class="el-icon-user-solid"></i>
             </el-avatar>
           </el-tooltip>
@@ -43,43 +44,23 @@
     </div>
     <!-- 검색 -->
     <section class="kanban-action-menu-bar" @click="handleClickFilter(false)">
+      <!-- filter setting (Flot Button) 필터 선택기능
+    다른사람이 만들어둔 필터SET을 선택하거나, 현재 필터 세팅을 'filterName'을 받아 저장할 수 있다. -->
       <section class="kanban-action-btns">
         <div class="--left">
-          <el-button-group>
-            <el-button type="primary" class="kanban-action-btn__item --table-view" @click="isOpenFilterView = true"
-              :text="!selectedFilterView">
-              <el-icon>
-                <Filter />
-              </el-icon>
-              <span v-if="selectedFilterView">필터 뷰: {{ selectedFilterView.label }}
-              </span>
-              <span v-else>필터 뷰</span>
-            </el-button>
-            <el-button v-if="selectedFilterView" :disabled="!isChangingView" type="default"
-              @click="handleClickViewUpdate" class="kanban-action-btn__item --table-view">
-              <el-icon :color="isChangingView ? 'green' : ''">
-                <Warning />
-              </el-icon>
-              <span>저장</span>
-            </el-button>
-            <!-- 뷰 끄기 -->
-            <el-button v-if="selectedFilterView" type="default" class="kanban-action-btn__item --table-view"
-              @click="handleClickViewClose()">
-              <el-icon color="red">
-                <Close />
-              </el-icon>
-              <span>닫기</span>
-            </el-button>
-          </el-button-group>
+          <el-button type="primary" class="kanban-action-btn__item --table-view" round @click="isOpenFilterView = true">
+            <el-icon>
+              <Filter />
+            </el-icon>
+            <span>저장된 필터 보기</span>
+          </el-button>
           <!-- 고급필터 설정 -->
-          <el-tooltip class="item" effect="dark" content="준비중인 기능입니다." placement="bottom">
-            <el-button text type="default" class="kanban-action-btn__item" round @click="isVisiblePop = true" disabled>
-              <el-icon>
-                <Filter />
-              </el-icon>
-              <span>고급 필터 추가</span>
-            </el-button>
-          </el-tooltip>
+          <el-button text type="default" class="kanban-action-btn__item" round @click="isVisiblePop = true">
+            <el-icon>
+              <Filter />
+            </el-icon>
+            <span>고급 필터 추가</span>
+          </el-button>
           <el-button text type="default" class="kanban-action-btn__item" :disabled="isOffFilter"
             @click="handleClickFilterReset" round>
             <el-icon class="filter" :class="{ '--is-off': isOffFilter }">
@@ -95,50 +76,18 @@
             </el-icon>
             <span> {{ isOffFilter ? '필터 보이기' : '필터 숨기기' }}</span>
           </el-button>
+          <!-- {{ selectedFilterView ? selectedFilterView.filterLabel : '' }} -->
         </div>
 
         <div class="--right">
-          <section class="right-btns__wrap">
 
-            <el-radio-group v-model="showTypeTable" size="large" class="kanban-action-btn__item">
-              <el-radio-button label="table" class="kanban-action-btn__item">
-                <el-icon>
-                  <Postcard />
-                </el-icon>
-                <span>표</span>
-              </el-radio-button>
-              <el-radio-button label="kanban" class="kanban-action-btn__item">
-                <el-icon>
-                  <Expand />
-                </el-icon>
-                <span>칸반</span>
-              </el-radio-button>
-              <!-- <el-radio-button label="gantt" class="kanban-action-btn__item">
-                <el-icon>
-                  <Calendar />
-                </el-icon>
-                <span>캘린더</span>
-              </el-radio-button> -->
-            </el-radio-group>
-            <!-- 설정 -->
-            <div class="right-btns__wrap__item">
-              <el-button text type="default" class="kanban-action-btn__item" round @click="isOpenSetting = true">
-                <el-icon>
-                  <Setting />
-                </el-icon>
-                <span>설정</span>
-              </el-button>
-            </div>
-            <el-dialog title="설정" v-model="isOpenSetting" width="auto">
-              <modal-board-setting />
+          <el-button text type="default" class="kanban-action-btn__item" round @click="isOpenFilterView = true">
+            <el-icon>
+              <Grid />
+            </el-icon>
+            <span>표로 보기</span>
+          </el-button>
 
-              <template #footer>
-                <el-button size="large" type="primary" @click="kanbanSettingSave">
-                  <span class="save__text">저장</span>
-                </el-button>
-              </template>
-            </el-dialog>
-          </section>
 
         </div>
         <el-dialog title="저장된 필터 보기" v-model="isOpenFilterView" width="auto">
@@ -146,25 +95,26 @@
           <!-- <span>필터를 저장하거나 현재 선택된 필터를 등록할 수 있습니다.</span> -->
           <div class="filter-other-views">
 
-            <el-select v-model="selectedFilterView" placeholder="필터 선택" class="select-user" value-key="_id"
+            <el-select v-model="selectedFilterView" placeholder="필터 선택" class="select-user" value-key="filterKey"
               :class="{ '--disabled': !!filterViewName }" :disabled="!filterOtherViews.length || !!filterViewName">
-              <el-option v-for="filter in filterOtherViews" :key="filter.key" :label="filter.label" :value="filter">
+              <el-option v-for="filter in filterOtherViews" :key="filter.key" :label="filter.filterLabel"
+                :value="filter">
               </el-option>
             </el-select>
           </div>
 
           <!-- 내 필터 이름 -->
-          <el-input v-model="filterViewName" placeholder="다른 이름으로 저장" clearable class="filter__input"
+          <el-input v-model="filterViewName" placeholder="내 필터 이름" clearable class="filter__input"
             @keypress.enter="handleClickViewSave"></el-input>
           <!-- 푸터 -->
 
           <template #footer>
-            <el-button size="large" type="primary" @click="handleClickViewSave" :disabled="!filterViewName">
+            <el-button size="large" type="primary" @click="isOpenFilterView = false" :disabled="!filterViewName">
               <span class="save__text">내 필터 등록</span>
             </el-button>
             <el-button size="large" type="default" @click="handleClickViewSelect" v-if="!filterViewName.length"
               @keypress.enter="handleClickViewSelect">
-              <span class="save__text">'{{ selectedFilterView?.label }}' 선택</span>
+              <span class="save__text">'{{ selectedFilterView?.filterLabel }}' 선택</span>
             </el-button>
           </template>
         </el-dialog>
@@ -202,8 +152,8 @@
                   </template>
 
                   <template #tag>
-                    <el-tag v-for="(item, index) in filter.value" :key="index">
-                      {{ item.label }}
+                    <el-tag v-for="(a, index) in filter.value" :key="index">
+                      {{ a.label }}
                     </el-tag>
                   </template>
                 </el-select>
@@ -222,27 +172,12 @@
                     </el-button>
                   </template>
                 </el-input>
-                <div v-else-if="filter.type === 'date'" class="filter__select --date">
-                  <el-date-picker type="date" v-model="filter.value" :placeholder="filter.filterLabel"
-                    :disabled="isOffFilter" class="filter__select --text" :clearable="false">
-
-                    <template #prepend>
-                      <span class="filter__method --input">{{ filter.method }}</span>
-                    </template>
-                  </el-date-picker>
-                  <el-button class="filter__remove-btn date" @click="handleClickFilterRemove(index)" type="text" circle
-                    size="mini" style="position: absolute; right: 0; top: 0; z-index: 1;">
-                    <el-icon>
-                      <Close />
-                    </el-icon>
-                  </el-button>
-                </div>
                 <div v-else :placeholder="filter.filterLabel" :disabled="true" class="filter__select --text">
                   <span class="filter__method">{{ filter.method }}</span> {{ filter.filterLabel }}
                 </div>
               </el-badge>
               <!-- AND 와 OR 중 선택 가능 -->
-              <!-- <el-button class="filter__op-btn" text>AND</el-button> -->
+              <el-button class="filter__op-btn" text>AND</el-button>
 
               <template #reference>
                 <el-button class="filter__op-btn" text>
@@ -290,13 +225,8 @@
                     </el-option>
                   </el-select>
                   <el-input v-else-if="selectedFilter.type === 'input'" v-model="selectedFilter.value"
-                    :placeholder="selectedFilter.filterLabel" class="filter__select --text"
-                    @keydown="handleEnterFilter">
+                    :placeholder="selectedFilter.filterLabel" class="filter__select --text">
                   </el-input>
-                  <!-- date -->
-                  <el-date-picker v-else-if="selectedFilter.type === 'date'" type="date" v-model="selectedFilter.value"
-                    placeholder="날짜 선택" class="filter__select --text">
-                  </el-date-picker>
                 </div>
 
                 <div class="popover__footer">
@@ -318,32 +248,16 @@
                     <Plus />
                   </el-icon>
                 </el-button>
+
               </template>
             </el-popover>
-            <div class="color-picker-container">
-              <!-- 컬러 선택 -->
-              <el-color-picker v-model="color" popper-class="color-picker" class="color-picker__btn"
-                @active-change="handleChangeColor" ref="colorPicker" color-format="hex"
-                :predefine="['#ff4500', '#ff8c00', '#ffd700', '#90ee90', '#00ced1', '#1e90ff', '#c71585']"></el-color-picker>
-              <!-- 끄기 버튼 -->
-              <el-button text v-if="color" @click="color = null" class="color-picker__btn --close" size="small">
-                <el-icon>
-                  <Close />
-                </el-icon>
-              </el-button>
-            </div>
           </el-form>
         </section>
       </section>
     </section>
 
-    <div v-if="showTypeTable === 'table'" class=" kanban-container-table">
-      <KanbanTable :cards="filterCards" :boards="boards" @select="handleSelectTable" :optionalField="getTemple" />
-    </div>
-    <div v-if="showTypeTable === 'gantt'" class="kanban-container-table">
-      <GanttChart :cards="filterCards" :boards="boards" />
-    </div>
-    <div v-if="showTypeTable === 'kanban'" class="kanban-container-boards">
+
+    <div class="kanban-container-boards">
 
       <div class="kanban-container-boards__panel" v-for="board in boards" :key="board.id"
         @drop.prevent="onDrop($event, board.id)" @dragenter.prevent @dragover.prevent>
@@ -389,15 +303,14 @@
             <el-icon>
               <Plus />
             </el-icon>
-            추가하기
-          </el-button>
+            추가하기</el-button>
         </section>
       </div>
     </div>
     <!-- 팝업 메뉴 -->
     <el-drawer size="55%" :title="modalKanban.boardTitle" v-model="modalKanban.dialogVisible" destroy-on-close>
       <ModalKanbanCardCreate :isOpen="modalKanban.dialogVisible" :form="form" @enter.self="handleSave(selectedBoardId)"
-        :optionalField="getTemple" @update:form="updateForm" :tags="tags" :type="modalKanban.openType" />
+        :optinalField="getTemple" @update:form="updateForm" :type="modalKanban.openType" />
 
       <template #footer>
         <div class="dialog-footer">
@@ -413,6 +326,7 @@
         </div>
       </template>
     </el-drawer>
+
   </div>
 </template>
 
@@ -423,13 +337,12 @@ import type { ComputedRef } from "vue";
 import { Board, Card } from "@/types/Kanban.type";
 import ModalKanbanCardCreate from "./ModalKanbanCardCreate.vue";
 import KanbanBoardCard from "@/components/KanbanBoardCard.vue";
-import KanbanTable from "@/components/KanbanTable.vue";
 import EmptyKanbanCard from "@/components/EmptyKanbanCard.vue";
 import { cloneDeep, orderBy } from "lodash";
 import { useUserStore } from "@/stores/user";
 import { useBoardStore } from "@/stores/board";
 import { useCommonStore } from "@/stores/common";
-import { ElMessageBox, ElNotification, valueEquals } from "element-plus"; // 메세지 박스
+import { ElMessageBox, ElNotification } from "element-plus"; // 메세지 박스
 import { ClickOutside as vClickOutside } from 'element-plus'
 
 import "md-editor-v3/lib/style.css";
@@ -438,17 +351,15 @@ import API from "@/apis";
 // Socket IO (실시간 통신)
 import { state, socket } from "@/socket";
 import { FormTemplate } from "@/types/projects.type";
-import {
-  MoonNight, Close, Check, Postcard, Expand, Calendar
-} from "@element-plus/icons-vue";
-import { al } from "vitest/dist/reporters-5f784f42";
+import { MoonNight } from "@element-plus/icons-vue";
+import { is } from "cypress/types/bluebird";
+import { ta } from "element-plus/es/locale";
 
 type FilterView = {
   filterLabel: string;
   _id: string;
   filters: Filter[];
 };
-const showTypeTable = ref('kanban');
 
 const boards = computed(() => useBoardStore().getBoards)
 const user = computed(() => useUserStore().getUserState)
@@ -466,8 +377,12 @@ const selectedFilter: Filter = ref(null);  // 현재 선택된 필터 아이템 
 const selectedFilters = ref<Filter[]>([]);  // 현재 선택된 필터 [필터 추가로 선택된 필터 아이템들]
 const selectedFilterLable = ref(''); // 현재 선택된 필터 이름
 const searchValue = ref("");
+const selectedForm: FormTemplate = ref(null);
+
+
 const popoverRef = ref()
 const onClickOutside = () => {
+
   // .el-select-dropdown__dropdown
   if (event.target.closest('.el-select-dropdown__dropdown') || event.target.closest('.el-select-dropdown')
     || event.target.closest('.el-select-dropdown__item') || event.target.closest('.el-select-dropdown__wrap')
@@ -477,11 +392,11 @@ const onClickOutside = () => {
   ) {
     return
   }
+
+
   isVisiblePop.value = false
 }
 
-// 필터가 변경되는 경우를 감지하여 '뷰 업데이트' 버튼이 활성화 됩니다.
-const isChangingView = ref(false);
 const cards = ref<Card[]>([]);
 const initForm = ref<Card>({
   _id: '',
@@ -490,7 +405,6 @@ const initForm = ref<Card>({
   created_date: "",
   userId: "",
   userName: '',
-  userAvatar: '',
   teamId: selectedTeamId.value,
   boardId: '',
   projectId: '',
@@ -501,15 +415,7 @@ const initForm = ref<Card>({
 });
 // team에 formTemplate가 있음
 const selectedTemplate = ref({});
-
 //선택한 팀에 따라서 폼이 달라짐
-const handleSelectTable = (row) => {
-  console.log('row', row)
-
-  // 모달 열기 수정
-  handleClickToUpdate(row, row.boardTitle)
-
-}
 
 const kanbanInfo = computed(() => {
   return {
@@ -524,41 +430,11 @@ const isVisiblePop = ref(false);
 const filters = ref<Filter[]>([]);
 const selectedfilterMetnod = ref('일치');
 const filterOperators = ref([]);
+
+
 const isOpenFilterView = ref(false);
 const filterOtherViews = ref([]);
 const filterViewName = ref('');
-const handleClickViewUpdate = async () => {
-  try {
-    const id = selectedFilterView.value._id;
-    const result = await API.updateFilterView(id, { filters: selectedFilters.value });
-    isOpenFilterView.value = false
-    ElMessageBox.alert("내 필터가 업데이트 되었습니다.", "알림", {
-      confirmButtonText: "확인",
-    });
-    //  TODO 동기화 되어 필터가 싱크 떠야함
-    isChangingView.value = false;
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-
-/* ---------------------------------- 설정 모달 --------------------------------- */
-const isOpenSetting = ref(false);
-const kanbanSettingSave = () => {
-  isOpenSetting.value = false;
-}
-
-
-// 필터뷰 닫기
-const handleClickViewClose = () => {
-  isOpenFilterView.value = false
-  selectedFilterView.value = null;
-  selectedFilters.value = [];
-  filterViewName.value = '';
-  isChangingView.value = false;
-  localStorage.removeItem('filterViewId')
-}
 
 
 //필터 오포레이터 추가
@@ -576,40 +452,18 @@ const setUserOptions = () => {
   });
 }
 
-const handleEnterFilter = (e) => {
-  if (e.key === 'Enter') {
-    handleClickFilterAdd(selectedFilter.value, selectedfilterMetnod.value)
-  }
-}
-
-// 필터 뷰 생성
-const handleClickViewSave = async () => {
-  try {
-    const result = await API.createFilterView({ teamId: selectedTeamId.value, label: filterViewName.value, filters: selectedFilters.value });
-    isOpenFilterView.value = false
-    ElMessageBox.alert("내 필터가 저장되었습니다.", "알림", {
-      confirmButtonText: "확인",
-    });
-
-    //저장한 필터뷰로 변경
-    selectedFilterView.value = result;
-  } catch (error) {
-    console.log(error)
-  }
-}
-
 // 필터 옵션을 추가합니다.
 const setFilters = async () => {
   try {
 
     let isConfirm = null
     // 만약 필터가 있고 선택한 필터뷰가 있다면 초기화 물어보기
-    if (selectedFilters.value.length > 0 && selectedFilterView.value) {
+    if (selectedFilters?.value?.length > 0 && selectedFilterView?.value) {
 
-      // isConfirm = await ElMessageBox.confirm("필터를 초기화 하시겠습니까?", "알림", {
-      //   confirmButtonText: "확인",
-      //   cancelButtonText: "취소",
-      // });
+      isConfirm = await ElMessageBox.confirm("필터를 초기화 하시겠습니까?", "알림", {
+        confirmButtonText: "확인",
+        cancelButtonText: "취소",
+      });
     } else { isConfirm = true; }
 
 
@@ -633,20 +487,13 @@ const setFilters = async () => {
     }
 
 
-    const optionalField = getTemple.value.cols.map((el) => {
-      return {
-        filterLabel: el.label, key: el.key, option: [], method: '일치', value: '', type: el.type, active: false, checkAll: true, indeterminate: false
-      }
-    })
-
-    filters.value = filters.value.concat(optionalField)
-
-
-
   } catch (error) {
     console.log('error', error)
   }
 };
+setTimeout(() => {
+  setFilters();
+}, 1000)
 
 const handleClickFilterRemove = (index) => {
   console.log('handleClickFilterRemove')
@@ -654,33 +501,21 @@ const handleClickFilterRemove = (index) => {
 }
 
 // 필터 추가 Select
-watch(selectedFilters, (val, oldVla) => {
-  // 필터뷰가 변경되면 뷰 업데이트 버튼이 활성화 됩니다.
-
-  if (oldVla.length === 0 || !val) {
-    return
-  }
-  isChangingView.value = true;
-
-
+watch(selectedFilters, (val) => {
   selectedFilters.value.forEach((el, idx) => {
     //필터 라벨과 일치하는 필터를 찾아서 값을 비교합니다. (select, input, date)
     const sameLabelOption = filters.value.filter((filter) => filter.key === selectedFilters.value[idx].key)[0].option.map((el) => el.value);
 
-
-
     //type 이 select 일때
     // if (selectedFilters.value[idx].type === 'select') {
-    if (selectedFilters.value[idx].type !== 'date') {
-      if (selectedFilters.value[idx].value.length === 0) {
-        el.checkAll = false
-        el.indeterminate = false
-      } else if (sameLabelOption.length === selectedFilters.value[idx].value.length) {
-        el.checkAll = true
-        el.indeterminate = false
-      } else {
-        el.indeterminate = true
-      }
+    if (selectedFilters.value[idx].value.length === 0) {
+      el.checkAll = false
+      el.indeterminate = false
+    } else if (sameLabelOption.length === selectedFilters.value[idx].value.length) {
+      el.checkAll = true
+      el.indeterminate = false
+    } else {
+      el.indeterminate = true
     }
   })
 }, { deep: true })
@@ -694,15 +529,42 @@ const handleCheckAll = (e, filter) => {
 /** function 필터뷰 가져오기
  * @returns void
  */
-const fetchFilterViews = async () => {
-  try {
-    // API 호출
-    const result = await API.getFilterViews({ teamId: selectedTeamId.value });
-    filterOtherViews.value = result;
-    console.log('filterOtherViews', filterOtherViews.value)
-  } catch (error) {
-    console.log('error', error)
-  }
+const fetchFilterViews = () => {
+  // API 호출
+  // const result = await API.getFilterView();
+  // filterOtherViews.value = result;
+  console.log('filterOtherViews', setUserOptions())
+  filterOtherViews.value = [
+    {
+      filterLabel: '내가 만든 필터',
+      key: '내가 만든 필터',
+      filters: [
+        {
+          filterLabel: '제목', key: 'title',
+          option: [], method: '일치', value: '', type: 'input', active: false, checkAll: true, indeterminate: false
+        },
+        {
+          filterLabel: '담당자', key: 'userId', option: [...setUserOptions()],
+          method: '일치', value: [...setUserOptions()], active: false, type: 'select', checkAll: true, indeterminate: false
+        },
+      ]
+    },
+    {
+      filterLabel: '내가 만든 필터2',
+      key: '내가 만든 필터2',
+      filters: [
+        {
+          filterLabel: '제목', key: 'title',
+          option: [], method: '일치', value: '', type: 'input', active: false, checkAll: true, indeterminate: false
+        },
+        {
+          filterLabel: '태그', key: 'tags', option: [...setTagsOptions(tags)
+          ],
+          method: '포함', value: [...setTagsOptions(tags)], active: false, type: 'select', checkAll: true, indeterminate: false
+        },
+      ]
+    },
+  ];
 };
 
 
@@ -727,25 +589,16 @@ const filterCardsByAction = (filters, cards) => {
         // }
         if (filter.method === '일치') {
           //card[filter.key]가 배열이 경우
-          if (Array.isArray(card[filter.key]) && filter.type !== 'date') {
+          if (Array.isArray(card[filter.key])) {
             console.log('card[filter.key]', card[filter.key], filter.value)
             return filter.value.every(objA => card[filter.key].some(objB => objB.label === objA.value));
-          }
-          else {
+          } else {
             return filter.value.some((el) => el.value === card[filter.key]);
           }
         } else if (filter.method === '포함') {
-          if (Array.isArray(card[filter.key])) {
-            return filter.value.some(objA => card[filter.key].some(objB => objB.label.includes(objA.value)));
-          } else {
-            return filter.value.some((el) => card[filter.key].includes(el.value));
-          }
+          return filter.value.some((el) => el.value.includes(card[filter.key]));
         } else if (filter.method === '제외') {
-          if (Array.isArray(card[filter.key])) {
-            return filter.value.every(objA => card[filter.key].some(objB => !objB.label.includes(objA.value)));
-          } else {
-            return filter.value.every((el) => !card[filter.key].includes(el.value));
-          }
+          return !filter.value.some((el) => el.value.includes(card[filter.key]));
         }
 
 
@@ -764,6 +617,7 @@ const filterCardsByAction = (filters, cards) => {
         }
       }
     });
+    // }
   });
 
   console.log('filterCards', filterCards)
@@ -771,13 +625,22 @@ const filterCardsByAction = (filters, cards) => {
 };
 
 const setTagsOptions = (tags) => {
-  console.log('하핫', tags.value)
-  if (!tags.value) return []
+  console.log(tags.value)
   return tags.value.map((tag) => {
     return {
-      label: tag.label,
-      value: tag.label,
+      label: tag,
+      value: tag,
     };
+  });
+};
+
+const handleClickViewSave = () => {
+  // 만약 내 필터 이름이 중복되면
+  // 중복된다는 문구 표시
+  // 중복되지 않으면
+  // 내가 설정한 필터가 저장됩니다. 문구 표시
+  ElMessageBox.alert("내 필터가 저장되었습니다.", "알림", {
+    confirmButtonText: "확인",
   });
 };
 
@@ -814,31 +677,6 @@ type FilterOption = {
   value: string;
 };
 
-
-/* ---------------------------------- 컬러 필터 --------------------------------- */
-const color = ref(null);
-const colorPicker = ref(null);
-const handleChangeColor = (color22) => {
-  color.value = color22
-  console.log(color)
-  console.log(color.value)
-  // 닫기
-  colorPicker.value.hide();
-}
-
-// 버튼에 호버했을 경우
-const isHoverColor = ref(false);
-const handleHoverColor = () => {
-  isHoverColor.value = !isHoverColor.value;
-}
-
-document.addEventListener('mouseup', (e) => {
-  if (colorPicker.value && !colorPicker.value.$el.contains(e.target)) {
-    handleHoverColor()
-  }
-});
-
-/* ------------------------------------ - ----------------------------------- */
 
 
 /* ---------------------------- TODO 팀에 옵셔널데이터 추가 --------------------------- */
@@ -915,33 +753,14 @@ const handleUserConnected = (data) => {
 // 필터 로컬 스토리지에 저장
 const setFilterLocal = () => {
   localStorage.setItem('filters', JSON.stringify(selectedFilters.value));
-  // 필터뷰 저장
-  // localStorage.setItem('selectedFilterView', JSON.stringify(selectedFilterView.value));
-
-  //필터 _id 를 저장
-  localStorage.setItem('filterViewId', selectedFilterView.value._id);
 };
 
 // 필터 로컬 스토리지에서 가져오기
 const getFilterViewLocal = () => {
   const filter = localStorage.getItem('filters');
 
+  selectedFilters.value = JSON.parse(filter);
 
-  const viewId = localStorage.getItem('filterViewId');
-
-
-  if (viewId) {
-    selectedFilterView.value = filterOtherViews.value.find((el) => el._id === viewId);
-    if (selectedFilterView.value) {
-      selectedFilters.value = selectedFilterView.value.filters;
-    }
-    // selectedFilters.value = selectedFilterView.value.filters;
-    console.log('오 정말 대단한걸', viewId, selectedFilterView.value, filterOtherViews.value)
-  }
-  else {
-    console.log('selectedFilterView4', selectedFilterView.value)
-    selectedFilters.value = JSON.parse(filter);
-  }
 };
 
 onMounted(() => {
@@ -949,6 +768,9 @@ onMounted(() => {
   socket.on("users:connected", (data) => {
     handleUserConnected(data);
   });
+
+  // localStorage 에 존재하는 필터뷰 가져오기
+  getFilterViewLocal();
 
   // 브라우저의 탭이 닫히거나 새로고침할때
   window.addEventListener('beforeunload', setFilterLocal);
@@ -1051,18 +873,17 @@ const onDragLeave = (e, cardId) => {
 
 const tags = ref([]);
 const setTagsFromCards = (cards) => {
-  // 태그에서 타이틀이 중복된 태그만 가져옵니다. (가져온 태그는 title, color 정보가 있습니다.)\
-  const _tag = cards.map((card) => card.tags).flat()
-
-  // label이 중복된 값 제거
-  const uniqueTags = _tag.filter((tag, index, self) =>
-    index === self.findIndex((t) => (
-      t.label === tag.label
-    ))
-  )
+  console.log('cards', cards)
+  // 태그에서 타이틀이 중복된 태그만 가져옵니다. (가져온 태그는 title, color 정보가 있습니다.)
+  const tagsSet = new Set(cards.flatMap((card) => card.tags).map((tag) => tag.label));
 
   // 태그를 배열로 변경합니다.
-  tags.value = uniqueTags;
+  tags.value = Array.from(tagsSet);
+
+
+
+
+  tags.value = Array.from(tagsSet);
 };
 // 카드 조회 API 호출
 const getCards = async () => {
@@ -1080,13 +901,8 @@ const getCards = async () => {
 
 
 // selectedTeamId 변경시 카드 조회
-watch(selectedTeamId, async () => {
-  await getCards();
-  await fetchFilterViews();
-  setFilters();
-
-  // localStorage 에 존재하는 필터뷰 가져오기
-  getFilterViewLocal();
+watch(selectedTeamId, () => {
+  getCards();
 }, { immediate: true })
 
 const getTemple = computed(() => {
@@ -1146,17 +962,15 @@ class CardActions {
   async update(cardId, form) {
     try {
       const cardIdx = cards.value.findIndex((card) => card._id === cardId);
-
+      cards.value[cardIdx] = form.value;
 
       this.resetCommit(cards.value)
       this.addCommit(cardId, cards.value)
 
       // API 호출
-      const result = await API.updateCard(form.value);
-      console.log(result)
-      cards.value[cardIdx] = result;
+      await API.updateCard(form.value);
 
-      socket.emit("cards:updated", { card: result }, (result: any) => {
+      socket.emit("cards:updated", { card: form.value }, (result: any) => {
         console.log('cards:updated', result)
       });
     } catch (error) {
@@ -1201,6 +1015,10 @@ class CardActions {
           const afterMb = element.title.split(`#mb-`)[1].split(' ')[0].split(')')[0].split(']')[0];
           const cardIdx = cards.value.findIndex((card) => card._id === afterMb);
           const cardTitle = element.title;
+          // const cardTag = element?.tags[0]?.title || 'chore';
+
+          // const commitMessage =
+          //   ` ${cardTag}: ${cardTitle}`
 
           const commitMessage =
             `${cardTitle}`
@@ -1221,11 +1039,13 @@ watch(selectedTeamId, () => {
   form.value = cloneDeep(initForm.value);
 
   setTimeout(() => {
-    socket.emit("users:connected", { userId: user.value.id, userName: user.value.name, avater: user.value.avatar }, (result: any) => {
+    socket.emit("users:connected", { userId: user.value.id, userName: user.value.name }, (result: any) => {
+      console.log('users:connected', result)
     });
   }, 1000);
 
   fetchFilterViews();
+
 
 })
 
@@ -1249,6 +1069,20 @@ class ModalKanban {
   close() {
     this.dialogVisible = false;
   }
+
+  // async beforeClose(done) { // TODO 사용성이 떨어짐 (노션도 물어보지 않습니다.)
+
+  //   const isClose = await ElMessageBox.confirm("작성중인 내용이 있습니다. 정말 닫으시겠습니까?"
+  //     , {
+  //       confirmButtonText: "닫기",
+  //       cancelButtonText: "취소",
+  //     });
+
+  //   if(isClose) {
+  //     this.dialogVisible = false;
+  //     done();
+  //   }
+
 }
 
 
@@ -1286,16 +1120,6 @@ const handleSave = async (boardId) => {
   try {
     const modalType = modalKanban.openType;
 
-    // startDate가 endDate보다 늦을 수 없습니다.
-    if (form.value.startDate > form.value.endDate) {
-      ElNotification({
-        title: "날짜 오류",
-        message: "시작일은 종료일보다 늦을 수 없습니다.",
-        type: "error",
-      });
-      return;
-    }
-
     if (modalType === 'create') {
       delete form.value._id;
       const order = filterCards.value.filter(el => el.boardId === boardId).length
@@ -1309,6 +1133,7 @@ const handleSave = async (boardId) => {
     console.error(error);
   }
 };
+
 
 const handleClickToAdd = (board) => {
   const boardTitle = board.title;
@@ -1403,10 +1228,6 @@ const onDrop = async (e, boardId) => {
 
   // 만약 커밋에 #mb-1 이런식으로 카드 번호가 붙어있으면 해당 카드의 커밋에 추가
   cardActions.addCommit(cardId, cards.value);
-
-
-  // 간트 차트 보기
-  const isGanttChart = ref(false);
 };
 
 
@@ -1544,42 +1365,8 @@ const onDrop = async (e, boardId) => {
       width: 100%;
       padding: 10px 24px;
 
-      .--right {
-        display: flex;
-
-        .right-btns__wrap {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-
-          .kanban-action-btn__item {
-            display: flex;
-          }
-        }
-
-        .color-systems-icon {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-
-          .color-systems-icon__item {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background-color: $background-transparent;
-            font-size: 14px;
-            color: $gray-600;
-            transition: all 0.2s ease-in-out;
-
-            &:hover {
-              cursor: pointer;
-              transform: scale(1.2);
-            }
-          }
-        }
+      .kanban-action-btn__item {
+        border: none;
       }
     }
 
@@ -1594,10 +1381,6 @@ const onDrop = async (e, boardId) => {
       padding: 12px 20px;
 
       .el-badge {
-        width: 100%;
-        display: flex;
-
-
         &::v-deep(sup) {
           font-size: 12px;
           color: $gray-100;
@@ -1622,8 +1405,6 @@ const onDrop = async (e, boardId) => {
             display: flex;
             flex-direction: row;
             align-items: center;
-            width: auto;
-            flex-wrap: nowrap;
             justify-content: flex-start;
           }
 
@@ -1766,18 +1547,6 @@ const onDrop = async (e, boardId) => {
     }
   }
 
-  // 표로보기
-  .kanban-container-table {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    padding: 20px;
-    overflow-y: scroll;
-  }
-
-
-  // 칸반으로 보기
   .kanban-container-boards {
     display: flex;
     flex-direction: row;
@@ -2108,6 +1877,10 @@ html.dark {
     border-top: 1px solid $dark-gray-100 !important;
   }
 
+  .--text {
+    // border: 2px dashed $dark-gray-100 !important;
+  }
+
   .add-btn:hover {
     background-color: $dark-gray-100;
   }
@@ -2157,120 +1930,6 @@ html.dark {
 .show-btn {
   &.--is-off {
     background-color: #892be257;
-  }
-}
-
-.filter__select.--date {
-  display: flex;
-  border: 0px;
-  width: 200px;
-  flex: 1 0;
-
-
-  // .el-input {
-  //   border-radius: 8px 0 0 8px;
-  // }
-
-  .el-input__wrapper {
-    border: 0px;
-    // width: 200px;
-  }
-
-  .filter__remove-btn {
-
-    // 날짜
-    &.date {
-      width: 40px;
-      position: relative;
-      padding: 0px;
-      margin: 0px;
-      display: flex;
-      align-items: center;
-      text-align: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: 700;
-      color: $gray-500;
-      border: 1px solid #4C4D4F;
-      background-color: #262727;
-      // border-left: 0px;
-      border-radius: 0 8px 8px 0;
-    }
-  }
-}
-
-//  Color Picker
-.color-picker {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: auto;
-  height: 40px;
-  font-size: 20px;
-  font-weight: 700;
-  margin-top: 10px;
-
-
-  // 컬리 픽커 팔레트 안보이게
-  .el-color-dropdown__main-wrapper {
-    display: none;
-  }
-
-  .el-color-alpha-slider {
-    display: none;
-  }
-
-  .el-color-dropdown__btns {
-    display: none;
-  }
-
-  .color-picker__item {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: $background-transparent;
-    font-size: 14px;
-    color: $gray-600;
-    transition: all 0.2s ease-in-out;
-
-
-
-    &:hover {
-      cursor: pointer;
-      transform: scale(1.2);
-    }
-  }
-}
-
-.color-picker-container {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: auto;
-  font-size: 20px;
-  font-weight: 700;
-
-  .el-color-picker__trigger {
-    padding: 0px;
-  }
-
-  .el-color-picker__color {
-    border: none;
-    border-radius: 6px;
-    overflow: hidden;
-  }
-
-  // 닫기 버튼
-  .el-color-picker__close {
-    display: none;
   }
 }
 </style>
